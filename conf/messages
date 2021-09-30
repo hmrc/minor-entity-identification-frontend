@@ -1,2 +1,4 @@
-service.name = minor-entity-identification-frontend
-service.text = This is your new service
+service.name                                                = minor-entity-identification-frontend
+
+getpagehelp.linkText                                        = Is this page not working properly?
+

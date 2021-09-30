@@ -1,0 +1,70 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcTrackingConsentSnippet, HmrcLayout}
+@import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+@import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
+@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
+
+@this(hmrcLayout: HmrcLayout,
+    hmrcHeader: HmrcHeader,
+    appConfig: AppConfig,
+    hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
+    standardBetaBanner: StandardBetaBanner)
+
+@(pageConfig: PageConfig, title: String, startUrl: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@hmrcTrackingConsentSnippet()
+
+@head = {
+    <!--[if lte IE 8]>
+    <link href=' @controllers.routes.Assets.versioned("stylesheets/application-ie-8.css")' rel="stylesheet" type="text/css" /> <![endif]-->
+    <!--[if gt IE 8]><!-->
+    <link href='@controllers.routes.Assets.versioned("stylesheets/application.css")' media="screen" rel="stylesheet" type="text/css" />
+    <!--<![endif]-->
+    <link href='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.css")' media="screen" rel="stylesheet" type="text/css" />
+}
+
+@content = {
+    <div class="govuk-!-margin-bottom-6">
+        @contentBlock
+    </div>
+
+    <div class="govuk-body">
+        <a id="get-help" lang="en" hreflang="en" class="govuk-link " target="_blank" href="@{appConfig.reportAProblemNonJSUrl(pageConfig.deskProServiceId)}">
+            @messages("getpagehelp.linkText")
+        </a>
+    </div>
+}
+
+@scripts = {
+    <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
+    <script src='@controllers.routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
+    <script>window.GOVUKFrontend.initAll();
+        window.HMRCFrontend.initAll()</script>
+}
+
+@hmrcLayout(
+    pageTitle = Some(title),
+    isWelshTranslationAvailable = false,
+    signOutUrl = Some(pageConfig.signOutUrl),
+    accessibilityStatementUrl = Some(pageConfig.accessibilityUrl),
+    additionalHeadBlock = Some(head),
+    additionalScriptsBlock = Some(scripts),
+    phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUrl(pageConfig.deskProServiceId))),
+    serviceName = Some(pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName))
+)(content)

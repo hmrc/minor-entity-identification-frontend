@@ -1,0 +1,2 @@
+GET        /create-overseas-company-journey                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateJourneyController.show
+POST       /create-overseas-company-journey                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateJourneyController.submit

@@ -25,3 +25,6 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
+
+javaOptions in Test += "-Dlogger.resource=logback-test.xml"
+javaOptions in IntegrationTest += "-Dlogger.resource=logback-test.xml"
