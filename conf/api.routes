@@ -1,0 +1,4 @@
+# microservice specific routes
+
++ nocsrf
+POST        /overseas-company-journey      uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.createJourney()

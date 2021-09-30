@@ -18,12 +18,39 @@ package uk.gov.hmrc.minorentityidentificationfrontend.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject()
-  (
-    config: Configuration
-  ) {
+class AppConfig @Inject()(config: Configuration,
+                          servicesConfig: ServicesConfig) {
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+
+  lazy val timeToLiveSeconds: Long = servicesConfig.getInt("mongodb.timeToLiveSeconds").toLong
+
+  lazy val defaultServiceName: String = servicesConfig.getString("defaultServiceName")
+
+  lazy val selfBaseUrl: String = servicesConfig.baseUrl("self")
+  lazy val selfUrl: String = servicesConfig.getString("microservice.services.self.url")
+
+  private lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
+
+  private lazy val backendUrl: String = servicesConfig.baseUrl("minor-entity-identification")
+
+  lazy val createJourneyUrl: String = s"$backendUrl/minor-entity-identification/journey"
+
+  lazy val vatRegExitSurveyOrigin: String = "vat-registration"
+  private lazy val feedbackUrl: String = servicesConfig.getString("feedback.host")
+  lazy val vatRegFeedbackUrl: String = s"$feedbackUrl/feedback/$vatRegExitSurveyOrigin"
+
+  def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier"
+
+  lazy val accessibilityStatementPath: String = servicesConfig.getString("accessibility-statement.host")
+  lazy val vatRegAccessibilityStatementUrl: String = s"$accessibilityStatementPath/accessibility-statement/vat-registration"
+
+  def reportAProblemPartialUrl(serviceIdentifier: String): String =
+    s"$contactHost/contact/problem_reports_ajax?service=$serviceIdentifier"
+
+  def reportAProblemNonJSUrl(serviceIdentifier: String): String =
+    s"$contactHost/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
 }

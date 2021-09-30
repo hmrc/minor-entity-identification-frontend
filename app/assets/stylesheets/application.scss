@@ -1,1 +1,5 @@
 @import "lib/govuk-frontend/govuk/base";
+@import "lib/hmrc-frontend/hmrc/all";
+
+$hmrc-assets-path: "/minor-entity-identification-frontend/assets/lib/hmrc-frontend/hmrc/";
+$govuk-assets-path: "/minor-entity-identification-frontend/assets/lib/govuk-frontend/govuk/assets/";
