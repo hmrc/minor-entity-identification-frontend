@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
-@import views.html.helper.CSPNonce
+package uk.gov.hmrc.minorentityidentificationfrontend.views.helpers
 
-@this(
-    appConfig: AppConfig,
-    hmrcLayout: HmrcLayout
-)
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+import play.api.data.Form
+import play.api.i18n.Messages
 
-@hmrcLayout(
-    pageTitle = pageTitle,
-    nonce = CSPNonce.get,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-)(contentBlock)
+object TitleHelper {
+  def title(titleMessage: String, form: Form[_])(implicit messages: Messages): String =
+    if (form.hasErrors) messages("error.title-prefix") + titleMessage
+    else titleMessage
+}

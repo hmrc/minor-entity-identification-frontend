@@ -1,0 +1,4 @@
+GET        /:journeyId/non-uk-company-utr   uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.show(journeyId)
+POST       /:journeyId/non-uk-company-utr   uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.submit(journeyId)
+
+GET        /                                uk.gov.hmrc.minorentityidentificationfrontend.controllers.HelloWorldController.helloWorld
