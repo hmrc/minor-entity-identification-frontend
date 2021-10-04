@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.utils
 
+import org.mongodb.scala.result.InsertOneResult
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
@@ -25,6 +26,10 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Writes}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
+
+import scala.concurrent.Future
 
 trait ComponentSpecHelper extends AnyWordSpec with Matchers
   with CustomMatchers
@@ -70,6 +75,7 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
 
   override def beforeEach(): Unit = {
     resetWiremock()
+    await(journeyConfigRepository.drop)
     super.beforeEach()
   }
 
@@ -105,4 +111,16 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
   private def buildClient(path: String): WSRequest =
     ws.url(s"http://localhost:$port$path").withFollowRedirects(false)
 
+  lazy val journeyConfigRepository: JourneyConfigRepository = app.injector.instanceOf[JourneyConfigRepository]
+
+  def insertJourneyConfig(journeyId: String,
+                          internalId: String,
+                          continueUrl: String,
+                          optServiceName: Option[String],
+                          deskProServiceId: String,
+                          signOutUrl: String,
+                          accessibilityUrl: String): Future[InsertOneResult] =
+    journeyConfigRepository.insertJourneyConfig(
+      journeyId, internalId, JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl))
+    )
 }

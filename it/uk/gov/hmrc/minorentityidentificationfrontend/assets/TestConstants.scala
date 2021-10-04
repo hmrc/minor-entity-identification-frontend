@@ -30,4 +30,6 @@ object TestConstants {
   val testAccessibilityUrl: String = "/accessibility"
   val testJourneyConfig: JourneyConfig = JourneyConfig(testContinueUrl, PageConfig(None, testDeskProServiceId, testSignOutUrl, testAccessibilityUrl))
 
+  val testUtr: String = "1234567890"
+
 }

@@ -1,4 +1,19 @@
 service.name                                                = minor-entity-identification-frontend
 
+## Base
 getpagehelp.linkText                                        = Is this page not working properly?
+base.save_and_continue                                      = Save and continue
+error.title-prefix                                          = 'Error: '
 
+## Banner
+phase.banner.before                                         = This is a new service - your
+phase.banner.link                                           = feedback
+phase.banner.after                                          = (opens in new tab) will help us to improve it.
+
+## Capture UTR page
+utr.title                                                   = What is the company‘s UK Unique Taxpayer Reference?
+utr.line_1                                                  = This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘.
+utr.no_utr_link                                             = The company does not have a UTR
+utr.error_not_entered                                       = Enter the company‘s UK Unique Taxpayer Reference
+utr.error_invalid_format                                    = Enter the UK Unique Taxpayer Reference using numbers only
+utr.error_invalid_length                                    = Enter a UK Unique Taxpayer Reference that is 10 numbers

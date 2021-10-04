@@ -16,20 +16,26 @@
 
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
-@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.inputText
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 
 @this(layout: govuk_template,
     govukFieldset: GovukFieldset,
     govukButton: GovukButton,
-    inputText: inputText,
-    formWithCSRF: FormWithCSRF
+    govukInput: GovukInput,
+    formWithCSRF: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary
 )
 
 @(pageConfig: PageConfig, form: Form[JourneyConfig], formAction: Call)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, "Enter Minor Entity Identification Journey Config") {
+
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
+    }
 
     @govukFieldset(Fieldset(
         legend = Some(Legend(
@@ -45,54 +51,39 @@
 @html = {
     @formWithCSRF(action = formAction) {
 
-        @inputText(
-            form = form,
-            id = "continueUrl",
-            name = "continueUrl",
-            label = "Continue URL",
-            isPageHeading = false,
-            hasFieldTitle = true,
-            classes = "govuk-input--width-10"
+        @govukInput(
+            Input(
+                label = Label(content=Text("Continue URL"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("continueUrl"))
         )
 
-        @inputText(
-            form = form,
-            id = "serviceName",
-            name = "serviceName",
-            label = "Service Name",
-            isPageHeading = false,
-            hasFieldTitle = true,
-            classes = "govuk-input--width-20"
+        @govukInput(
+            Input(
+                label = Label(content=Text("Service Name"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("serviceName"))
         )
 
-        @inputText(
-            form = form,
-            id = "deskProServiceId",
-            name = "deskProServiceId",
-            label = "DeskPro Service Identifier",
-            isPageHeading = false,
-            hasFieldTitle = true,
+        @govukInput(
+            Input(
+            label = Label(content=Text("DeskPro Service Identifier"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
             classes = "govuk-input--width-20"
+            ).withFormField(form("deskProServiceId"))
         )
 
-        @inputText(
-            form = form,
-            id = "signOutUrl",
-            name = "signOutUrl",
-            label = "Sign Out Url",
-            isPageHeading = false,
-            hasFieldTitle = true,
-            classes = "govuk-input--width-20"
+        @govukInput(
+            Input(
+                label = Label(content=Text("Sign Out UrlL"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("signOutUrl"))
         )
 
-        @inputText(
-            form = form,
-            id = "accessibilityUrl",
-            name = "accessibilityUrl",
-            label = "Accessibility Statement Url",
-            isPageHeading = false,
-            hasFieldTitle = true,
-            classes = "govuk-input--width-20"
+        @govukInput(
+            Input(
+                label = Label(content=Text("Accessibility Statement Url"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("accessibilityUrl"))
         )
 
         @govukButton(Button(
