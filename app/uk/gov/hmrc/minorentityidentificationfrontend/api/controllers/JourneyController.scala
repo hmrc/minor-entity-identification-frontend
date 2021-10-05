@@ -52,8 +52,9 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           journeyService.createJourney(req.body, authInternalId).map(
-            _ => Created(Json.obj(
-                "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.HelloWorldController.helloWorld().url}"
+            journeyId =>
+              Created(Json.obj(
+                "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
               ))
           )
         case _ =>

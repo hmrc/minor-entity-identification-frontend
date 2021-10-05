@@ -35,13 +35,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "signOutUrl" -> testSignOutUrl,
       "accessibilityUrl"-> testAccessibilityUrl
     )
-    "return Not Implemented" in {
+    "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
       lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
 
-      (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.HelloWorldController.helloWorld().url)
+      (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureUtrController.show(testJourneyId).url)
 
       result.status mustBe CREATED
 
