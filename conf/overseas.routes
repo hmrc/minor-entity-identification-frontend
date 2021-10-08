@@ -1,4 +1,6 @@
-GET        /:journeyId/non-uk-company-utr   uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.show(journeyId)
-POST       /:journeyId/non-uk-company-utr   uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.submit(journeyId)
+GET         /:journeyId/non-uk-company-utr               uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.show(journeyId)
+POST        /:journeyId/non-uk-company-utr               uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.submit(journeyId)
+GET         /:journeyId/no-utr                           uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.noUtr(journeyId)
 
-GET        /                                uk.gov.hmrc.minorentityidentificationfrontend.controllers.HelloWorldController.helloWorld
+GET         /:journeyId/check-your-answers-business      uk.gov.hmrc.minorentityidentificationfrontend.controllers.CheckYourAnswersController.show(journeyId)
+POST        /:journeyId/check-your-answers-business      uk.gov.hmrc.minorentityidentificationfrontend.controllers.CheckYourAnswersController.submit(journeyId)

@@ -16,18 +16,17 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.{JsObject, Reads, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReadsInstances}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.httpParsers.MinorEntityIdentificationStorageHttpParser.SoleTraderIdentificationStorageHttpReads
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{StorageResult, Utr}
+import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.{SuccessfullyRemoved, SuccessfullyStored}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class MinorEntityIdentificationConnector @Inject()(http: HttpClient,
-                                                   appConfig: AppConfig
-                                                  )(implicit ec: ExecutionContext) extends HttpReadsInstances {
+class StorageConnector @Inject()(http: HttpClient,
+                                 appConfig: AppConfig
+                                )(implicit ec: ExecutionContext) extends HttpReadsInstances {
 
   def retrieveDataField[DataType](journeyId: String,
                                   dataKey: String
@@ -36,11 +35,17 @@ class MinorEntityIdentificationConnector @Inject()(http: HttpClient,
                                    hc: HeaderCarrier): Future[Option[DataType]] =
     http.GET[Option[DataType]](s"${appConfig.minorEntityIdentificationUrl(journeyId)}/$dataKey")
 
+  def retrieveAllDataFields(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[JsObject]] =
+    http.GET[Option[JsObject]](s"${appConfig.minorEntityIdentificationUrl(journeyId)}")
+
   def storeDataField[DataType](journeyId: String,
                                dataKey: String,
                                data: DataType
                               )(implicit dataTypeWriter: Writes[DataType],
-                                hc: HeaderCarrier): Future[StorageResult] =
-    http.PUT[DataType, StorageResult](s"${appConfig.minorEntityIdentificationUrl(journeyId)}/$dataKey", data)
+                                hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    http.PUT[DataType, SuccessfullyStored.type](s"${appConfig.minorEntityIdentificationUrl(journeyId)}/$dataKey", data)
+
+  def removeDataField(journeyId: String, dataKey: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    http.DELETE[SuccessfullyRemoved.type](s"${appConfig.minorEntityIdentificationUrl(journeyId)}/$dataKey")
 
 }

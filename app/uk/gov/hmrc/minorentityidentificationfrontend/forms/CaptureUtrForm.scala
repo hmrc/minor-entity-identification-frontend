@@ -17,41 +17,41 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms.text
+import play.api.data.Forms._
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrMapping.utrMapping
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
 import scala.util.matching.Regex
 
 object CaptureUtrForm {
-  val utrErrorKey: String = "utr.error"
+  val UtrKey = "utr"
+
+  val UtrNotEnteredErrorKey = "utr.error_not_entered"
+  val UtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
+  val UtrInvalidLengthErrorKey = "utr.error_invalid_length"
+
   val utrRegex: Regex = "[0-9]{10}".r
 
-  val utrNotEntered: Constraint[String] = Constraint("utr.not_entered")(
-    utr => validate(
-      constraint = utr.isEmpty,
-      errMsg = "utr.error_not_entered"
-    )
-  )
-
-  val utrInvalidCharacters: Constraint[String] = Constraint("utr.invalid_format")(
+  val utrInvalidCharacters: Constraint[Utr] = Constraint("utr.invalid_format")(
     utr => validateNot(
-      constraint = utr matches utrRegex.regex,
-      errMsg = "utr.error_invalid_format"
+      constraint = utr.value matches utrRegex.regex,
+      errMsg = UtrInvalidCharactersErrorKey
     )
   )
 
-  val utrInvalidLength: Constraint[String] = Constraint("utr.invalid_length")(
+  val utrInvalidLength: Constraint[Utr] = Constraint("utr.invalid_length")(
     utr => validate(
-      constraint = utr.length != 10,
-      errMsg = "utr.error_invalid_length"
+      constraint = utr.value.length != 10,
+      errMsg = UtrInvalidLengthErrorKey
     )
   )
 
-  val form: Form[String] =
+  val form: Form[Utr] =
     Form(
-      "utr" -> text.verifying(utrNotEntered andThen utrInvalidLength andThen utrInvalidCharacters)
+      UtrKey -> of(utrMapping(UtrNotEnteredErrorKey)).verifying(utrInvalidLength andThen utrInvalidCharacters)
     )
 
 }

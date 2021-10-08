@@ -20,18 +20,19 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
-import uk.gov.hmrc.minorentityidentificationfrontend.services.JourneyService
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_utr_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureUtrController @Inject()(mcc: MessagesControllerComponents,
+class CaptureUtrController @Inject()(val authConnector: AuthConnector,
                                      journeyService: JourneyService,
-                                     view: capture_utr_page,
-                                     val authConnector: AuthConnector
+                                     storageService: StorageService,
+                                     mcc: MessagesControllerComponents,
+                                     view: capture_utr_page
                                     )(implicit val config: AppConfig,
                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
@@ -41,6 +42,7 @@ class CaptureUtrController @Inject()(mcc: MessagesControllerComponents,
         journeyService.getJourneyConfig(journeyId).map {
           journeyConfig =>
             Ok(view(
+              journeyId = journeyId,
               pageConfig = journeyConfig.pageConfig,
               formAction = routes.CaptureUtrController.submit(journeyId),
               form = CaptureUtrForm.form
@@ -57,14 +59,26 @@ class CaptureUtrController @Inject()(mcc: MessagesControllerComponents,
             journeyService.getJourneyConfig(journeyId).map {
               journeyConfig =>
                 BadRequest(view(
+                  journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureUtrController.submit(journeyId),
                   form = formWithErrors
                 ))
             },
-          _ =>
-            Future.successful(Redirect(routes.HelloWorldController.helloWorld()))
+          utr =>
+            storageService.storeUtr(journeyId, utr).map {
+              _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
+            }
         )
+      }
+  }
+
+  def noUtr(journeyId: String): Action[AnyContent] = Action.async {
+    implicit request =>
+      authorised() {
+        storageService.removeUtr(journeyId).map {
+          _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
+        }
       }
   }
 

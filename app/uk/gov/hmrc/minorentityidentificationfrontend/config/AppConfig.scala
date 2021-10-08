@@ -53,6 +53,6 @@ class AppConfig @Inject()(config: Configuration,
   def reportAProblemNonJSUrl(serviceIdentifier: String): String =
     s"$contactHost/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
-  def minorEntityIdentificationUrl(journeyId: String): String = s"$backendUrl/identify-your-minor-entity-business/$journeyId"
+  def minorEntityIdentificationUrl(journeyId: String): String = s"$backendUrl/minor-entity-identification/journey/$journeyId"
 
 }

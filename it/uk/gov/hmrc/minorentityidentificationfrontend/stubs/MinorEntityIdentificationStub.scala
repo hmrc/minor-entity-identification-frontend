@@ -16,25 +16,25 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
 
 trait MinorEntityIdentificationStub extends WiremockMethods {
 
-  def stubStoreUtr(journeyId: String, utr: Utr)(status: Int) =
+  def stubStoreUtr(journeyId: String, utr: Utr)(status: Int): Unit =
     when(method = PUT,
-      uri = s"/identify-your-minor-entity-business/$journeyId/utrKey",
+      uri = s"/minor-entity-identification/journey/$journeyId/utr",
       body = Json.obj(
-        "type" -> utr.utrType.toString,
+        "type" -> utr.utrType,
         "value" -> utr.value
       )
     ).thenReturn(
       status = status
     )
 
-  def stubRetrieveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()) =
-    when(method = GET, uri = s"/identify-your-minor-entity-business/$journeyId/utrKey"
+  def stubRetrieveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
+    when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/utr"
     ).thenReturn(
       status = status,
       body = body

@@ -32,7 +32,7 @@ object TestConstants {
   val testJourneyConfig: JourneyConfig = JourneyConfig(testContinueUrl, PageConfig(None, testDeskProServiceId, testSignOutUrl, testAccessibilityUrl))
 
   val testUtr: String = "1234567890"
-  val testUtrType: String = "Sautr"
+  val testUtrType: String = "sautr"
 
   val testUtrJson: JsObject = {
     Json.obj(

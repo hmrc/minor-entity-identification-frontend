@@ -22,6 +22,7 @@ object MessageLookup {
     val confirmAndContinue = "Confirm and continue"
     val saveAndContinue = "Save and continue"
     val getHelp = "Is this page not working properly?"
+    val change = "Change"
 
     object Error {
       val title = "There is a problem"
@@ -48,6 +49,13 @@ object MessageLookup {
       val error_invalid_format = "Enter the UK Unique Taxpayer Reference using numbers only"
       val error_invalid_length = "Enter a UK Unique Taxpayer Reference that is 10 numbers"
     }
+  }
+
+  object CheckYourAnswers {
+    val title = "Check your answers"
+    val heading = "Check your answers"
+    val utr = "Unique taxpayers reference number"
+    val noUtr = "The business does not have a UTR"
   }
 
 }
