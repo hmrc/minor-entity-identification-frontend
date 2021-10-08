@@ -16,12 +16,14 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLabel
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLabel, HmrcSectionCaption}
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+@import uk.gov.hmrc.minorentityidentificationfrontend.controllers.routes
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
-@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
+
 
 @this(layout: govuk_template,
         govukInput: GovukInput,
@@ -29,7 +31,7 @@
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton)
 
-@(pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
 @layout(pageConfig, title = title(messages("utr.title"), form)) {
 
@@ -47,7 +49,7 @@
         )
 
         <p class="govuk-body">
-            <a class="govuk-link" id="no-utr" href="">@messages("utr.no_utr_link")</a>
+            <a class="govuk-link" id="no-utr" href="@routes.CaptureUtrController.noUtr(journeyId)">@messages("utr.no_utr_link")</a>
         </p>
 
         @govukButton(Button(

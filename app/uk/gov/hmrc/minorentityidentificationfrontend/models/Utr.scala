@@ -16,38 +16,15 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.models
 
-import play.api.libs.json.{JsObject, JsResult, JsValue, Json, JsonValidationError, OFormat}
+sealed trait Utr {
+  val value: String
+  val utrType: String
+}
 
-sealed trait UtrType
+case class Sautr(value: String) extends Utr {
+  val utrType: String = "sautr"
+}
 
-case object Sautr extends UtrType
-
-case object Ctutr extends UtrType
-
-case class Utr(utrType: UtrType, value: String)
-
-object Utr {
-  private val ValueKey = "value"
-  private val TypeKey = "type"
-  private val CtutrKey = "Ctutr"
-  private val SautrKey = "Sautr"
-
-  implicit val format: OFormat[Utr] = new OFormat[Utr] {
-    override def reads(json: JsValue): JsResult[Utr] = {
-      for {
-        utrValue <- (json \ ValueKey).validate[String]
-        utrType <- (json \ TypeKey).validate[String].collect(JsonValidationError("Invalid UTR type")) {
-          case SautrKey => Sautr
-          case CtutrKey => Ctutr
-        }
-      } yield Utr(utrType, utrValue)
-    }
-
-    override def writes(o: Utr): JsObject =
-      Json.obj(
-        TypeKey -> o.utrType.toString,
-        ValueKey -> o.value
-      )
-  }
-
+case class Ctutr(value: String) extends Utr {
+  val utrType: String = "ctutr"
 }
