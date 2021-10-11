@@ -19,11 +19,11 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, MinorEntityIdentificationStub}
+import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersViewTests
 
-class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub with MinorEntityIdentificationStub with CheckYourAnswersViewTests {
+class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with CheckYourAnswersViewTests {
 
   override def beforeEach(): Unit = {
     await(journeyConfigRepository.drop)

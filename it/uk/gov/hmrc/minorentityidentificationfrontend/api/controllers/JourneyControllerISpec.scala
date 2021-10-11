@@ -19,12 +19,13 @@ package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
-import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub}
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
+import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
+import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
-class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with AuthStub {
+class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with AuthStub with StorageStub {
 
   lazy val repo: JourneyConfigRepository = app.injector.instanceOf[JourneyConfigRepository]
 
@@ -33,7 +34,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "continueUrl" -> testContinueUrl,
       "deskProServiceId" -> testDeskProServiceId,
       "signOutUrl" -> testSignOutUrl,
-      "accessibilityUrl"-> testAccessibilityUrl
+      "accessibilityUrl" -> testAccessibilityUrl
     )
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -62,6 +63,59 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
             "&origin=minor-entity-identification-frontend"
           )
         )
+      }
+    }
+  }
+
+  "GET /api/journey/:journeyId" should {
+    "return utr, business registration status and registration status" when {
+      "the utr exists in the database" in {
+        val testDetailsJson = Json.obj(
+          "sautr" -> "1234567890",
+          "identifiersMatch" -> false,
+          "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
+          "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes)
+        )
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+        result.status mustBe OK
+        result.json mustBe testDetailsJson
+      }
+
+      "return the business verification status and registration status" when {
+        "the utr does not exist in the database" in {
+          val testDetailsJson = Json.obj(
+            "identifiersMatch" -> false,
+            "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
+            "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes)
+          )
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+          result.json mustBe testDetailsJson
+        }
+      }
+
+      "redirect to Sign In Page" when {
+        "the user is UNAUTHORISED" in {
+          stubAuthFailure()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result must have {
+            httpStatus(SEE_OTHER)
+            redirectUri("/bas-gateway/sign-in" +
+              s"?continue_url=%2Fminor-entity-identification%2Fapi%2Fjourney%2F$testJourneyId" +
+              "&origin=minor-entity-identification-frontend")
+          }
+        }
       }
     }
   }

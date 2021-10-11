@@ -20,11 +20,11 @@ import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr}
-import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, MinorEntityIdentificationStub}
+import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CaptureUtrViewTests
 
-class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with MinorEntityIdentificationStub with CaptureUtrViewTests {
+class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with CaptureUtrViewTests {
 
   "GET /non-uk-company-utr" should {
     lazy val result = {

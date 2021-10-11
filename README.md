@@ -34,6 +34,44 @@ All other fields must be provided.
     "accessibilityUrl": "/accessibility"
 }
 ```
+### GET /minor-entity-identification/api/journey/:journeyId
+
+---
+Retrieves all the journey data that is stored against a specific journeyID.
+#### Request:
+A valid journeyId must be sent in the URI
+
+#### Response:
+Status:
+
+| Expected Response                       | Reason
+|-----------------------------------------|------------------------------
+| ```OK(200)```                           |  ```JourneyId exists```
+| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
+
+Example response bodies:
+```
+{
+    "sautr": "0000030000"
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+      }
+}
+```
+```
+{
+    "ctutr": "0000029999"
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+      }
+}
+```
 
 ### License
 

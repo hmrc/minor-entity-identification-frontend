@@ -17,24 +17,25 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
-import uk.gov.hmrc.minorentityidentificationfrontend.services.JourneyService
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class JourneyController @Inject()(controllerComponents: ControllerComponents,
+class JourneyController @Inject()(val authConnector: AuthConnector,
                                   journeyService: JourneyService,
-                                  val authConnector: AuthConnector,
+                                  storageService: StorageService,
+                                  controllerComponents: ControllerComponents,
                                   appConfig: AppConfig
                                  )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) with AuthorisedFunctions {
 
@@ -62,6 +63,12 @@ class JourneyController @Inject()(controllerComponents: ControllerComponents,
       }
   }
 
+  def retrieveJourneyData(journeyId: String): Action[AnyContent] = Action.async {
+    implicit req =>
+      authorised() {
+        storageService.retrieveAllData(journeyId).map(journeyDataJson => Ok(journeyDataJson))
+      }
+  }
 }
 
 object JourneyController {
