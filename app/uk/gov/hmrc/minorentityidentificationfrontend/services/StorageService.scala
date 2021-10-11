@@ -20,11 +20,13 @@ import play.api.libs.json._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.StorageConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.{SuccessfullyRemoved, SuccessfullyStored}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.{format => bvFormat}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService._
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class StorageService @Inject()(connector: StorageConnector) {
@@ -37,6 +39,30 @@ class StorageService @Inject()(connector: StorageConnector) {
 
   def removeUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, UtrKey)
+
+  def retrieveAllData(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+    for {
+      optUtr <- retrieveUtr(journeyId)
+      identifiersMatch = false
+      businessVerificationStatus = BusinessVerificationUnchallenged
+      registrationStatus = RegistrationNotCalled
+    }
+    yield {
+      optUtr match {
+        case Some(utr) =>
+          Json.obj(
+            utr.utrType -> utr.value,
+            "identifiersMatch" -> identifiersMatch,
+            "businessVerification" -> Json.toJson(businessVerificationStatus)(bvFormat.writes),
+            "registration" -> Json.toJson(registrationStatus)(regFormat.writes)
+          )
+        case _ => Json.obj(
+          "identifiersMatch" -> identifiersMatch,
+          "businessVerification" -> Json.toJson(businessVerificationStatus)(bvFormat.writes),
+          "registration" -> Json.toJson(registrationStatus)(regFormat.writes)
+        )
+      }
+    }
 
 }
 

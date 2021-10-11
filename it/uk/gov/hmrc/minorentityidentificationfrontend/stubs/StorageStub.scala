@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
 
-trait MinorEntityIdentificationStub extends WiremockMethods {
+trait StorageStub extends WiremockMethods {
 
   def stubStoreUtr(journeyId: String, utr: Utr)(status: Int): Unit =
     when(method = PUT,
@@ -35,6 +35,13 @@ trait MinorEntityIdentificationStub extends WiremockMethods {
 
   def stubRetrieveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
     when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/utr"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
+  def stubRemoveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
+    when(method = DELETE, uri = s"/minor-entity-identification/journey/$journeyId/utr"
     ).thenReturn(
       status = status,
       body = body

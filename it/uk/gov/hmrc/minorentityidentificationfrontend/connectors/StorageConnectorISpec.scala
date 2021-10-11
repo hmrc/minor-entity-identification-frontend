@@ -23,10 +23,10 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService.utrStorageFormat
-import uk.gov.hmrc.minorentityidentificationfrontend.stubs.MinorEntityIdentificationStub
+import uk.gov.hmrc.minorentityidentificationfrontend.stubs.StorageStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
-class StorageConnectorISpec extends ComponentSpecHelper with MinorEntityIdentificationStub {
+class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
 
   private val storageConnector = app.injector.instanceOf[StorageConnector]
 
@@ -64,6 +64,17 @@ class StorageConnectorISpec extends ComponentSpecHelper with MinorEntityIdentifi
         val result = await(storageConnector.retrieveDataField[JsObject](testJourneyId, utrKey))
 
         result mustBe None
+      }
+    }
+  }
+
+  s"removeDataField($testJourneyId, $utrKey)" should {
+    "return SuccessfullyRemoved" when {
+      "the utr successfully removed from the database" in {
+        stubRemoveUtr(testJourneyId)(NO_CONTENT)
+        val result = await(storageConnector.removeDataField(testJourneyId, utrKey))
+
+        result mustBe SuccessfullyRemoved
       }
     }
   }
