@@ -1,3 +1,6 @@
+->          /hmrc-frontend                               hmrcfrontend.Routes
+GET         /assets/*file                                controllers.Assets.versioned(path = "/public", file: Asset)
+
 GET         /:journeyId/non-uk-company-utr               uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.show(journeyId)
 POST        /:journeyId/non-uk-company-utr               uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.submit(journeyId)
 GET         /:journeyId/no-utr                           uk.gov.hmrc.minorentityidentificationfrontend.controllers.CaptureUtrController.noUtr(journeyId)
