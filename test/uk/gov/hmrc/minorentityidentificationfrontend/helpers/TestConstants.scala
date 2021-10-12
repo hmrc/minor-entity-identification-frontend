@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.helpers
 
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
-
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, JourneyConfig, PageConfig, Sautr, Utr}
 import java.util.UUID
+
+import play.api.libs.json.{JsObject, Json}
 
 object TestConstants {
 
@@ -38,4 +39,20 @@ object TestConstants {
     )
   )
 
+
+  val saUtr = "1234599999"
+  val ctUtr = "1234500000"
+
+  val testSaUtr = Sautr(saUtr)
+  val testCtUtr = Ctutr(ctUtr)
+
+  val testOverseasSAUtrAuditEventJson: JsObject = Json.obj(
+    "businessType" -> "Overseas Company",
+    "etmpPartyType" -> "55",
+    "userSAUTR" -> saUtr)
+
+  val testOverseasCTUtrAuditEventJson: JsObject = Json.obj(
+    "businessType" -> "Overseas Company",
+    "etmpPartyType" -> "55",
+    "userCTUTR" -> ctUtr)
 }
