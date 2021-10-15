@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, delete, equalTo, get, getRequestedFor, patch, post, postRequestedFor, put, stubFor, urlEqualTo, urlMatching, verify}
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 
 object WiremockHelper extends Eventually with IntegrationPatience {
@@ -85,6 +86,18 @@ object WiremockHelper extends Eventually with IntegrationPatience {
           withBody(responseBody)
       )
     )
+
+  def stubAudit(): Unit = {
+    stubPost("/write/audit", 200, "{}")
+    stubPost("/write/audit/merged", 200, "{}")
+  }
+
+  def verifyAudit(): Unit = {
+    verifyPost("/write/audit")
+    verifyPost("/write/audit/merged")
+  }
+
+
 }
 
 trait WiremockHelper {

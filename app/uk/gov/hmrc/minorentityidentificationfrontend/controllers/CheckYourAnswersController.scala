@@ -19,17 +19,18 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{CheckYourAnswersRowBuilder, JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, CheckYourAnswersRowBuilder, JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            journeyService: JourneyService,
                                            storageService: StorageService,
+                                           auditService: AuditService,
                                            rowBuilder: CheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page
@@ -54,9 +55,12 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised() {
         journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+          journeyConfig => {
+            auditService.auditJourney(journeyId)
+            Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+          }
+          }
         }
       }
-  }
 
 }
