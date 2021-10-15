@@ -16,14 +16,27 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersViewTests
 
-class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with CheckYourAnswersViewTests {
+class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with CheckYourAnswersViewTests with WiremockHelper {
+
+  def extraConfig = Map(
+    "auditing.enabled" -> "true",
+    "auditing.consumer.baseUri.host" -> mockHost,
+    "auditing.consumer.baseUri.port" -> mockPort
+  )
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure(config ++ extraConfig)
+    .build
 
   override def beforeEach(): Unit = {
     await(journeyConfigRepository.drop)
@@ -44,6 +57,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubAudit()
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -58,6 +72,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       "redirect to sign in page" when {
         "the user is UNAUTHORISED" in {
           stubAuthFailure()
+          stubAudit()
 
           lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
 
@@ -85,6 +100,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubAudit()
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -99,6 +115,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       "redirect to sign in page" when {
         "the user is UNAUTHORISED" in {
           stubAuthFailure()
+          stubAudit()
 
           lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
 
@@ -117,7 +134,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
 
   "POST /check-your-answers-business" should {
     "redirect to the provided continueUrl" in {
-        await(insertJourneyConfig(
+      await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
           continueUrl = testContinueUrl,
@@ -125,15 +142,18 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
           deskProServiceId = testDeskProServiceId,
           signOutUrl = testSignOutUrl,
           accessibilityUrl = testAccessibilityUrl
-        ))
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      ))
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubRetrieveUtr(testJourneyId)(OK,testUtrJson)
+      stubAudit()
 
-        val result = post(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")()
+      val result = post(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")()
 
         result must have {
           httpStatus(SEE_OTHER)
           redirectUri(testContinueUrl)
         }
+        verifyAudit()
     }
   }
 

@@ -32,16 +32,21 @@ class AuditService @Inject()(auditConnector: AuditConnector, storageService: Sto
       optUtr <- storageService.retrieveUtr(journeyId)
     } yield Some(optUtr) match {
 
+        //TODO Hardcoding the match field for now.  Will be updated in a later story.
       case Some(optUtr) => {
         val optUtrBlock = optUtr match {
-          case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value)
-          case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value)
+          case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value, "cTUTRMatch" -> false)
+          case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "sautrMatch" -> false)
           case None => Json.obj()
         }
 
+//TODO Hardcoding the Verification and RegisterAPI status for now.  Will be updated in a future story
+
         Json.obj(
           "businessType" -> "Overseas Company",
-          "etmpPartyType" -> "55"
+          "etmpPartyType" -> "55",
+          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+          "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
         ) ++ optUtrBlock
       }
       case _ =>

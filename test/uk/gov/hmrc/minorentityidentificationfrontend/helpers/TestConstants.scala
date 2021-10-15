@@ -49,10 +49,16 @@ object TestConstants {
   val testOverseasSAUtrAuditEventJson: JsObject = Json.obj(
     "businessType" -> "Overseas Company",
     "etmpPartyType" -> "55",
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "sautrMatch" -> false,
     "userSAUTR" -> saUtr)
 
   val testOverseasCTUtrAuditEventJson: JsObject = Json.obj(
     "businessType" -> "Overseas Company",
     "etmpPartyType" -> "55",
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "cTUTRMatch" -> false,
     "userCTUTR" -> ctUtr)
 }
