@@ -17,9 +17,10 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.helpers
 
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, JourneyConfig, PageConfig, Sautr, Utr}
-import java.util.UUID
 
+import java.util.UUID
 import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 
 object TestConstants {
 
@@ -29,14 +30,15 @@ object TestConstants {
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
 
-  val testJourneyConfig: JourneyConfig = JourneyConfig(
+  val testOverseasCompanyJourneyConfig: JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
     pageConfig = PageConfig(
       optServiceName = None,
       deskProServiceId = "vrs",
       signOutUrl = testSignOutUrl,
       accessibilityUrl = testAccessibilityUrl
-    )
+    ),
+    OverseasCompany
   )
 
 

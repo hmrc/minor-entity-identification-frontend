@@ -1,6 +1,6 @@
 # microservice specific routes
 
 + nocsrf
-POST        /overseas-company-journey                       uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.createJourney()
+POST        /overseas-company-journey                       uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.createOverseasCompanyJourney()
 
 GET        /journey/:journeyId                              uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.retrieveJourneyData(journeyId: String)

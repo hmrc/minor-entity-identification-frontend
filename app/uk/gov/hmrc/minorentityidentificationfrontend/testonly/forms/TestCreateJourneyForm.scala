@@ -21,6 +21,7 @@ import play.api.data.Forms.{mapping, text}
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.MappingUtil.optText
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.validate
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 
 object TestCreateJourneyForm {
@@ -67,7 +68,7 @@ object TestCreateJourneyForm {
       signOutUrl -> text.verifying(signOutUrlEmpty),
       accessibilityUrl -> text.verifying(accessibilityUrlEmpty)
     )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl) =>
-      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, accessibilityUrl))
+      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, accessibilityUrl), OverseasCompany)
     )(journeyConfig =>
       Some(journeyConfig.continueUrl, journeyConfig.pageConfig.optServiceName,
         journeyConfig.pageConfig.deskProServiceId, journeyConfig.pageConfig.signOutUrl, journeyConfig.pageConfig.accessibilityUrl)

@@ -17,13 +17,15 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, CheckYourAnswersRowBuilder, JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -38,29 +40,35 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        for {
-          journeyConfig <- journeyService.getJourneyConfig(journeyId)
-          utr <- storageService.retrieveUtr(journeyId)
-          summaryRows = rowBuilder.buildSummaryListRows(journeyId, utr)
-        } yield Ok(view(
-          pageConfig = journeyConfig.pageConfig,
-          formAction = routes.CheckYourAnswersController.submit(journeyId),
-          summaryRows = summaryRows
-        ))
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          for {
+            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+            utr <- storageService.retrieveUtr(journeyId)
+            summaryRows = rowBuilder.buildSummaryListRows(journeyId, utr)
+          } yield Ok(view(
+            pageConfig = journeyConfig.pageConfig,
+            formAction = routes.CheckYourAnswersController.submit(journeyId),
+            summaryRows = summaryRows
+          ))
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig => {
-            auditService.auditJourney(journeyId)
-            Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          journeyService.getJourneyConfig(journeyId, authInternalId).map {
+            journeyConfig => {
+              auditService.auditJourney(journeyId)
+              Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+            }
           }
-          }
-        }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
+  }
 
 }

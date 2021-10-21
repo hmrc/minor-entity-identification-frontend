@@ -26,6 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Writes}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 
@@ -119,8 +120,9 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
                           optServiceName: Option[String],
                           deskProServiceId: String,
                           signOutUrl: String,
-                          accessibilityUrl: String): Future[InsertOneResult] =
+                          accessibilityUrl: String,
+                          businessEntity: BusinessEntity): Future[InsertOneResult] =
     journeyConfigRepository.insertJourneyConfig(
-      journeyId, internalId, JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl))
+      journeyId, internalId, JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity)
     )
 }
