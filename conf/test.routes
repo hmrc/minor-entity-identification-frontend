@@ -1,5 +1,5 @@
-GET        /create-overseas-company-journey                                                         uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateJourneyController.show
-POST       /create-overseas-company-journey                                                         uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateJourneyController.submit
+GET        /create-overseas-company-journey                                                         uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateOverseasCompanyJourneyController.show
+POST       /create-overseas-company-journey                                                         uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateOverseasCompanyJourneyController.submit
 
-GET        /retrieve-journey/:journeyId                                                             uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveSoleTraderDetails(journeyId)
-GET        /retrieve-journey                                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveSoleTraderDetails(journeyId)
+GET        /retrieve-journey/:journeyId                                                             uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+GET        /retrieve-journey                                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)

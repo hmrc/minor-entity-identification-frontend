@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.forms.TestCreateJourneyForm
@@ -29,12 +30,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestCreateJourneyController @Inject()(messagesControllerComponents: MessagesControllerComponents,
-                                            testCreateJourneyConnector: TestCreateJourneyConnector,
-                                            view: test_create_journey,
-                                            val authConnector: AuthConnector
-                                           )(implicit ec: ExecutionContext,
-                                             appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
+class TestCreateOverseasCompanyJourneyController @Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                                           testCreateJourneyConnector: TestCreateJourneyConnector,
+                                                           view: test_create_journey,
+                                                           val authConnector: AuthConnector
+                                                          )(implicit ec: ExecutionContext,
+                                                            appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
 
 
   private val defaultPageConfig = PageConfig(
@@ -46,14 +47,15 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
 
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-overseas-business/test-only/retrieve-journey",
-    pageConfig = defaultPageConfig
+    pageConfig = defaultPageConfig,
+    businessEntity = OverseasCompany
   )
 
   val show: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form().fill(defaultJourneyConfig), routes.TestCreateJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.form().fill(defaultJourneyConfig), routes.TestCreateOverseasCompanyJourneyController.submit()))
         )
       }
   }
@@ -64,10 +66,10 @@ class TestCreateJourneyController @Inject()(messagesControllerComponents: Messag
         TestCreateJourneyForm.form().bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateJourneyController.submit()))
+              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateOverseasCompanyJourneyController.submit()))
             ),
           journeyConfig =>
-            testCreateJourneyConnector.createJourney(journeyConfig).map {
+            testCreateJourneyConnector.createOverseasCompanyJourney(journeyConfig).map {
               journeyUrl => SeeOther(journeyUrl)
             }
         )

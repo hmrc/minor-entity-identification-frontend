@@ -30,7 +30,7 @@ class TestRetrieveJourneyDataController @Inject()(messagesControllerComponents: 
                                                   val authConnector: AuthConnector
                                                  )(implicit ec: ExecutionContext) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
 
-  def retrieveSoleTraderDetails(journeyId: String): Action[AnyContent] = Action.async {
+  def retrieveDetails(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         storageService.retrieveAllData(journeyId).map(journeyDataJson => Ok(journeyDataJson))

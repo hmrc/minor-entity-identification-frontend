@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.models
 
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
+object BusinessEntity {
 
-case class JourneyConfig(continueUrl: String, pageConfig: PageConfig, businessEntity: BusinessEntity)
+  sealed trait BusinessEntity
 
+  case object OverseasCompany extends BusinessEntity
+
+}

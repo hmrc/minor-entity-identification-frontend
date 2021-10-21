@@ -30,14 +30,15 @@ trait MockJourneyConfigRepository extends IdiomaticMockito with ResetMocksAfterE
                                 internalId: String,
                                 journeyConfig: JourneyConfig): Unit =
     mockJourneyConfigRepository.insertJourneyConfig(
-      eqTo(journeyId),
-      eqTo(internalId),
-      eqTo(journeyConfig)
+      journeyId,
+      internalId,
+      journeyConfig
     ) was called
 
-  def verifyGetJourneyConfig(journeyId: String): Unit =
+  def verifyGetJourneyConfig(journeyId: String, internalId: String): Unit =
     mockJourneyConfigRepository.getJourneyConfig(
-      eqTo(journeyId)
+      journeyId,
+      internalId
     ) was called
 
 }

@@ -36,12 +36,9 @@ class JourneyService @Inject()(createJourneyConnector: CreateJourneyConnector,
       _ <- journeyConfigRepository.insertJourneyConfig(journeyId, authInternalId, journeyConfig)
     } yield journeyId
 
-  def getJourneyConfig(journeyId: String): Future[JourneyConfig] =
-    journeyConfigRepository.getJourneyConfig(journeyId).map {
-      case Some(journeyConfig) =>
-        journeyConfig.as[JourneyConfig]
-      case None =>
-        throw new InternalServerException(s"Journey config was not found for journey ID $journeyId")
-    }
+  def getJourneyConfig(journeyId: String, authInternalId: String): Future[JourneyConfig] =
+    journeyConfigRepository.getJourneyConfig(journeyId, authInternalId)
+      .map(_.getOrElse(throw new InternalServerException(s"Journey config was not found for journey ID $journeyId")))
+
 
 }

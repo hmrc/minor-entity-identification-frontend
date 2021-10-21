@@ -19,12 +19,13 @@ package uk.gov.hmrc.minorentityidentificationfrontend.repositories
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import org.mongodb.scala.result.InsertOneResult
-import play.api.libs.json.{Format, JsObject, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository.{AuthInternalIdKey, CreationTimestampKey, JourneyIdKey, timeToLiveIndex}
+import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository._
 import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -38,7 +39,8 @@ class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
   collectionName = "minor-entity-identification-frontend",
   mongoComponent = mongoComponent,
   domainFormat = implicitly[Format[JsObject]],
-  indexes = Seq(timeToLiveIndex(appConfig.timeToLiveSeconds))
+  indexes = Seq(timeToLiveIndex(appConfig.timeToLiveSeconds)),
+  extraCodecs = Seq(Codecs.playFormatCodec(journeyConfigFormat))
 ) {
 
   def insertJourneyConfig(journeyId: String, authInternalId: String, journeyConfig: JourneyConfig): Future[InsertOneResult] = {
@@ -51,9 +53,9 @@ class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
     collection.insertOne(document).toFuture()
   }
 
-  def getJourneyConfig(journeyId: String): Future[Option[JsObject]] =
-    collection.find(
-      Filters.equal(JourneyIdKey, journeyId)
+  def getJourneyConfig(journeyId: String, authInternalId: String): Future[Option[JourneyConfig]] =
+    collection.find[JourneyConfig](
+      Filters.and(Filters.equal(JourneyIdKey, journeyId), Filters.equal(AuthInternalIdKey, authInternalId))
     ).headOption
 
   def drop: Future[Unit] = collection.drop().toFuture.map(_ => Unit)
@@ -72,5 +74,19 @@ object JourneyConfigRepository {
       .name("MinorEntityIdentificationFrontendExpires")
       .expireAfter(timeToLiveDuration, TimeUnit.SECONDS)
   )
-}
 
+  val OverseasCompanyKey = "OverseasCompany"
+
+  implicit val businessEntityMongoFormat: Format[BusinessEntity] = new Format[BusinessEntity] {
+    override def reads(json: JsValue): JsResult[BusinessEntity] = json.validate[String].collect(JsonValidationError("Invalid entity type")) {
+      case OverseasCompanyKey => OverseasCompany
+    }
+
+    override def writes(partnershipType: BusinessEntity): JsValue = partnershipType match {
+      case OverseasCompany => JsString(OverseasCompanyKey)
+    }
+  }
+
+  implicit val journeyConfigFormat: OFormat[JourneyConfig] = Json.format[JourneyConfig]
+
+}

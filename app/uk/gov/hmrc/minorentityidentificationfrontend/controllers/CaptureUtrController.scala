@@ -17,7 +17,9 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
@@ -38,38 +40,44 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        journeyService.getJourneyConfig(journeyId).map {
-          journeyConfig =>
-            Ok(view(
-              journeyId = journeyId,
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CaptureUtrController.submit(journeyId),
-              form = CaptureUtrForm.form
-            ))
-        }
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          journeyService.getJourneyConfig(journeyId, authInternalId).map {
+            journeyConfig =>
+              Ok(view(
+                journeyId = journeyId,
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CaptureUtrController.submit(journeyId),
+                form = CaptureUtrForm.form
+              ))
+          }
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        CaptureUtrForm.form.bindFromRequest().fold(
-          formWithErrors =>
-            journeyService.getJourneyConfig(journeyId).map {
-              journeyConfig =>
-                BadRequest(view(
-                  journeyId = journeyId,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureUtrController.submit(journeyId),
-                  form = formWithErrors
-                ))
-            },
-          utr =>
-            storageService.storeUtr(journeyId, utr).map {
-              _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
-            }
-        )
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          CaptureUtrForm.form.bindFromRequest().fold(
+            formWithErrors =>
+              journeyService.getJourneyConfig(journeyId, authInternalId).map {
+                journeyConfig =>
+                  BadRequest(view(
+                    journeyId = journeyId,
+                    pageConfig = journeyConfig.pageConfig,
+                    formAction = routes.CaptureUtrController.submit(journeyId),
+                    form = formWithErrors
+                  ))
+              },
+            utr =>
+              storageService.storeUtr(journeyId, utr).map {
+                _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
+              }
+          )
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 

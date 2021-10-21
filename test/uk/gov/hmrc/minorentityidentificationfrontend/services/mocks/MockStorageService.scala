@@ -17,9 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.when
 import org.mockito.scalatest.MockitoSugar
-import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr

@@ -21,6 +21,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersViewT
 
 class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with CheckYourAnswersViewTests with WiremockHelper {
 
-  def extraConfig = Map(
+  def extraConfig: Map[String, String] = Map(
     "auditing.enabled" -> "true",
     "auditing.consumer.baseUri.host" -> mockHost,
     "auditing.consumer.baseUri.port" -> mockPort
@@ -53,7 +54,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
           optServiceName = None,
           deskProServiceId = testDeskProServiceId,
           signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl
+          accessibilityUrl = testAccessibilityUrl,
+          OverseasCompany
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
@@ -96,7 +98,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
           optServiceName = None,
           deskProServiceId = testDeskProServiceId,
           signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl
+          accessibilityUrl = testAccessibilityUrl,
+          OverseasCompany
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
@@ -135,25 +138,26 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
   "POST /check-your-answers-business" should {
     "redirect to the provided continueUrl" in {
       await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl
+        journeyId = testJourneyId,
+        internalId = testInternalId,
+        continueUrl = testContinueUrl,
+        optServiceName = None,
+        deskProServiceId = testDeskProServiceId,
+        signOutUrl = testSignOutUrl,
+        accessibilityUrl = testAccessibilityUrl,
+        OverseasCompany
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(OK,testUtrJson)
+      stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
       stubAudit()
 
       val result = post(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")()
 
-        result must have {
-          httpStatus(SEE_OTHER)
-          redirectUri(testContinueUrl)
-        }
-        verifyAudit()
+      result must have {
+        httpStatus(SEE_OTHER)
+        redirectUri(testContinueUrl)
+      }
+      verifyAudit()
     }
   }
 

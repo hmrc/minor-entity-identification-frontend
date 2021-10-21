@@ -24,6 +24,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -39,7 +40,9 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                                   appConfig: AppConfig
                                  )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) with AuthorisedFunctions {
 
-  def createJourney(): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
+  def createOverseasCompanyJourney(): Action[JourneyConfig] = createJourney(OverseasCompany)
+
+  private def createJourney(businessEntity: BusinessEntity): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
     json =>
       for {
         continueUrl <- (json \ continueUrlKey).validate[String]
@@ -47,7 +50,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
         deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
         signOutUrl <- (json \ signOutUrlKey).validate[String]
         accessibilityUrl <- (json \ accessibilityUrlKey).validate[String]
-      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl))
+      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity)
   }) {
     implicit req =>
       authorised().retrieve(internalId) {
@@ -58,7 +61,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                 "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
               ))
           )
-        case _ =>
+        case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
