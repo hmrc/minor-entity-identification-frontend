@@ -73,6 +73,53 @@ Example response bodies:
 }
 ```
 
+### POST /minor-entity-identification/api/trusts-journey
+
+---
+Creates a new journey for a Trusts Company, storing the journeyConfig against the journeyId.
+#### Request:
+
+optServiceName will default to `Entity Validation Service` if the field is not provided.
+
+All other fields must be provided.
+
+```
+{
+    "continueUrl" : "/test",
+    "optServiceName" : "Service Name",
+    "deskProServiceId" : "abc",
+    "signOutUrl" : "/sign-out",
+    "accessibilityUrl": "/accessibility"
+}
+```
+### GET /minor-entity-identification/api/journey/:journeyId
+
+---
+Retrieves all the journey data that is stored against a specific journeyID.
+#### Request:
+A valid journeyId must be sent in the URI
+
+#### Response:
+Status:
+
+| Expected Response                       | Reason
+|-----------------------------------------|------------------------------
+| ```OK(200)```                           |  ```JourneyId exists```
+| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
+
+Example response bodies:
+```
+{
+    "identifiersMatch":false
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+      }
+}
+```
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").

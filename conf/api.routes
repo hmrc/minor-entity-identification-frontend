@@ -3,4 +3,7 @@
 + nocsrf
 POST        /overseas-company-journey                       uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.createOverseasCompanyJourney()
 
++ nocsrf
+POST        /trusts-journey                                 uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.createTrustsJourney()
+
 GET        /journey/:journeyId                              uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.retrieveJourneyData(journeyId: String)

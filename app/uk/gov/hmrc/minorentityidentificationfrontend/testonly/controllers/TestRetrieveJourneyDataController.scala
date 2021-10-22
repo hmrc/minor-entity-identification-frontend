@@ -17,7 +17,9 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -32,8 +34,9 @@ class TestRetrieveJourneyDataController @Inject()(messagesControllerComponents: 
 
   def retrieveDetails(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        storageService.retrieveAllData(journeyId).map(journeyDataJson => Ok(journeyDataJson))
+      authorised().retrieve(internalId) {
+        case Some(_) => storageService.retrieveAllData(journeyId).map(journeyDataJson => Ok(journeyDataJson))
+        case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 

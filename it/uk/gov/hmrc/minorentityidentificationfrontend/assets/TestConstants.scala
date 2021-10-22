@@ -17,7 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 
 import java.util.UUID
@@ -40,6 +40,18 @@ object TestConstants {
         testAccessibilityUrl
       ),
       OverseasCompany
+    )
+
+  val testTrustsJourneyConfig: JourneyConfig =
+    JourneyConfig(
+      testContinueUrl,
+      PageConfig(
+        None,
+        testDeskProServiceId,
+        testSignOutUrl,
+        testAccessibilityUrl
+      ),
+      Trusts
     )
 
   val testUtr: String = "1234567890"
