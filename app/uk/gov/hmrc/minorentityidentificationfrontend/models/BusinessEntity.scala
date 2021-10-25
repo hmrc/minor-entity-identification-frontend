@@ -21,5 +21,6 @@ object BusinessEntity {
   sealed trait BusinessEntity
 
   case object OverseasCompany extends BusinessEntity
+  case object Trusts extends BusinessEntity
 
 }

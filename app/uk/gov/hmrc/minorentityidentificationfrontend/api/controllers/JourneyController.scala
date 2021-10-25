@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany, Trusts}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -41,6 +41,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                                  )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) with AuthorisedFunctions {
 
   def createOverseasCompanyJourney(): Action[JourneyConfig] = createJourney(OverseasCompany)
+  def createTrustsJourney(): Action[JourneyConfig] = createJourney(Trusts)
 
   private def createJourney(businessEntity: BusinessEntity): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
     json =>
@@ -57,9 +58,14 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
         case Some(authInternalId) =>
           journeyService.createJourney(req.body, authInternalId).map(
             journeyId =>
-              Created(Json.obj(
-                "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
-              ))
+              businessEntity match{
+                case OverseasCompany => Created(Json.obj(
+                  "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
+                ))
+                case Trusts => Created(Json.obj(
+                    "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
+                ))
+              }
           )
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")

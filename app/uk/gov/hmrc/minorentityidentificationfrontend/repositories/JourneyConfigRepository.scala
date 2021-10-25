@@ -21,7 +21,7 @@ import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import org.mongodb.scala.result.InsertOneResult
 import play.api.libs.json._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany, Trusts}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository._
 import uk.gov.hmrc.mongo.MongoComponent
@@ -76,14 +76,17 @@ object JourneyConfigRepository {
   )
 
   val OverseasCompanyKey = "OverseasCompany"
+  val TrustsKey = "Trusts"
 
   implicit val businessEntityMongoFormat: Format[BusinessEntity] = new Format[BusinessEntity] {
     override def reads(json: JsValue): JsResult[BusinessEntity] = json.validate[String].collect(JsonValidationError("Invalid entity type")) {
       case OverseasCompanyKey => OverseasCompany
+      case TrustsKey => Trusts
     }
 
     override def writes(partnershipType: BusinessEntity): JsValue = partnershipType match {
       case OverseasCompany => JsString(OverseasCompanyKey)
+      case Trusts => JsString(TrustsKey)
     }
   }
 

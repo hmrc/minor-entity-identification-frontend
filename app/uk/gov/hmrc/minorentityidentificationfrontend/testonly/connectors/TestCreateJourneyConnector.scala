@@ -42,6 +42,14 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
     }
   }
 
+  def createTrustsJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] = {
+    val url = appConfig.selfBaseUrl + apiRoutes.JourneyController.createTrustsJourney().url
+
+    httpClient.POST(url, journeyConfig).map {
+      case response@HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
+    }
+  }
+
 }
 
 object TestCreateJourneyConnector {
