@@ -46,7 +46,7 @@ class TestCreateOverseasCompanyJourneyController @Inject()(messagesControllerCom
   )
 
   private val defaultJourneyConfig = JourneyConfig(
-    continueUrl = s"${appConfig.selfUrl}/minor-entity-identification/test-only/retrieve-journey",
+    continueUrl = s"${appConfig.selfUrl}/identify-your-overseas-business/test-only/retrieve-journey",
     pageConfig = defaultPageConfig,
     businessEntity = OverseasCompany
   )
