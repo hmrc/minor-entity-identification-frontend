@@ -4,5 +4,8 @@ POST       /identify-your-overseas-business/test-only/create-overseas-company-jo
 GET        /identify-your-trust/test-only/create-trusts-journey                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateTrustsJourneyController.show
 POST       /identify-your-trust/test-only/create-trusts-journey                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateTrustsJourneyController.submit
 
-GET        /minor-entity-identification/test-only/retrieve-journey/:journeyId                                                      uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
-GET        /minor-entity-identification/test-only/retrieve-journey                                                                 uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+GET        /identify-your-overseas-business/test-only/retrieve-journey/:journeyId                                                             uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+GET        /identify-your-overseas-business/test-only/retrieve-journey                                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+
+GET        /identify-your-trust/test-only/retrieve-journey/:journeyId                                                             uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+GET        /identify-your-trust/test-only/retrieve-journey                                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)

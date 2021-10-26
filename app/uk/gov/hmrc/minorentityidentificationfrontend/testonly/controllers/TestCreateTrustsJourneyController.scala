@@ -34,8 +34,8 @@ class TestCreateTrustsJourneyController @Inject()(messagesControllerComponents: 
                                                   testCreateJourneyConnector: TestCreateJourneyConnector,
                                                   view: test_create_journey,
                                                   val authConnector: AuthConnector
-                                                          )(implicit ec: ExecutionContext,
-                                                            appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
+                                                 )(implicit ec: ExecutionContext,
+                                                   appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
 
 
   private val defaultPageConfig = PageConfig(
@@ -46,7 +46,7 @@ class TestCreateTrustsJourneyController @Inject()(messagesControllerComponents: 
   )
 
   private val defaultJourneyConfig = JourneyConfig(
-    continueUrl = s"${appConfig.selfUrl}/minor-entity-identification/test-only/retrieve-journey",
+    continueUrl = s"${appConfig.selfUrl}/identify-your-trust/test-only/retrieve-journey",
     pageConfig = defaultPageConfig,
     Trusts
   )

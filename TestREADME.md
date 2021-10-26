@@ -67,9 +67,16 @@ This is a test entry point which simulates a service by triggering the initial P
    - Shown in the HMRC footer
    - This is currently autofilled but can be changed
 
+### Retrieve journey Data
 
-### GET /minor-entity-identification/test-only/retrieve-journey/:journeyId or /minor-entity-identification/test-only/retrieve-journey
+---
+#### Retrieve journey data from an Overseas Company journey:
+- GET /identify-your-overseas-business/test-only/retrieve-journey/:journeyId or 
+- GET /identify-your-overseas-business/test-only/retrieve-journey
 
+#### Retrieve journey data from a Trust journey:
+- GET /identify-your-trust/test-only/retrieve-journey/:journeyId or
+- GET /identify-your-trust/test-only/retrieve-journey
 ---
 Retrieves all the journey data that is stored against a specific journeyID.
 
