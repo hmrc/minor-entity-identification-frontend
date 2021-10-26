@@ -34,49 +34,11 @@ All other fields must be provided.
     "accessibilityUrl": "/accessibility"
 }
 ```
-### GET /minor-entity-identification/api/journey/:journeyId
-
----
-Retrieves all the journey data that is stored against a specific journeyID.
-#### Request:
-A valid journeyId must be sent in the URI
-
-#### Response:
-Status:
-
-| Expected Response                       | Reason
-|-----------------------------------------|------------------------------
-| ```OK(200)```                           |  ```JourneyId exists```
-| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
-
-Example response bodies:
-```
-{
-    "sautr": "0000030000"
-    "businessVerification": {
-      "verificationStatus":"UNCHALLENGED"
-    },
-    "registration": {
-        "registrationStatus":"REGISTRATION_NOT_CALLED",
-      }
-}
-```
-```
-{
-    "ctutr": "0000029999"
-    "businessVerification": {
-      "verificationStatus":"UNCHALLENGED"
-    },
-    "registration": {
-        "registrationStatus":"REGISTRATION_NOT_CALLED",
-      }
-}
-```
 
 ### POST /minor-entity-identification/api/trusts-journey
 
 ---
-Creates a new journey for a Trusts Company, storing the journeyConfig against the journeyId.
+Creates a new journey for a Trust, storing the journeyConfig against the journeyId.
 #### Request:
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
@@ -108,15 +70,31 @@ Status:
 | ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
 
 Example response bodies:
+
+---
+Overseas Company:
 ```
 {
-    "identifiersMatch":false
+    "sautr": "0000030000",
+    "identifiersMatch": false,
     "businessVerification": {
       "verificationStatus":"UNCHALLENGED"
     },
     "registration": {
         "registrationStatus":"REGISTRATION_NOT_CALLED",
-      }
+    }
+}
+```
+Trust:
+```
+{
+    "identifiersMatch": false,
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+    }
 }
 ```
 
