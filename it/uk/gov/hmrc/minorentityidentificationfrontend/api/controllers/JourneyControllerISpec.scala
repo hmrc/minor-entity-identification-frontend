@@ -168,4 +168,53 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       }
     }
   }
+
+  "POST /api/unincorporated-association-journey" should {
+    val testJourneyConfigJson: JsObject = Json.obj(
+      "continueUrl" -> testContinueUrl,
+      "deskProServiceId" -> testDeskProServiceId,
+      "signOutUrl" -> testSignOutUrl,
+      "accessibilityUrl" -> testAccessibilityUrl
+    )
+    "return a created journey" in {
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+      lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
+
+      (result.json \ "journeyStartUrl").as[String] must include(testContinueUrl + s"?journeyId=$testJourneyId")
+
+      result.status mustBe CREATED
+
+      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig)
+
+    }
+
+    "redirect to Sign In page" when {
+      "the user is UNAUTHORISED" in {
+        stubAuthFailure()
+
+        lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
+
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri("/bas-gateway/sign-in" +
+            "?continue_url=%2Fminor-entity-identification%2Fapi%2Funincorporated-association-journey" +
+            "&origin=minor-entity-identification-frontend"
+          )
+        )
+      }
+    }
+
+    "throw an Internal Server Exception" when {
+      "the user does not have an internal ID" in {
+        stubAuth(OK, successfulAuthResponse(None))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+        lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
+
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+  }
 }
