@@ -26,7 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, JourneyService, StorageService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
@@ -37,7 +37,8 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                                   journeyService: JourneyService,
                                   storageService: StorageService,
                                   controllerComponents: ControllerComponents,
-                                  appConfig: AppConfig
+                                  appConfig: AppConfig,
+                                  auditService: AuditService
                                  )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) with AuthorisedFunctions {
 
   def createOverseasCompanyJourney(): Action[JourneyConfig] = createJourney(OverseasCompany)
@@ -66,9 +67,12 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                 case Trusts => Created(Json.obj(
                     "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
                 ))
-                case UnincorporatedAssociation => Created(Json.obj(
-                  "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
-                ))
+                case UnincorporatedAssociation => {
+                  auditService.auditJourney(journeyId, authInternalId)
+                  Created(Json.obj(
+                    "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
+                  ))
+                }
               }
           )
         case None =>
