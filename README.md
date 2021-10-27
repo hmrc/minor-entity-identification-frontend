@@ -54,6 +54,27 @@ All other fields must be provided.
     "accessibilityUrl": "/accessibility"
 }
 ```
+
+### POST /minor-entity-identification/api/unincorporated-association-journey
+
+---
+Creates a new journey for an Unincorporated Association, storing the journeyConfig against the journeyId.
+#### Request:
+
+optServiceName will default to `Entity Validation Service` if the field is not provided.
+
+All other fields must be provided.
+
+```
+{
+    "continueUrl" : "/test",
+    "optServiceName" : "Service Name",
+    "deskProServiceId" : "abc",
+    "signOutUrl" : "/sign-out",
+    "accessibilityUrl": "/accessibility"
+}
+```
+
 ### GET /minor-entity-identification/api/journey/:journeyId
 
 ---
@@ -86,6 +107,19 @@ Overseas Company:
 }
 ```
 Trust:
+```
+{
+    "identifiersMatch": false,
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+    }
+}
+```
+
+Unincorporated Association:
 ```
 {
     "identifiersMatch": false,

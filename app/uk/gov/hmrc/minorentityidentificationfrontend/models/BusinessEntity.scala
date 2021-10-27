@@ -22,5 +22,6 @@ object BusinessEntity {
 
   case object OverseasCompany extends BusinessEntity
   case object Trusts extends BusinessEntity
+  case object UnincorporatedAssociation extends BusinessEntity
 
 }

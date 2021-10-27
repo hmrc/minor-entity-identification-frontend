@@ -67,6 +67,35 @@ This is a test entry point which simulates a service by triggering the initial P
    - Shown in the HMRC footer
    - This is currently autofilled but can be changed
 
+### GET /identify-your-trust/test-only/create-unincorporated-association-journey
+
+---
+This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an Unincorporated Association.
+
+1. Continue URL (Required)
+
+   - Where to redirect the user after the journey has been completed
+
+2. Service Name (Optional)
+
+   - Service Name to use throughout the service
+   - Currently, this is empty by default, so the default service name will be used
+
+3. DeskPro Service ID (Required)
+
+   - Used for the `Get help with this page` link
+   - This is currently autofilled but can be changed
+
+4. Sign Out Link (Required)
+
+   - Shown in the HMRC header - typically a link to a feedback questionnaire
+   - This is currently autofilled but can be changed
+
+4. Accessibility Statement Link (Required)
+
+   - Shown in the HMRC footer
+   - This is currently autofilled but can be changed
+
 ### Retrieve journey Data
 
 ---
@@ -77,6 +106,10 @@ This is a test entry point which simulates a service by triggering the initial P
 #### Retrieve journey data from a Trust journey:
 - GET /identify-your-trust/test-only/retrieve-journey/:journeyId or
 - GET /identify-your-trust/test-only/retrieve-journey
+
+#### Retrieve journey data from an Unincorporated Association journey:
+- GET /identify-your-unincorporated-association/test-only/retrieve-journey/:journeyId or
+- GET /identify-your-unincorporated-association/test-only/retrieve-journey
 ---
 Retrieves all the journey data that is stored against a specific journeyID.
 
@@ -110,6 +143,18 @@ Overseas Company:
 }
 ```
 Trust:
+```
+{
+    "identifiersMatch": "false",
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+    }
+}
+```
+Unincorporated Association:
 ```
 {
     "identifiersMatch": "false",

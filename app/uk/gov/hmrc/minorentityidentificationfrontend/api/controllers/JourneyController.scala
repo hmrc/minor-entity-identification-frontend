@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany, Trusts}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -42,6 +42,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
 
   def createOverseasCompanyJourney(): Action[JourneyConfig] = createJourney(OverseasCompany)
   def createTrustsJourney(): Action[JourneyConfig] = createJourney(Trusts)
+  def createUnincorporatedAssociationJourney(): Action[JourneyConfig] = createJourney(UnincorporatedAssociation)
 
   private def createJourney(businessEntity: BusinessEntity): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
     json =>
@@ -64,6 +65,9 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                 ))
                 case Trusts => Created(Json.obj(
                     "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
+                ))
+                case UnincorporatedAssociation => Created(Json.obj(
+                  "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
                 ))
               }
           )
