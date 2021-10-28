@@ -20,7 +20,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, JourneyConfi
 
 import java.util.UUID
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany}
 
 object TestConstants {
 
@@ -30,7 +30,7 @@ object TestConstants {
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
 
-  val testOverseasCompanyJourneyConfig: JourneyConfig = JourneyConfig(
+  def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
     pageConfig = PageConfig(
       optServiceName = None,
@@ -38,9 +38,8 @@ object TestConstants {
       signOutUrl = testSignOutUrl,
       accessibilityUrl = testAccessibilityUrl
     ),
-    OverseasCompany
+    businessEntity = businessEntity
   )
-
 
   val saUtr = "1234599999"
   val ctUtr = "1234500000"
@@ -63,4 +62,10 @@ object TestConstants {
     "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
     "cTUTRMatch" -> false,
     "userCTUTR" -> ctUtr)
+
+  val testUnincorporatedAssociationAuditEventJson: JsObject = Json.obj(
+    "businessType" -> "Unincorporated Association",
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "identifiersMatch" -> false)
 }

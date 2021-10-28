@@ -62,7 +62,7 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
         case Some(authInternalId) =>
           journeyService.getJourneyConfig(journeyId, authInternalId).map {
             journeyConfig => {
-              auditService.auditJourney(journeyId)
+              auditService.auditJourney(journeyId, authInternalId)
               Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
             }
           }
