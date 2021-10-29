@@ -22,7 +22,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, UnincorporatedAssociation}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -76,6 +76,17 @@ class AuditServiceSpec
       result mustBe()
 
       mockAuditConnector.sendExplicitAudit("UnincorporatedAssociationRegistration", testUnincorporatedAssociationAuditEventJson) was called
+    }
+
+    "send an event for Trust" in {
+      mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
+      mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(None)
+
+      val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
+
+      result mustBe()
+
+      mockAuditConnector.sendExplicitAudit("TrustsRegistration", testTrustsAuditEventJson) was called
     }
   }
 }
