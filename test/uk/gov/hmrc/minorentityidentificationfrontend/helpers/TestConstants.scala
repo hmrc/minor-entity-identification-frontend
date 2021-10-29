@@ -68,4 +68,10 @@ object TestConstants {
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
     "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
     "identifiersMatch" -> false)
+
+  val testTrustsAuditEventJson: JsObject = Json.obj(
+    "businessType" -> "Trusts",
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "identifiersMatch" -> false)
 }

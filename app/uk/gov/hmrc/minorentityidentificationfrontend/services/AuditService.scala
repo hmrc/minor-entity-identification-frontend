@@ -66,6 +66,19 @@ class AuditService @Inject()(auditConnector: AuditConnector,
           auditType = "UnincorporatedAssociationRegistration",
           detail = auditJson
         )
+      case Trusts =>
+        //TODO Hardcoding the Verification and RegisterAPI status for now.  Will be updated in a future story
+        val auditJson = Json.obj(
+          "businessType" -> "Trusts",
+          "identifiersMatch" -> false,
+          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+          "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
+        )
+
+        auditConnector.sendExplicitAudit(
+          auditType = "TrustsRegistration",
+          detail = auditJson
+        )
       case _ =>
         throw new InternalServerException(s"Not enough information to audit minor entity journey for Journey ID $journeyId")
     }

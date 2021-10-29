@@ -42,7 +42,9 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                                  )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) with AuthorisedFunctions {
 
   def createOverseasCompanyJourney(): Action[JourneyConfig] = createJourney(OverseasCompany)
+
   def createTrustsJourney(): Action[JourneyConfig] = createJourney(Trusts)
+
   def createUnincorporatedAssociationJourney(): Action[JourneyConfig] = createJourney(UnincorporatedAssociation)
 
   private def createJourney(businessEntity: BusinessEntity): Action[JourneyConfig] = Action.async(parse.json[JourneyConfig] {
@@ -60,13 +62,15 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
         case Some(authInternalId) =>
           journeyService.createJourney(req.body, authInternalId).map(
             journeyId =>
-              businessEntity match{
+              businessEntity match {
                 case OverseasCompany => Created(Json.obj(
                   "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
                 ))
-                case Trusts => Created(Json.obj(
+                case Trusts =>
+                  auditService.auditJourney(journeyId, authInternalId)
+                  Created(Json.obj(
                     "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
-                ))
+                  ))
                 case UnincorporatedAssociation => {
                   auditService.auditJourney(journeyId, authInternalId)
                   Created(Json.obj(
