@@ -15,3 +15,10 @@ GET        /identify-your-trust/test-only/retrieve-journey                      
 
 GET        /identify-your-unincorporated-association/test-only/retrieve-journey/:journeyId                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
 GET        /identify-your-unincorporated-association/test-only/retrieve-journey                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+
+GET        /:journey/test-only/feature-switches                                                                                   uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.frontend.controllers.FeatureSwitchFrontendController.show(journey)
+POST       /:journey/test-only/feature-switches                                                                                   uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.frontend.controllers.FeatureSwitchFrontendController.submit(journey)
+
+GET        /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches(journey)
++ nocsrf
+POST       /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches(journey)
