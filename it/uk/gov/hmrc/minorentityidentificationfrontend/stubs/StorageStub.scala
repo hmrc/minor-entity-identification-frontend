@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
 
@@ -54,7 +54,7 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
-  def stubRetrieveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: String = ""): Unit =
+  def stubRetrieveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/overseas"
     ).thenReturn(

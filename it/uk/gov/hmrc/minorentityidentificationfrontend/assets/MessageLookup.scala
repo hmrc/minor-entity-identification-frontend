@@ -72,6 +72,8 @@ object MessageLookup {
     val heading = "Check your answers"
     val utr = "Unique taxpayers reference number"
     val noUtr = "The business does not have a UTR"
+    val overseasTaxIdentifier = "Overseas tax identifier"
+    val overseasTaxIdentifierNotProvided = "I do not want to provide an identifier"
   }
 
 }

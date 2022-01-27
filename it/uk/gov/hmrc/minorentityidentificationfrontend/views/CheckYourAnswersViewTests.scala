@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CheckYourAnswers => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testSignOutUrl, testUtr}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testOverseasTaxIdentifiers, testSignOutUrl, testUtr}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.routes
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
@@ -31,7 +31,8 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 trait CheckYourAnswersViewTests {
   this: ComponentSpecHelper =>
 
-  def testCheckYourAnswersView(result: => WSResponse): Unit = {
+  //noinspection ScalaStyle
+  def testCheckYourAnswersView(result: => WSResponse, journeyId: String): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
@@ -62,8 +63,8 @@ trait CheckYourAnswersViewTests {
     "have a summary list which" should {
       lazy val summaryListRows = doc.getSummaryListRows.iterator().asScala.toList
 
-      "have 1 row" in {
-        summaryListRows.size mustBe 1
+      "have 2 rows" in {
+        summaryListRows.size mustBe 2
       }
 
       "have a utr row" in {
@@ -73,6 +74,15 @@ trait CheckYourAnswersViewTests {
         utrRow.getSummaryListAnswer mustBe testUtr
         utrRow.getSummaryListChangeLink mustBe routes.CaptureUtrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
+      }
+
+      "have an overseas tax identifiers row" in {
+        val taxIdentifierRow = summaryListRows(1)
+
+        taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
+        taxIdentifierRow.getSummaryListAnswer mustBe s"${testOverseasTaxIdentifiers.taxIdentifier} Albania"
+        taxIdentifierRow.getSummaryListChangeLink mustBe routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
+        taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
     }
 
@@ -85,7 +95,8 @@ trait CheckYourAnswersViewTests {
     }
   }
 
-  def testCheckYourAnswersNoUtrView(result: => WSResponse): Unit = {
+  //noinspection ScalaStyle
+  def testCheckYourAnswersViewWithAllRequestedDataNotProvided(result: => WSResponse, journeyId: String): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
@@ -116,17 +127,26 @@ trait CheckYourAnswersViewTests {
     "have a summary list which" should {
       lazy val summaryListRows = doc.getSummaryListRows.iterator().asScala.toList
 
-      "have 1 row" in {
-        summaryListRows.size mustBe 1
+      "have 2 rows" in {
+        summaryListRows.size mustBe 2
       }
 
-      "have a utr row" in {
+      "have a utr row saying utr not provided" in {
         val utrRow = summaryListRows.head
 
         utrRow.getSummaryListQuestion mustBe messages.utr
         utrRow.getSummaryListAnswer mustBe messages.noUtr
         utrRow.getSummaryListChangeLink mustBe routes.CaptureUtrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
+      }
+
+      "have an overseas tax identifiers row saying overseas tax identifiers not provided" in {
+        val taxIdentifierRow = summaryListRows(1)
+
+        taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
+        taxIdentifierRow.getSummaryListAnswer mustBe messages.overseasTaxIdentifierNotProvided
+        taxIdentifierRow.getSummaryListChangeLink mustBe routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
+        taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
     }
 

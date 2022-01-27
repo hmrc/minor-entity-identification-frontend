@@ -31,6 +31,11 @@ object TestConstants {
   val testDeskProServiceId: String = "vrs"
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
+  val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
+    "taxIdentifier" -> testOverseasTaxIdentifiers.taxIdentifier,
+    "country" -> testOverseasTaxIdentifiers.country
+  )
+
   val testOverseasCompanyJourneyConfig: JourneyConfig =
     JourneyConfig(
       testContinueUrl,

@@ -21,7 +21,8 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, CheckYourAnswersRowBuilder, JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.CheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -45,7 +46,11 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
           for {
             journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
             utr <- storageService.retrieveUtr(journeyId)
-            summaryRows = rowBuilder.buildSummaryListRows(journeyId, utr)
+            optOverseasTaxIdentifiers <- storageService.retrieveOverseasTaxIdentifiers(journeyId)
+            summaryRows = rowBuilder.buildSummaryListRows(
+              journeyId = journeyId,
+              optOverseasTaxId = optOverseasTaxIdentifiers,
+              optUtr = utr)
           } yield Ok(view(
             pageConfig = journeyConfig.pageConfig,
             formAction = routes.CheckYourAnswersController.submit(journeyId),

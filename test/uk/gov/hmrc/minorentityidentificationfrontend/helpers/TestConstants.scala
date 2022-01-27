@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.helpers
 
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, JourneyConfig, PageConfig, Sautr, Utr}
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import java.util.UUID
-import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany}
 
 object TestConstants {
 
@@ -29,6 +29,7 @@ object TestConstants {
   val testContinueUrl: String = "/test"
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
+  val testOverseas: Overseas = Overseas("134124532", "AL")
 
   def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
@@ -74,4 +75,10 @@ object TestConstants {
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
     "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
     "identifiersMatch" -> false)
+
+  val testOverseasIdentifiersAudiEventJson: JsObject = Json.obj(
+    "overseasTaxIdentifier" -> testOverseas.taxIdentifier,
+    "overseasTaxIdentifierCountry" -> testOverseas.country
+  )
+
 }

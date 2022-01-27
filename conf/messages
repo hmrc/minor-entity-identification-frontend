@@ -3,6 +3,7 @@ service.name                                                = minor-entity-ident
 ## Base
 getpagehelp.linkText                                        = Is this page not working properly?
 base.save_and_continue                                      = Save and continue
+base.change                                                 = Change
 base.confirm_and_continue                                   = Confirm and continue
 error.title-prefix                                          = 'Error: '
 
@@ -35,3 +36,5 @@ check-your-answers.title                                    = Check your answers
 check-your-answers.heading                                  = Check your answers
 check-your-answers.utr                                      = Unique taxpayers reference number
 check-your-answers.no_utr                                   = The business does not have a UTR
+check-your-answers.tax_identifiers                          = Overseas tax identifier
+check-your-answers.no_tax-identifiers                       = I do not want to provide an identifier
