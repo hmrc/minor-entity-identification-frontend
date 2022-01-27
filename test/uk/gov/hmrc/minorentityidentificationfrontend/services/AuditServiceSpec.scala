@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.libs.json.JsObject
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
@@ -43,27 +44,44 @@ class AuditServiceSpec
 
   "auditJourney" should {
     "send an event" when {
-      "the entity is minor and overseas with SA Utr." in {
+      "the entity is an OverseasCompany with SA Utr and no overseas tax identifiers." in {
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(testSaUtr))
+        mockStorageService.retrieveOverseasTaxIdentifiers(testJourneyId) returns Future.successful(None)
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
-        result mustBe()
+        result.mustBe(())
 
         mockAuditConnector.sendExplicitAudit("OverseasCompanyRegistration", testOverseasSAUtrAuditEventJson) was called
       }
     }
     "send an event" when {
-      "the entity is minor and overseas with CT Utr." in {
+      "the entity is an OverseasCompany with CT Utr and no overseas tax identifiers." in {
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(testCtUtr))
+        mockStorageService.retrieveOverseasTaxIdentifiers(testJourneyId) returns Future.successful(None)
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
-        result mustBe()
+        result.mustBe(())
 
         mockAuditConnector.sendExplicitAudit("OverseasCompanyRegistration", testOverseasCTUtrAuditEventJson) was called
+      }
+    }
+    "send an event" when {
+      "the entity is an OverseasCompany and the user provided an overseas tax identifiers." in {
+        mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
+        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(testCtUtr))
+        mockStorageService.retrieveOverseasTaxIdentifiers(testJourneyId) returns Future.successful(Some(testOverseas))
+
+        val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
+
+        result.mustBe(())
+
+        val expectedAuditEventJson: JsObject = testOverseasCTUtrAuditEventJson ++ testOverseasIdentifiersAudiEventJson
+
+        mockAuditConnector.sendExplicitAudit(auditType = "OverseasCompanyRegistration", detail = expectedAuditEventJson) was called
       }
     }
 
@@ -73,7 +91,7 @@ class AuditServiceSpec
 
       val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
-      result mustBe()
+      result.mustBe(())
 
       mockAuditConnector.sendExplicitAudit("UnincorporatedAssociationRegistration", testUnincorporatedAssociationAuditEventJson) was called
     }
@@ -84,7 +102,7 @@ class AuditServiceSpec
 
       val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
-      result mustBe()
+      result.mustBe(())
 
       mockAuditConnector.sendExplicitAudit("TrustsRegistration", testTrustsAuditEventJson) was called
     }
