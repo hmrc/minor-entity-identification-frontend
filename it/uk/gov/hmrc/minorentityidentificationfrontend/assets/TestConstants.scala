@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig}
 
 import java.util.UUID
 
@@ -26,6 +26,7 @@ object TestConstants {
 
   val testJourneyId: String = UUID.randomUUID().toString
   val testInternalId: String = UUID.randomUUID().toString
+  val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
   val testContinueUrl: String = "/test"
   val testDeskProServiceId: String = "vrs"
   val testSignOutUrl: String = "/sign-out"

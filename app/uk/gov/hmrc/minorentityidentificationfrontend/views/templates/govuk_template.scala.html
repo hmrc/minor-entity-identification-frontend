@@ -1,5 +1,5 @@
 @*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,12 @@
 
 @(pageConfig: PageConfig, title: String, startUrl: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
+@head = {
+<link href='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.css")' media="screen" rel="stylesheet" type="text/css" />
+
+@hmrcTimeoutDialogHelper(signOutUrl = pageConfig.signOutUrl)
+}
+
 @content = {
     <div class="govuk-!-margin-bottom-6">
         @contentBlock
@@ -46,7 +52,7 @@
     pageTitle = Some(title),
     isWelshTranslationAvailable = false,
     signOutUrl = Some(pageConfig.signOutUrl),
-    additionalHeadBlock = Some(hmrcTimeoutDialogHelper(signOutUrl = pageConfig.signOutUrl)),
+    additionalHeadBlock = Some(head),
     accessibilityStatementUrl = Some(pageConfig.accessibilityUrl),
     nonce = CSPNonce.get,
     phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUrl(pageConfig.deskProServiceId))),

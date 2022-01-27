@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views.helpers
+@this()
 
-import play.api.data.Form
-import play.api.i18n.Messages
+@(
+        link: String,
+        messageKey: String,
+        id: Option[String] = None,
+        isExternal: Boolean = false
+)(implicit messages: Messages)
 
-object TitleHelper {
-  def title(titleMessage: String, form: Form[_])(implicit messages: Messages): String =
-    if (form.hasErrors) messages("error.title-prefix") + titleMessage
-    else titleMessage
-}
+<a href="@link" class="govuk-link govuk-body" @id.map(x => s"id=$x") @if(isExternal) { target="_blank" }>@messages(messageKey)@if(isExternal)(" " + messages("app.common.openInNewTab"))</a>

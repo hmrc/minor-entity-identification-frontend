@@ -19,6 +19,17 @@ utr.error_not_entered                                       = Enter the companyâ
 utr.error_invalid_characters                                = Enter the UK Unique Taxpayer Reference using numbers only
 utr.error_invalid_length                                    = Enter a UK Unique Taxpayer Reference that is 10 numbers
 
+## Overseas Tax Identifiers Page
+tax-identifiers.title                                        = What is the businessâ€™s overseas tax identifier?
+tax-identifiers.line_1                                       = We may use this number to help us identify your business. The tax identifier could be VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details.
+tax-identifiers.field_1                                      = Enter a tax identifier
+tax-identifiers.field_2                                      = Enter the name of the country that issued the tax identifier
+tax-identifiers.no_identifier_link                           = I do not want to provide an identifier
+error.no_tax_identifier                                      = Enter a tax identifier
+error.invalid_tax_identifier                                 = Enter a tax identifier that does not contain special characters
+error.invalid_tax_identifier_length                          = Enter a tax identifier that is 60 characters or less
+error.no_tax_identifier_country                              = Enter the name of the country that issued the tax identifier
+
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers
 check-your-answers.heading                                  = Check your answers

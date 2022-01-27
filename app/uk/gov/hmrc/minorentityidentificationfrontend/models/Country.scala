@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views.helpers
+package uk.gov.hmrc.minorentityidentificationfrontend.models
 
-import play.api.data.Form
-import play.api.i18n.Messages
+import play.api.libs.json.Json
 
-object TitleHelper {
-  def title(titleMessage: String, form: Form[_])(implicit messages: Messages): String =
-    if (form.hasErrors) messages("error.title-prefix") + titleMessage
-    else titleMessage
+case class Country(country: String, name: String)
+object Country {
+  implicit val CountryFormat = Json.format[Country]
 }
+
