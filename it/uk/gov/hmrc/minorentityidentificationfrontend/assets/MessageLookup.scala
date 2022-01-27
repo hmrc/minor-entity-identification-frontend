@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,22 @@ object MessageLookup {
       val error_not_entered = "Enter the company‘s UK Unique Taxpayer Reference"
       val error_invalid_format = "Enter the UK Unique Taxpayer Reference using numbers only"
       val error_invalid_length = "Enter a UK Unique Taxpayer Reference that is 10 numbers"
+    }
+  }
+
+  object CaptureOverseasTaxIdentifiers {
+
+    val title = "What is the business’s overseas tax identifier?"
+    val hint = "We may use this number to help us identify your business. The tax identifier could be VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
+    val form_field_1 = "Enter a tax identifier"
+    val form_field_2 = "Enter the name of the country that issued the tax identifier"
+    val no_identifierLink = "I do not want to provide an identifier"
+
+    object Error {
+      val invalid_tax_identifier = "Enter a tax identifier that does not contain special characters"
+      val no_entry_tax_identifier = "Enter a tax identifier"
+      val invalid_length_tax_identifier = "Enter a tax identifier that is 60 characters or less"
+      val no_entry_country = "Enter the name of the country that issued the tax identifier"
     }
   }
 
