@@ -3,3 +3,8 @@
 
 $hmrc-assets-path: "/minor-entity-identification-frontend/assets/lib/hmrc-frontend/hmrc/";
 $govuk-assets-path: "/minor-entity-identification-frontend/assets/lib/govuk-frontend/govuk/assets/";
+
+.app-reference-number {
+  display: block;
+  font-weight: bold;
+}

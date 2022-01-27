@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,12 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, UtrKey)
 
+  def storeOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeDataField[Overseas](journeyId, OverseasKey, taxIdentifiers)
+
+  def removeOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeDataField(journeyId, OverseasKey)
+
   def retrieveAllData(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     for {
       optUtr <- retrieveUtr(journeyId)
@@ -68,6 +74,7 @@ class StorageService @Inject()(connector: StorageConnector) {
 
 object StorageService {
   val UtrKey = "utr"
+  val OverseasKey: String = "overseas"
 
   implicit val utrStorageFormat: OFormat[Utr] = new OFormat[Utr] {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.config
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.{Configuration, Environment}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Country
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject()(config: Configuration,
-                          servicesConfig: ServicesConfig) {
+                          servicesConfig: ServicesConfig, environment: Environment) {
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
   lazy val timeToLiveSeconds: Long = servicesConfig.getInt("mongodb.timeToLiveSeconds").toLong
@@ -54,5 +58,24 @@ class AppConfig @Inject()(config: Configuration,
     s"$contactHost/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
   def minorEntityIdentificationUrl(journeyId: String): String = s"$backendUrl/minor-entity-identification/journey/$journeyId"
+
+  lazy val countries: Map[String, Country] = {
+    environment.resourceAsStream("/countries.json") match {
+      case Some(countriesStream) =>
+        Json.parse(countriesStream).as[Map[String, Country]]
+      case None =>
+        throw new InternalServerException("Country list missing")
+    }
+  }
+
+  lazy val orderedCountryList: Seq[Country] = countries.values.toSeq.sortBy(_.name)
+
+  def getCountryName(countryCode: String): String = countries.get(countryCode) match {
+    case Some(Country(_, name)) =>
+      name
+    case None =>
+      throw new InternalServerException("Invalid country code")
+
+  }
 
 }
