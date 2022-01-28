@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,40 +34,55 @@ class StorageService @Inject()(connector: StorageConnector) {
   def storeUtr(journeyId: String, utr: Utr)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField(journeyId, UtrKey, utr)
 
-  def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =
-    connector.retrieveDataField[Utr](journeyId, UtrKey)
-
   def removeUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, UtrKey)
+
+  def storeOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeDataField[Overseas](journeyId, OverseasKey, taxIdentifiers)
+
+  def removeOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeDataField(journeyId, OverseasKey)
 
   def retrieveAllData(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     for {
       optUtr <- retrieveUtr(journeyId)
-      identifiersMatch = false
-      businessVerificationStatus = BusinessVerificationUnchallenged
-      registrationStatus = RegistrationNotCalled
-    }
-    yield {
-      optUtr match {
-        case Some(utr) =>
-          Json.obj(
-            utr.utrType -> utr.value,
-            "identifiersMatch" -> identifiersMatch,
-            "businessVerification" -> Json.toJson(businessVerificationStatus)(bvFormat.writes),
-            "registration" -> Json.toJson(registrationStatus)(regFormat.writes)
-          )
-        case _ => Json.obj(
-          "identifiersMatch" -> identifiersMatch,
-          "businessVerification" -> Json.toJson(businessVerificationStatus)(bvFormat.writes),
-          "registration" -> Json.toJson(registrationStatus)(regFormat.writes)
-        )
+      optOverseasTaxIdentifiers <- retrieveOverseasTaxIdentifiers(journeyId)
+    } yield {
+
+      val utrBlock: JsObject = optUtr match {
+        case Some(utr) => Json.obj(utr.utrType -> utr.value)
+        case None => Json.obj()
       }
+
+      val overseasTaxIdentifiersBlock: JsObject = optOverseasTaxIdentifiers match {
+        case Some(overseasTaxIdentifiers) => Json.obj(
+          "overseas" -> Json.obj(
+            "taxIdentifier" -> overseasTaxIdentifiers.taxIdentifier,
+            "country" -> overseasTaxIdentifiers.country
+          ))
+        case None => Json.obj()
+      }
+
+      Json.obj(
+        "identifiersMatch" -> false,
+        "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(bvFormat.writes),
+        "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
+      ) ++
+        utrBlock ++
+        overseasTaxIdentifiersBlock
     }
+
+  def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =
+    connector.retrieveDataField[Utr](journeyId, UtrKey)
+
+  def retrieveOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Overseas]] =
+    connector.retrieveDataField[Overseas](journeyId, OverseasKey)
 
 }
 
 object StorageService {
   val UtrKey = "utr"
+  val OverseasKey: String = "overseas"
 
   implicit val utrStorageFormat: OFormat[Utr] = new OFormat[Utr] {
 

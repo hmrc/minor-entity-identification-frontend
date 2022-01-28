@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersViewTests
 
 class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with CheckYourAnswersViewTests with WiremockHelper {
@@ -45,7 +45,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
   }
 
   "GET /check-your-answers-business" when {
-    "the applicant has an sautr" should {
+    "the applicant has a sautr and an overseas tax identifier" should {
       lazy val result: WSResponse = {
         await(insertJourneyConfig(
           journeyId = testJourneyId,
@@ -60,6 +60,8 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
         stubAudit()
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
+
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -68,7 +70,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       }
 
       "return a view which" should {
-        testCheckYourAnswersView(result)
+        testCheckYourAnswersView(result, testJourneyId)
       }
 
       "redirect to sign in page" when {
@@ -89,7 +91,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       }
     }
 
-    "the applicant does not have a sautr" should {
+    "the applicant does not provide a sautr and an overseas tax identifier" should {
       lazy val result: WSResponse = {
         await(insertJourneyConfig(
           journeyId = testJourneyId,
@@ -103,6 +105,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
         stubAudit()
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
       }
@@ -112,7 +115,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       }
 
       "return a view which" should {
-        testCheckYourAnswersNoUtrView(result)
+        testCheckYourAnswersViewWithAllRequestedDataNotProvided(result, testJourneyId)
       }
 
       "redirect to sign in page" when {

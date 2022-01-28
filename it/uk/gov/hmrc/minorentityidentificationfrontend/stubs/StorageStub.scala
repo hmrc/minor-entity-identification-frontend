@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
 
@@ -42,6 +42,29 @@ trait StorageStub extends WiremockMethods {
 
   def stubRemoveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
     when(method = DELETE, uri = s"/minor-entity-identification/journey/$journeyId/utr"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
+  def stubStoreOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/overseas", body = Json.toJson(taxIdentifiers)
+    ).thenReturn(
+      status = status
+    )
+
+  def stubRetrieveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/overseas"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
+  def stubRemoveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: String = ""): Unit =
+    when(method = DELETE,
+      uri = s"/minor-entity-identification/journey/$journeyId/overseas"
     ).thenReturn(
       status = status,
       body = body
