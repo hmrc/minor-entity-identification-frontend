@@ -34,6 +34,7 @@ class AuditService @Inject()(auditConnector: AuditConnector,
     for {
       journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
       optUtr <- storageService.retrieveUtr(journeyId)
+      optOverseasTaxIdentifiers <- storageService.retrieveOverseasTaxIdentifiers(journeyId)
     } yield journeyConfig.businessEntity match {
       case OverseasCompany =>
         val optUtrBlock = optUtr match {
@@ -41,13 +42,20 @@ class AuditService @Inject()(auditConnector: AuditConnector,
           case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "sautrMatch" -> false)
           case None => Json.obj()
         }
+        val overseasIdentifiersBlock =
+          optOverseasTaxIdentifiers match {
+            case Some(overseas) => Json.obj(
+              "overseasTaxIdentifier" -> overseas.taxIdentifier,
+              "overseasTaxIdentifierCountry" -> overseas.country)
+            case _ => Json.obj()
+          }
         //TODO Hardcoding the Verification and RegisterAPI status for now.  Will be updated in a future story
         val auditJson = Json.obj(
           "businessType" -> "Overseas Company",
           "etmpPartyType" -> "55",
           "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
           "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-        ) ++ optUtrBlock
+        ) ++ optUtrBlock ++ overseasIdentifiersBlock
 
         auditConnector.sendExplicitAudit(
           auditType = "OverseasCompanyRegistration",
