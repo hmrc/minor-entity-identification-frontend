@@ -16,17 +16,19 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Registered, RegistrationFailed, Sautr}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditService @Inject()(auditConnector: AuditConnector,
+class AuditService @Inject()(appConfig: AppConfig,
+                             auditConnector: AuditConnector,
                              journeyService: JourneyService,
                              storageService: StorageService) {
 
@@ -35,60 +37,72 @@ class AuditService @Inject()(auditConnector: AuditConnector,
       journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
       optUtr <- storageService.retrieveUtr(journeyId)
       optOverseasTaxIdentifiers <- storageService.retrieveOverseasTaxIdentifiers(journeyId)
-    } yield journeyConfig.businessEntity match {
-      case OverseasCompany =>
-        val optUtrBlock = optUtr match {
-          case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value, "cTUTRMatch" -> false)
-          case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "sautrMatch" -> false)
-          case None => Json.obj()
+      optRegistrationStatus <- storageService.retrieveRegistrationStatus(journeyId)
+    } yield {
+      val registrationStatusBlock =
+        optRegistrationStatus match {
+          case Some(Registered(_)) => "success"
+          case Some(RegistrationFailed) => "fail"
+          case _ => "not called"
         }
-        val overseasIdentifiersBlock =
-          optOverseasTaxIdentifiers match {
-            case Some(overseas) => Json.obj(
-              "overseasTaxIdentifier" -> overseas.taxIdentifier,
-              "overseasTaxIdentifierCountry" -> overseas.country)
-            case _ => Json.obj()
+      val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+      journeyConfig.businessEntity match {
+        case OverseasCompany =>
+          val optUtrBlock = optUtr match {
+            case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value, "cTUTRMatch" -> false)
+            case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "sautrMatch" -> false)
+            case None => Json.obj()
           }
-        //TODO Hardcoding the Verification and RegisterAPI status for now.  Will be updated in a future story
-        val auditJson = Json.obj(
-          "businessType" -> "Overseas Company",
-          "etmpPartyType" -> "55",
-          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-          "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-        ) ++ optUtrBlock ++ overseasIdentifiersBlock
+          val overseasIdentifiersBlock =
+            optOverseasTaxIdentifiers match {
+              case Some(overseas) => Json.obj(
+                "overseasTaxIdentifier" -> overseas.taxIdentifier,
+                "overseasTaxIdentifierCountry" -> overseas.country)
+              case _ => Json.obj()
+            }
+          //TODO Hardcoding the Verification status for now.  Will be updated in a future story
+          val auditJson = Json.obj(
+            "callingService" -> callingService,
+            "businessType" -> "Overseas Company",
+            "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+            "RegisterApiStatus" -> registrationStatusBlock
+          ) ++ optUtrBlock ++ overseasIdentifiersBlock
 
-        auditConnector.sendExplicitAudit(
-          auditType = "OverseasCompanyRegistration",
-          detail = auditJson
-        )
-      case UnincorporatedAssociation =>
-        //TODO Hardcoding the Verification and RegisterAPI status for now.  Will be updated in a future story
-        val auditJson = Json.obj(
-          "businessType" -> "Unincorporated Association",
-          "identifiersMatch" -> false,
-          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-          "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-        )
+          auditConnector.sendExplicitAudit(
+            auditType = "OverseasCompanyRegistration",
+            detail = auditJson
+          )
+        case UnincorporatedAssociation =>
+          //TODO Hardcoding the Verification status for now.  Will be updated in a future story
+          val auditJson = Json.obj(
+            "callingService" -> callingService,
+            "businessType" -> "Unincorporated Association",
+            "identifiersMatch" -> false,
+            "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+            "RegisterApiStatus" -> registrationStatusBlock
+          )
 
-        auditConnector.sendExplicitAudit(
-          auditType = "UnincorporatedAssociationRegistration",
-          detail = auditJson
-        )
-      case Trusts =>
-        //TODO Hardcoding the Verification and RegisterAPI status for now.  Will be updated in a future story
-        val auditJson = Json.obj(
-          "businessType" -> "Trusts",
-          "identifiersMatch" -> false,
-          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-          "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-        )
+          auditConnector.sendExplicitAudit(
+            auditType = "UnincorporatedAssociationRegistration",
+            detail = auditJson
+          )
+        case Trusts =>
+          //TODO Hardcoding the Verification status for now.  Will be updated in a future story
+          val auditJson = Json.obj(
+            "callingService" -> callingService,
+            "businessType" -> "Trusts",
+            "identifiersMatch" -> false,
+            "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+            "RegisterApiStatus" -> registrationStatusBlock
+          )
 
-        auditConnector.sendExplicitAudit(
-          auditType = "TrustsRegistration",
-          detail = auditJson
-        )
-      case _ =>
-        throw new InternalServerException(s"Not enough information to audit minor entity journey for Journey ID $journeyId")
+          auditConnector.sendExplicitAudit(
+            auditType = "TrustsRegistration",
+            detail = auditJson
+          )
+        case _ =>
+          throw new InternalServerException(s"Not enough information to audit minor entity journey for Journey ID $journeyId")
+      }
     }
   }
 }

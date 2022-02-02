@@ -30,6 +30,7 @@ object TestConstants {
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
   val testOverseas: Overseas = Overseas("134124532", "AL")
+  val testDefaultServiceName: String = "Entity Validation Service"
 
   def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
@@ -49,34 +50,36 @@ object TestConstants {
   val testCtUtr = Ctutr(ctUtr)
 
   val testOverseasSAUtrAuditEventJson: JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Overseas Company",
-    "etmpPartyType" -> "55",
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "RegisterApiStatus" ->  "not called",
     "sautrMatch" -> false,
     "userSAUTR" -> saUtr)
 
   val testOverseasCTUtrAuditEventJson: JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Overseas Company",
-    "etmpPartyType" -> "55",
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "RegisterApiStatus" ->  "not called",
     "cTUTRMatch" -> false,
     "userCTUTR" -> ctUtr)
 
   val testUnincorporatedAssociationAuditEventJson: JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Unincorporated Association",
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "RegisterApiStatus" ->  "not called",
     "identifiersMatch" -> false)
 
   val testTrustsAuditEventJson: JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
     "businessType" -> "Trusts",
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+    "RegisterApiStatus" ->  "not called",
     "identifiersMatch" -> false)
 
-  val testOverseasIdentifiersAudiEventJson: JsObject = Json.obj(
+  val testOverseasIdentifiersAuditEventJson: JsObject = Json.obj(
     "overseasTaxIdentifier" -> testOverseas.taxIdentifier,
     "overseasTaxIdentifierCountry" -> testOverseas.country
   )
