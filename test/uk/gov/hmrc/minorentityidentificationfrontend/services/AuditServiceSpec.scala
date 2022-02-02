@@ -19,11 +19,14 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.JsObject
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Registered, RegistrationNotCalled}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,13 +35,16 @@ import scala.concurrent.Future
 class AuditServiceSpec
   extends AnyWordSpec
     with Matchers
-    with IdiomaticMockito {
+    with IdiomaticMockito
+    with GuiceOneAppPerSuite {
+
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
   val mockJourneyService: JourneyService = mock[JourneyService]
   val mockStorageService: StorageService = mock[StorageService]
 
-  object TestAuditService extends AuditService(mockAuditConnector, mockJourneyService, mockStorageService)
+  object TestAuditService extends AuditService(appConfig, mockAuditConnector, mockJourneyService, mockStorageService)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -48,6 +54,7 @@ class AuditServiceSpec
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(testSaUtr))
         mockStorageService.retrieveOverseasTaxIdentifiers(testJourneyId) returns Future.successful(None)
+        mockStorageService.retrieveRegistrationStatus(testJourneyId) returns Future.successful(Some(RegistrationNotCalled))
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
@@ -79,7 +86,7 @@ class AuditServiceSpec
 
         result.mustBe(())
 
-        val expectedAuditEventJson: JsObject = testOverseasCTUtrAuditEventJson ++ testOverseasIdentifiersAudiEventJson
+        val expectedAuditEventJson: JsObject = testOverseasCTUtrAuditEventJson ++ testOverseasIdentifiersAuditEventJson
 
         mockAuditConnector.sendExplicitAudit(auditType = "OverseasCompanyRegistration", detail = expectedAuditEventJson) was called
       }
