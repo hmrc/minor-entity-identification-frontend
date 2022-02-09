@@ -36,12 +36,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
       await(insertJourneyConfig(
         journeyId = testJourneyId,
         internalId = testInternalId,
-        continueUrl = testContinueUrl,
-        optServiceName = None,
-        deskProServiceId = testDeskProServiceId,
-        signOutUrl = testSignOutUrl,
-        accessibilityUrl = testAccessibilityUrl,
-        OverseasCompany
+        testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       get(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier")
@@ -77,12 +72,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubStoreOverseasTaxIdentifiers(testJourneyId, testOverseasTaxIdentifiers)(OK)
@@ -102,12 +92,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
@@ -127,12 +112,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
@@ -152,12 +132,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
@@ -179,12 +154,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRemoveOverseasTaxIdentifiers(testJourneyId)(NO_CONTENT)
@@ -203,12 +173,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRemoveOverseasTaxIdentifiers(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")

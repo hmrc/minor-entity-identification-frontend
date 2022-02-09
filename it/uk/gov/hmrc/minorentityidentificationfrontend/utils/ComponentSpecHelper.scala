@@ -116,13 +116,6 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
 
   def insertJourneyConfig(journeyId: String,
                           internalId: String,
-                          continueUrl: String,
-                          optServiceName: Option[String],
-                          deskProServiceId: String,
-                          signOutUrl: String,
-                          accessibilityUrl: String,
-                          businessEntity: BusinessEntity): Future[InsertOneResult] =
-    journeyConfigRepository.insertJourneyConfig(
-      journeyId, internalId, JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity)
-    )
+                          journeyConfig: JourneyConfig): Future[InsertOneResult] =
+    journeyConfigRepository.insertJourneyConfig(journeyId, internalId, journeyConfig)
 }

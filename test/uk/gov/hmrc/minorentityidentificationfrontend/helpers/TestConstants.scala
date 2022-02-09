@@ -31,6 +31,7 @@ object TestConstants {
   val testAccessibilityUrl: String = "/accessibility"
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testDefaultServiceName: String = "Entity Validation Service"
+  val testRegime: String = "VATC"
 
   def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
@@ -40,7 +41,9 @@ object TestConstants {
       signOutUrl = testSignOutUrl,
       accessibilityUrl = testAccessibilityUrl
     ),
-    businessEntity = businessEntity
+    businessEntity = businessEntity,
+    businessVerificationCheck = true,
+    testRegime
   )
 
   val saUtr = "1234599999"

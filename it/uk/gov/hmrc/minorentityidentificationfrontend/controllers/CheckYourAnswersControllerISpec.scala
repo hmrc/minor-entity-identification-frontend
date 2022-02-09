@@ -50,12 +50,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
@@ -96,12 +91,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
@@ -143,12 +133,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       await(insertJourneyConfig(
         journeyId = testJourneyId,
         internalId = testInternalId,
-        continueUrl = testContinueUrl,
-        optServiceName = None,
-        deskProServiceId = testDeskProServiceId,
-        signOutUrl = testSignOutUrl,
-        accessibilityUrl = testAccessibilityUrl,
-        OverseasCompany
+        testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubRetrieveUtr(testJourneyId)(OK, testUtrJson)

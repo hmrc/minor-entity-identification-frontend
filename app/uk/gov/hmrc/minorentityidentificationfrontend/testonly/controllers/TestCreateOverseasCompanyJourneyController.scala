@@ -48,7 +48,9 @@ class TestCreateOverseasCompanyJourneyController @Inject()(messagesControllerCom
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-overseas-business/test-only/retrieve-journey",
     pageConfig = defaultPageConfig,
-    businessEntity = OverseasCompany
+    businessEntity = OverseasCompany,
+    businessVerificationCheck = true,
+    regime = "VATC"
   )
 
   val show: Action[AnyContent] = Action.async {
