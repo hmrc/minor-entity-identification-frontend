@@ -48,7 +48,9 @@ class TestCreateTrustsJourneyController @Inject()(messagesControllerComponents: 
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-trust/test-only/retrieve-journey",
     pageConfig = defaultPageConfig,
-    Trusts
+    Trusts,
+    businessVerificationCheck = true,
+    regime = "VATC"
   )
 
   val show: Action[AnyContent] = Action.async {

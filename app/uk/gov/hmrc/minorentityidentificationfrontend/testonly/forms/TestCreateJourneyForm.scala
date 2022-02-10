@@ -17,7 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.forms
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
+import play.api.data.Forms.{boolean, mapping, text}
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.MappingUtil.optText
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.validate
@@ -31,6 +31,8 @@ object TestCreateJourneyForm {
   val deskProServiceId = "deskProServiceId"
   val signOutUrl = "signOutUrl"
   val accessibilityUrl = "accessibilityUrl"
+  val businessVerificationCheck = "businessVerificationCheck"
+  val regime = "regime"
 
   def continueUrlEmpty: Constraint[String] = Constraint("continue_url.not_entered")(
     continueUr => validate(
@@ -60,18 +62,33 @@ object TestCreateJourneyForm {
     )
   )
 
+  def regimeEmpty: Constraint[String] = Constraint("regime.not_entered")(
+    regime => validate(
+      constraint = regime.isEmpty,
+      errMsg = "Regime is not entered"
+    )
+  )
+
   def form(businessEntity: BusinessEntity): Form[JourneyConfig] = {
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
       serviceName -> optText,
       deskProServiceId -> text.verifying(deskProServiceIdEmpty),
       signOutUrl -> text.verifying(signOutUrlEmpty),
-      accessibilityUrl -> text.verifying(accessibilityUrlEmpty)
-    )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl) =>
-      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity)
+      accessibilityUrl -> text.verifying(accessibilityUrlEmpty),
+      businessVerificationCheck -> boolean,
+      regime -> text.verifying(regimeEmpty)
+    )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, businessVerificationCheck, regime) =>
+      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity, businessVerificationCheck, regime)
     )(journeyConfig =>
-      Some(journeyConfig.continueUrl, journeyConfig.pageConfig.optServiceName,
-        journeyConfig.pageConfig.deskProServiceId, journeyConfig.pageConfig.signOutUrl, journeyConfig.pageConfig.accessibilityUrl)
+      Some(journeyConfig.continueUrl,
+        journeyConfig.pageConfig.optServiceName,
+        journeyConfig.pageConfig.deskProServiceId,
+        journeyConfig.pageConfig.signOutUrl,
+        journeyConfig.pageConfig.accessibilityUrl,
+        journeyConfig.businessVerificationCheck,
+        journeyConfig.regime
+      )
     ))
   }
 

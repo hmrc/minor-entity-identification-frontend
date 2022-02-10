@@ -55,7 +55,9 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
         deskProServiceId <- (json \ deskProServiceIdKey).validate[String]
         signOutUrl <- (json \ signOutUrlKey).validate[String]
         accessibilityUrl <- (json \ accessibilityUrlKey).validate[String]
-      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity)
+        businessVerificationCheck <- (json \ businessVerificationCheckKey).validateOpt[Boolean]
+        regime <- (json \ regimeKey).validate[String]
+      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity, businessVerificationCheck.getOrElse(true), regime)
   }) {
     implicit req =>
       authorised().retrieve(internalId) {
@@ -98,4 +100,6 @@ object JourneyController {
   val deskProServiceIdKey = "deskProServiceId"
   val signOutUrlKey = "signOutUrl"
   val accessibilityUrlKey = "accessibilityUrl"
+  val businessVerificationCheckKey = "businessVerificationCheck"
+  val regimeKey = "regime"
 }
