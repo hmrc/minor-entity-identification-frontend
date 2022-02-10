@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.trust
 
 import play.api.data.Form
 import play.api.data.Forms._
@@ -23,19 +23,22 @@ import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ConstraintUtil.
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrMapping.utrMapping
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
-object CaptureUtrForm {
+import scala.util.matching.Regex
+
+object TrustCaptureUtrForm {
   val UtrKey = "utr"
 
-  val UtrNotEnteredErrorKey = "utr.error_not_entered"
-  val UtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
-  val UtrInvalidLengthErrorKey = "utr.error_invalid_length"
+  val TrustUtrNotEnteredErrorKey = "utr.error_not_entered"
+  val TrustUtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
+  val TrustUtrInvalidLengthErrorKey = "utr.error_invalid_length"
 
-  val form: Form[Utr] =
-    Form(
-      UtrKey -> of(utrMapping(UtrNotEnteredErrorKey))
+  val utrRegex: Regex = "[0-9]{10}".r
+
+  val trustForm: Form[Utr] = Form(
+      UtrKey -> of(utrMapping(TrustUtrNotEnteredErrorKey))
         .verifying(
-          UtrCaptureHelper.utrInvalidLength(UtrInvalidCharactersErrorKey) andThen
-            UtrCaptureHelper.utrInvalidCharacters(UtrInvalidLengthErrorKey)
+          UtrCaptureHelper.utrInvalidLength(TrustUtrInvalidCharactersErrorKey) andThen
+            UtrCaptureHelper.utrInvalidCharacters(TrustUtrInvalidLengthErrorKey)
         )
     )
 
