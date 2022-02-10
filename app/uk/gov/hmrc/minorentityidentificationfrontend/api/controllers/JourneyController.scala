@@ -25,6 +25,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyCont
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trust.{routes => trustControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services._
@@ -40,7 +41,8 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                                   controllerComponents: ControllerComponents,
                                   appConfig: AppConfig,
                                   auditService: AuditService
-                                 )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) with AuthorisedFunctions {
+                                 )(implicit ec: ExecutionContext)
+  extends BackendController(controllerComponents) with AuthorisedFunctions with FeatureSwitching {
 
   def createOverseasCompanyJourney(): Action[JourneyConfig] = createJourney(OverseasCompany)
 
@@ -69,8 +71,13 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                 ))
                 case Trusts =>
                   auditService.auditJourney(journeyId, authInternalId)
+                  val pathToRedirect = if(isEnabled(TrustVerificationStub)) {
+                    s"${appConfig.selfUrl}${trustControllerRoutes.TrustUtrController.show(journeyId).url}"
+                  } else {
+                    (req.body.continueUrl + s"?journeyId=$journeyId")
+                  }
                   Created(Json.obj(
-                    journeyStartUrl -> s"${appConfig.selfUrl}${trustControllerRoutes.TrustUtrController.show(journeyId).url}"
+                    journeyStartUrl -> pathToRedirect
                   ))
                 case UnincorporatedAssociation => {
                   auditService.auditJourney(journeyId, authInternalId)
