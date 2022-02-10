@@ -33,25 +33,40 @@ object CaptureUtrForm {
   val UtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
   val UtrInvalidLengthErrorKey = "utr.error_invalid_length"
 
+  val TrustUtrNotEnteredErrorKey = "utr.error_not_entered"
+  val TrustUtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
+  val TrustUtrInvalidLengthErrorKey = "utr.error_invalid_length"
+
   val utrRegex: Regex = "[0-9]{10}".r
 
-  val utrInvalidCharacters: Constraint[Utr] = Constraint("utr.invalid_format")(
+  private def utrInvalidCharacters(errMessageKey: String): Constraint[Utr] = Constraint("utr.invalid_format")(
     utr => validateNot(
       constraint = utr.value matches utrRegex.regex,
-      errMsg = UtrInvalidCharactersErrorKey
+      errMsg = errMessageKey
     )
   )
 
-  val utrInvalidLength: Constraint[Utr] = Constraint("utr.invalid_length")(
+  private def utrInvalidLength(errMessageKey: String): Constraint[Utr] = Constraint("utr.invalid_length")(
     utr => validate(
       constraint = utr.value.length != 10,
-      errMsg = UtrInvalidLengthErrorKey
+      errMsg = errMessageKey
     )
   )
 
   val form: Form[Utr] =
     Form(
-      UtrKey -> of(utrMapping(UtrNotEnteredErrorKey)).verifying(utrInvalidLength andThen utrInvalidCharacters)
+      UtrKey -> of(utrMapping(UtrNotEnteredErrorKey))
+        .verifying(
+          utrInvalidLength(UtrInvalidCharactersErrorKey) andThen utrInvalidCharacters(UtrInvalidLengthErrorKey)
+        )
+    )
+
+  val trustForm: Form[Utr] =
+    Form(
+      UtrKey -> of(utrMapping(TrustUtrNotEnteredErrorKey))
+        .verifying(
+          utrInvalidLength(TrustUtrInvalidCharactersErrorKey) andThen utrInvalidCharacters(TrustUtrInvalidLengthErrorKey)
+        )
     )
 
 }

@@ -1,0 +1,61 @@
+@*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLabel
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+@import uk.gov.hmrc.minorentityidentificationfrontend.controllers.routes
+@import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
+
+
+@this(layout: govuk_template,
+        govukInput: GovukInput,
+        govukErrorSummary: GovukErrorSummary,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton)
+
+@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@layout(pageConfig, title = title(messages("utr.trust.title"), form)) {
+
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
+    }
+
+    @formWithCSRF(action = formAction) {
+        @govukInput(
+            Input(
+                label = HmrcPageHeadingLabel(content = Text(messages("utr.trust.title"))),
+                hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-body">${messages("utr.trust.line_1")} <a href="https://www.gov.uk/find-lost-utr-number">${messages("utr.trust.line_1_ending")}</a></p>"""))),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("utr"))
+        )
+
+        <p class="govuk-body">
+            <a class="govuk-link" id="no-utr" href="@routes.CaptureUtrController.noUtr(journeyId)">@messages("utr.no_utr_link")</a>
+        </p>
+
+        @govukButton(Button(
+            attributes = Map("id" -> "save-and-continue"),
+            classes = "govuk-!-margin-right-1",
+            content = Text(messages("base.save_and_continue"))
+        ))
+    }
+}

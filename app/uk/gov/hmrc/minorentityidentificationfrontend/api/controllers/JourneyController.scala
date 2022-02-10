@@ -17,16 +17,17 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.FeatureSwitchingModule
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
@@ -61,16 +62,16 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           journeyService.createJourney(req.body, authInternalId).map(
-            journeyId =>
+            journeyId => {
+              val journeyStartUrl = Created(Json.obj(
+                "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
+              ))
               businessEntity match {
-                case OverseasCompany => Created(Json.obj(
-                  "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
-                ))
-                case Trusts =>
+                case OverseasCompany => journeyStartUrl
+                case Trusts => {
                   auditService.auditJourney(journeyId, authInternalId)
-                  Created(Json.obj(
-                    "journeyStartUrl" -> (req.body.continueUrl + s"?journeyId=$journeyId")
-                  ))
+                  journeyStartUrl
+                }
                 case UnincorporatedAssociation => {
                   auditService.auditJourney(journeyId, authInternalId)
                   Created(Json.obj(
@@ -78,6 +79,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                   ))
                 }
               }
+            }
           )
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")

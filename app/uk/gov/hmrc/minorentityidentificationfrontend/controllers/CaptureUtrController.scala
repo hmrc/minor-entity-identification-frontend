@@ -16,14 +16,15 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_utr_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.{capture_utr_page, capture_utr_trust_page}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -34,7 +35,8 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
                                      journeyService: JourneyService,
                                      storageService: StorageService,
                                      mcc: MessagesControllerComponents,
-                                     view: capture_utr_page
+                                     view: capture_utr_page,
+                                     trustView: capture_utr_trust_page
                                     )(implicit val config: AppConfig,
                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
@@ -44,12 +46,21 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
         case Some(authInternalId) =>
           journeyService.getJourneyConfig(journeyId, authInternalId).map {
             journeyConfig =>
-              Ok(view(
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureUtrController.submit(journeyId),
-                form = CaptureUtrForm.form
-              ))
+              journeyConfig.businessEntity match {
+                case BusinessEntity.OverseasCompany => Ok(view(
+                  journeyId = journeyId,
+                  pageConfig = journeyConfig.pageConfig,
+                  formAction = routes.CaptureUtrController.submit(journeyId),
+                  form = CaptureUtrForm.form
+                ))
+                case BusinessEntity.Trusts => Ok(trustView(
+                  journeyId = journeyId,
+                  pageConfig = journeyConfig.pageConfig,
+                  formAction = routes.CaptureUtrController.submit(journeyId),
+                  form = CaptureUtrForm.trustForm
+                ))
+                case _ => throw new InternalServerException("Business entity not found")
+              }
           }
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
@@ -64,12 +75,21 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
                 journeyConfig =>
-                  BadRequest(view(
-                    journeyId = journeyId,
-                    pageConfig = journeyConfig.pageConfig,
-                    formAction = routes.CaptureUtrController.submit(journeyId),
-                    form = formWithErrors
-                  ))
+                  journeyConfig.businessEntity match {
+                    case BusinessEntity.OverseasCompany => BadRequest(view(
+                      journeyId = journeyId,
+                      pageConfig = journeyConfig.pageConfig,
+                      formAction = routes.CaptureUtrController.submit(journeyId),
+                      form = formWithErrors
+                    ))
+                    case BusinessEntity.Trusts => BadRequest(trustView(
+                      journeyId = journeyId,
+                      pageConfig = journeyConfig.pageConfig,
+                      formAction = routes.CaptureUtrController.submit(journeyId),
+                      form = formWithErrors
+                    ))
+                    case BusinessEntity.UnincorporatedAssociation => throw new InternalServerException("Business entity not found")
+                  }
               },
             utr =>
               storageService.storeUtr(journeyId, utr).map {
