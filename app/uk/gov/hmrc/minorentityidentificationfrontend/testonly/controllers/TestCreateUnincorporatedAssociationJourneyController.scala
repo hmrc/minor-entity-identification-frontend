@@ -48,7 +48,9 @@ class TestCreateUnincorporatedAssociationJourneyController @Inject()(messagesCon
   private val defaultJourneyConfig = JourneyConfig(
     continueUrl = s"${appConfig.selfUrl}/identify-your-unincorporated-association/test-only/retrieve-journey",
     pageConfig = defaultPageConfig,
-    UnincorporatedAssociation
+    UnincorporatedAssociation,
+    businessVerificationCheck = true,
+    regime = "VATC"
   )
 
   val show: Action[AnyContent] = Action.async {

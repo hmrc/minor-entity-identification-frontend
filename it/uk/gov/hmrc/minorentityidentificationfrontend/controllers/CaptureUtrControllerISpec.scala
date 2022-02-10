@@ -32,12 +32,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
       await(insertJourneyConfig(
         journeyId = testJourneyId,
         internalId = testInternalId,
-        continueUrl = testContinueUrl,
-        optServiceName = None,
-        deskProServiceId = testDeskProServiceId,
-        signOutUrl = testSignOutUrl,
-        accessibilityUrl = testAccessibilityUrl,
-        OverseasCompany
+        testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       get(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")
@@ -73,12 +68,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubStoreUtr(testJourneyId, Sautr(testUtr))(OK)
@@ -99,12 +89,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubStoreUtr(testJourneyId, Ctutr(testCtutr))(OK)
@@ -125,12 +110,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubStoreUtr(testJourneyId, Sautr(testSautr))(OK)
@@ -149,12 +129,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")("utr" -> "")
@@ -172,12 +147,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")("utr" -> "1@34567890")
@@ -195,12 +165,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          continueUrl = testContinueUrl,
-          optServiceName = None,
-          deskProServiceId = testDeskProServiceId,
-          signOutUrl = testSignOutUrl,
-          accessibilityUrl = testAccessibilityUrl,
-          OverseasCompany
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")("utr" -> "123456789123456789")

@@ -31,46 +31,32 @@ object TestConstants {
   val testDeskProServiceId: String = "vrs"
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
+  val testRegime: String = "VATC"
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
     "taxIdentifier" -> testOverseasTaxIdentifiers.taxIdentifier,
     "country" -> testOverseasTaxIdentifiers.country
   )
 
-  val testOverseasCompanyJourneyConfig: JourneyConfig =
+  def testJourneyConfig(serviceName: Option[String] = None,
+                        businessEntity: BusinessEntity,
+                        businessVerificationCheck: Boolean,
+                        regime: String): JourneyConfig =
     JourneyConfig(
       testContinueUrl,
-      PageConfig(
-        None,
-        testDeskProServiceId,
-        testSignOutUrl,
-        testAccessibilityUrl
-      ),
-      OverseasCompany
+      PageConfig(serviceName, testDeskProServiceId, testSignOutUrl, testAccessibilityUrl),
+      businessEntity,
+      businessVerificationCheck,
+      regime
     )
 
-  val testTrustsJourneyConfig: JourneyConfig =
-    JourneyConfig(
-      testContinueUrl,
-      PageConfig(
-        None,
-        testDeskProServiceId,
-        testSignOutUrl,
-        testAccessibilityUrl
-      ),
-      Trusts
-    )
+  def testTrustsJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
+    testJourneyConfig(businessEntity = Trusts, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
-  val testUnincorporatedAssociationJourneyConfig: JourneyConfig =
-    JourneyConfig(
-      testContinueUrl,
-      PageConfig(
-        None,
-        testDeskProServiceId,
-        testSignOutUrl,
-        testAccessibilityUrl
-      ),
-      UnincorporatedAssociation
-    )
+  def testUnincorporatedAssociationJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
+    testJourneyConfig(businessEntity = UnincorporatedAssociation, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
+
+  def testOverseasCompanyJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
+    testJourneyConfig(businessEntity = OverseasCompany, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
   val testUtr: String = "1234567890"
   val testUtrType: String = "sautr"

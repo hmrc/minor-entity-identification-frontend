@@ -34,7 +34,9 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "continueUrl" -> testContinueUrl,
       "deskProServiceId" -> testDeskProServiceId,
       "signOutUrl" -> testSignOutUrl,
-      "accessibilityUrl" -> testAccessibilityUrl
+      "accessibilityUrl" -> testAccessibilityUrl,
+      "businessVerificationCheck" -> true,
+      "regime" -> testRegime
     )
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -125,7 +127,9 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "continueUrl" -> testContinueUrl,
       "deskProServiceId" -> testDeskProServiceId,
       "signOutUrl" -> testSignOutUrl,
-      "accessibilityUrl" -> testAccessibilityUrl
+      "accessibilityUrl" -> testAccessibilityUrl,
+      "businessVerificationCheck" -> true,
+      "regime" -> testRegime
     )
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -137,7 +141,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
 
       result.status mustBe CREATED
 
-      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig)
+      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig(businessVerificationCheck = true))
 
     }
 
@@ -174,7 +178,9 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "continueUrl" -> testContinueUrl,
       "deskProServiceId" -> testDeskProServiceId,
       "signOutUrl" -> testSignOutUrl,
-      "accessibilityUrl" -> testAccessibilityUrl
+      "accessibilityUrl" -> testAccessibilityUrl,
+      "businessVerificationCheck" -> true,
+      "regime" -> testRegime
     )
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -186,7 +192,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
 
       result.status mustBe CREATED
 
-      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig)
+      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
 
     }
 
