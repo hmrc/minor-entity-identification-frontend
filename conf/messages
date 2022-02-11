@@ -31,6 +31,13 @@ error.invalid_tax_identifier                                 = Enter a tax ident
 error.invalid_tax_identifier_length                          = Enter a tax identifier that is 60 characters or less
 error.no_tax_identifier_country                              = Enter the name of the country that issued the tax identifier
 
+## SA Postcode Page
+sa-postcode.title                                            = What is the postcode where the trust is registered for Self Assessment?
+sa-postcode.hint                                             = For example, AB1 2YZ
+sa-postcode.no.postcodeLink                                  = The trust does not have a Self Assessment postcode
+error.invalid_format_sa-postcode                             = Enter a UK postcode
+error.no_entry_sa-postcode                                   = Enter a postcode
+
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers
 check-your-answers.heading                                  = Check your answers

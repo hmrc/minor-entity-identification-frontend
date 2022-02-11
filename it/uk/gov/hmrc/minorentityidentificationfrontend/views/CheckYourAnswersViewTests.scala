@@ -22,7 +22,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CheckYourAnswers => messages}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testOverseasTaxIdentifiers, testSignOutUrl, testUtr}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.routes
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.routes
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 

@@ -26,8 +26,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Writes}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 
 import scala.concurrent.Future

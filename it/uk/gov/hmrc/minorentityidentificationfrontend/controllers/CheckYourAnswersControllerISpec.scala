@@ -21,7 +21,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}

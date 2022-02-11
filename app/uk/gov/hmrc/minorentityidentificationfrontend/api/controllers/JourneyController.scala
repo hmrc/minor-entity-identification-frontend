@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, JourneyService, StorageService}
@@ -66,7 +66,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
             journeyId =>
               businessEntity match {
                 case OverseasCompany => Created(Json.obj(
-                  "journeyStartUrl" -> s"${appConfig.selfUrl}${controllerRoutes.CaptureUtrController.show(journeyId).url}"
+                  "journeyStartUrl" -> s"${appConfig.selfUrl}${overseasControllerRoutes.CaptureUtrController.show(journeyId).url}"
                 ))
                 case Trusts =>
                   auditService.auditJourney(journeyId, authInternalId)

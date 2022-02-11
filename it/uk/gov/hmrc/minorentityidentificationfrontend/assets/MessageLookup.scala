@@ -67,6 +67,18 @@ object MessageLookup {
     }
   }
 
+  object CaptureSaPostcode {
+
+    val title = "What is the postcode where the trust is registered for Self Assessment?"
+    val hint = "For example, AB1 2YZ"
+    val no_postcodeLink = "The trust does not have a Self Assessment postcode"
+
+    object Error {
+      val invalid_sa_postcode = "Enter a UK postcode"
+      val no_entry_sa_postcode = "Enter a postcode"
+    }
+  }
+
   object CheckYourAnswers {
     val title = "Check your answers"
     val heading = "Check your answers"
