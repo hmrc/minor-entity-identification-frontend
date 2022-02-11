@@ -60,7 +60,7 @@ class TrustUtrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          CaptureUtrForm.form.bindFromRequest().fold(
+          TrustCaptureUtrForm.trustForm.bindFromRequest().fold(
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
                 journeyConfig => BadRequest(trustView(

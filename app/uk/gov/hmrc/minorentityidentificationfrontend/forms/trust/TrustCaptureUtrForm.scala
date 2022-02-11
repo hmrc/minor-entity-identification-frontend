@@ -37,8 +37,8 @@ object TrustCaptureUtrForm {
   val trustForm: Form[Utr] = Form(
       UtrKey -> of(utrMapping(TrustUtrNotEnteredErrorKey))
         .verifying(
-          UtrCaptureHelper.utrInvalidLength(TrustUtrInvalidCharactersErrorKey) andThen
-            UtrCaptureHelper.utrInvalidCharacters(TrustUtrInvalidLengthErrorKey)
+          UtrCaptureHelper.utrInvalidLength(TrustUtrInvalidLengthErrorKey) andThen
+            UtrCaptureHelper.utrInvalidCharacters(TrustUtrInvalidCharactersErrorKey)
         )
     )
 

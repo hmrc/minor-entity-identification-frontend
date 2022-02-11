@@ -27,15 +27,15 @@ object CaptureUtrForm {
   val UtrKey = "utr"
 
   val UtrNotEnteredErrorKey = "utr.error_not_entered"
-  val UtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
   val UtrInvalidLengthErrorKey = "utr.error_invalid_length"
+  val UtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
 
   val form: Form[Utr] =
     Form(
       UtrKey -> of(utrMapping(UtrNotEnteredErrorKey))
         .verifying(
-          UtrCaptureHelper.utrInvalidLength(UtrInvalidCharactersErrorKey) andThen
-            UtrCaptureHelper.utrInvalidCharacters(UtrInvalidLengthErrorKey)
+          UtrCaptureHelper.utrInvalidLength(UtrInvalidLengthErrorKey) andThen
+            UtrCaptureHelper.utrInvalidCharacters(UtrInvalidCharactersErrorKey)
         )
     )
 
