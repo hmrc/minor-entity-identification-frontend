@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
-import play.api.http.Status.NOT_IMPLEMENTED
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Sautr
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.TrustCaptureUtrViewTests
@@ -74,27 +73,6 @@ class TrustUtrControllerISpec extends ComponentSpecHelper with AuthStub with Sto
         stubStoreUtr(testJourneyId, Sautr(testUtr))(OK)
 
         lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testUtr)
-
-        result must have(
-          httpStatus(SEE_OTHER),
-          redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
-        )
-      }
-    }
-
-    "the utr is a ctutr" should {
-      "redirect to check your answers" in {
-        val testCtutr = "1234529999"
-
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testTrustsJourneyConfig(businessVerificationCheck = true)
-        ))
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubStoreUtr(testJourneyId, Ctutr(testCtutr))(OK)
-
-        lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testCtutr)
 
         result must have(
           httpStatus(SEE_OTHER),
