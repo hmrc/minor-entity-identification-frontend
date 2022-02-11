@@ -35,7 +35,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
                                             view: capture_sa_postcode_page,
                                             journeyService: JourneyService,
                                             storageService: StorageService,
-                                            val authConnector: AuthConnector,
+                                            val authConnector: AuthConnector
                                            )(implicit val config: AppConfig,
                                              executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
