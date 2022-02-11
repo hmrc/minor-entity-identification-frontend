@@ -1,6 +1,7 @@
 # Add all the application routes to the app.routes file
 ->         /minor-entity-identification-frontend              app.Routes
 ->         /identify-your-overseas-business                   overseas.Routes
+->         /identify-your-trust                               trust.Routes
 ->         /minor-entity-identification/api                   api.Routes
 ->         /                                                  health.Routes
 

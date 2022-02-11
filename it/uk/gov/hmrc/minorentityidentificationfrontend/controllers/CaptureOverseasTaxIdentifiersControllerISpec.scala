@@ -19,7 +19,6 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, INTERNAL_SERVER_ERROR, await, defaultAwaitTimeout}
@@ -83,7 +82,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CheckYourAnswersController.show(testJourneyId).url)
         )
       }
     }
@@ -163,7 +162,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CheckYourAnswersController.show(testJourneyId).url)
         )
       }
     }

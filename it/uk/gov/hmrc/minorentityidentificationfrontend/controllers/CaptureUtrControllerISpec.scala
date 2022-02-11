@@ -19,7 +19,6 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
@@ -77,7 +76,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
         )
       }
     }
@@ -98,7 +97,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
         )
       }
     }
@@ -119,7 +118,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
         )
       }
     }

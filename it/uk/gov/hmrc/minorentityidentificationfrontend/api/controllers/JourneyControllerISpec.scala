@@ -19,7 +19,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
@@ -44,7 +45,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
 
       lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
 
-      (result.json \ "journeyStartUrl").as[String] must include(controllerRoutes.CaptureUtrController.show(testJourneyId).url)
+      (result.json \ "journeyStartUrl").as[String] must include(overseasControllerRoutes.CaptureUtrController.show(testJourneyId).url)
 
       result.status mustBe CREATED
 

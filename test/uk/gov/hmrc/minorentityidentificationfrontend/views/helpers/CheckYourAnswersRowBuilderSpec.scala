@@ -25,7 +25,7 @@ import uk.gov.hmrc.govukfrontend.views.Aliases.{Actions, Key, SummaryListRow, Va
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.routes
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.routes
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testOverseas, testSaUtr}
 
 class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {

@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.routes
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureOverseasTaxIdentifiersForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_utr_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_overseas_tax_identifiers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-@Singleton
-class CaptureUtrController @Inject()(val authConnector: AuthConnector,
-                                     journeyService: JourneyService,
-                                     storageService: StorageService,
-                                     mcc: MessagesControllerComponents,
-                                     view: capture_utr_page
-                                    )(implicit val config: AppConfig,
-                                      executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerComponents,
+                                                        journeyService: JourneyService,
+                                                        storageService: StorageService,
+                                                        view: capture_overseas_tax_identifiers_page,
+                                                        val authConnector: AuthConnector
+                                                       )(implicit val config: AppConfig,
+                                                         executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
@@ -47,8 +47,10 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
               Ok(view(
                 journeyId = journeyId,
                 pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureUtrController.submit(journeyId),
-                form = CaptureUtrForm.form
+                formAction = routes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
+                form = CaptureOverseasTaxIdentifiersForm.form,
+                countries = config.orderedCountryList
+
               ))
           }
         case None =>
@@ -56,24 +58,27 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
       }
   }
 
+
+
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          CaptureUtrForm.form.bindFromRequest().fold(
+          CaptureOverseasTaxIdentifiersForm.form.bindFromRequest().fold(
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
                 journeyConfig =>
                   BadRequest(view(
                     journeyId = journeyId,
                     pageConfig = journeyConfig.pageConfig,
-                    formAction = routes.CaptureUtrController.submit(journeyId),
-                    form = formWithErrors
+                    formAction = routes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
+                    form = formWithErrors,
+                    countries = config.orderedCountryList
                   ))
               },
-            utr =>
-              storageService.storeUtr(journeyId, utr).map {
-                _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+            taxIdentifiers =>
+              storageService.storeOverseasTaxIdentifiers(journeyId, taxIdentifiers).map {
+                _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
               }
           )
         case None =>
@@ -81,13 +86,13 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
       }
   }
 
-  def noUtr(journeyId: String): Action[AnyContent] = Action.async {
+
+  def noOverseasTaxIdentifiers(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        storageService.removeUtr(journeyId).map {
-          _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+        storageService.removeOverseasTaxIdentifiers(journeyId).map {
+          _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
         }
       }
   }
-
 }

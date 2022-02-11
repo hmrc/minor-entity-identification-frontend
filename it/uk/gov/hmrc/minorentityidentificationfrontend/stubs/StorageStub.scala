@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
 
@@ -70,4 +70,19 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
+  def stubStoreSaPostcode(journeyId: String, saPostcode: String)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/saPostcode",
+      body = JsString(saPostcode)
+    ).thenReturn(
+      status = status
+    )
+
+  def stubRemoveSaPostcode(journeyId: String)(status: Int, body: String = ""): Unit =
+    when(method = DELETE,
+      uri = s"/minor-entity-identification/journey/$journeyId/saPostcode"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
 }

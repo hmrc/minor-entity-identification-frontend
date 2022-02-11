@@ -1,0 +1,6 @@
+->          /hmrc-frontend                               hmrcfrontend.Routes
+GET         /assets/*file                                controllers.Assets.versioned(path = "/public", file: Asset)
+
+GET         /:journeyId/self-assessment-postcode         uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.show(journeyId)
+POST        /:journeyId/self-assessment-postcode         uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.submit(journeyId)
+GET         /:journeyId/no-self-assessment-postcode      uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.noSaPostcode(journeyId)
