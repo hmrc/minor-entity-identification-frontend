@@ -25,7 +25,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyCont
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, EnableFullTrustJourney}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services._
@@ -73,8 +73,8 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                 ))
                 case Trusts =>
                   auditService.auditJourney(journeyId, authInternalId)
-                  enable(TrustVerificationStub)
-                  val pathToRedirect = if(isEnabled(TrustVerificationStub)) {
+                  enable(EnableFullTrustJourney)
+                  val pathToRedirect = if(isEnabled(EnableFullTrustJourney)) {
                     s"${appConfig.selfUrl}${trustControllerRoutes.TrustUtrController.show(journeyId).url}"
                   } else {
                     (req.body.continueUrl + s"?journeyId=$journeyId")
