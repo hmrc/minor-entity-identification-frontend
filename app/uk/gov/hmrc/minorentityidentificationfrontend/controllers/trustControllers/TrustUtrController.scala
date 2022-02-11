@@ -82,7 +82,7 @@ class TrustUtrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised() {
         storageService.removeUtr(journeyId).map {
-          _ => Redirect(routes.CaptureSaPostcodeController.show(journeyId))
+          _ => NotImplemented
         }
       }
   }
