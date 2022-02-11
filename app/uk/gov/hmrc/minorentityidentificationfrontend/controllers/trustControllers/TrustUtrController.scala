@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trust
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.trust.TrustCaptureUtrForm
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms.TrustCaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trust.capture_utr_trust_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trustViews.capture_utr_trust_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}

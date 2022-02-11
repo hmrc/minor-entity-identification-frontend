@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trust
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
 import play.api.http.Status.NOT_IMPLEMENTED
 import play.api.libs.ws.WSResponse
@@ -23,7 +23,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
-import uk.gov.hmrc.minorentityidentificationfrontend.views.trust.TrustCaptureUtrViewTests
+import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.TrustCaptureUtrViewTests
 
 class TrustUtrControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with TrustCaptureUtrViewTests {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms.trust
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms
 
 import play.api.data.Form
 import play.api.data.Forms._

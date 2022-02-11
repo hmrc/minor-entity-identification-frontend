@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views.trust
+package uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
