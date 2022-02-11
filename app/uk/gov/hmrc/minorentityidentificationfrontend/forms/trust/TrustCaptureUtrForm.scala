@@ -28,9 +28,9 @@ import scala.util.matching.Regex
 object TrustCaptureUtrForm {
   val UtrKey = "utr"
 
-  val TrustUtrNotEnteredErrorKey = "utr.error_not_entered"
-  val TrustUtrInvalidCharactersErrorKey = "utr.error_invalid_characters"
-  val TrustUtrInvalidLengthErrorKey = "utr.error_invalid_length"
+  val TrustUtrNotEnteredErrorKey = "utr.trust.error_not_entered"
+  val TrustUtrInvalidCharactersErrorKey = "utr.trust.error_invalid_characters"
+  val TrustUtrInvalidLengthErrorKey = "utr.trust.error_invalid_length"
 
   val utrRegex: Regex = "[0-9]{10}".r
 
