@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.routes
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureOverseasTaxIdentifiersForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_overseas_tax_identifiers_page

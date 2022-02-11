@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trust.{routes => trustControllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.{routes => controllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}

@@ -33,7 +33,18 @@ This is a test entry point which simulates a service by triggering the initial P
     - Shown in the HMRC header - typically a link to a feedback questionnaire
     - This is currently autofilled but can be changed
 
-4. Accessibility Statement Link (Required)
+5. Business verification checkbox 
+
+   - Used for skipping further verification checks carried out currently by Business Verification (SI)
+   - This is currently autofilled but can be changed
+
+6. Regime (Required)
+
+   - This is the Tax Regime Identifier
+   - It is passed down to the Registration API
+   - This is currently defaulted to VATC but accepted values are PPT or VATC
+   
+7. Accessibility Statement Link (Required)
 
     - Shown in the HMRC footer
     - This is currently autofilled but can be changed
@@ -62,12 +73,23 @@ This is a test entry point which simulates a service by triggering the initial P
    - Shown in the HMRC header - typically a link to a feedback questionnaire
    - This is currently autofilled but can be changed
 
-4. Accessibility Statement Link (Required)
+5. Business verification checkbox
+
+   - Used for skipping further verification checks carried out currently by Business Verification (SI)
+   - This is currently autofilled but can be changed
+
+6. Regime (Required)
+
+   - This is the Tax Regime Identifier
+   - It is passed down to the Registration API
+   - This is currently defaulted to VATC but accepted values are PPT or VATC
+
+7. Accessibility Statement Link (Required)
 
    - Shown in the HMRC footer
    - This is currently autofilled but can be changed
 
-### GET /identify-your-trust/test-only/create-unincorporated-association-journey
+### GET /identify-your-unincorporated-association/test-only/create-unincorporated-association-journey
 
 ---
 This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an Unincorporated Association.
@@ -91,10 +113,22 @@ This is a test entry point which simulates a service by triggering the initial P
    - Shown in the HMRC header - typically a link to a feedback questionnaire
    - This is currently autofilled but can be changed
 
-4. Accessibility Statement Link (Required)
+5. Business verification checkbox
 
-   - Shown in the HMRC footer
+   - Used for skipping further verification checks carried out currently by Business Verification (SI)
    - This is currently autofilled but can be changed
+
+6. Regime (Required)
+
+   - This is the Tax Regime Identifier
+   - It is passed down to the Registration API
+   - This is currently defaulted to VATC but accepted values are PPT or VATC
+
+7. Accessibility Statement URL (Required)
+
+   - Shown in the footer - a link to the accessibility statement for the calling service
+   - This is currently autofilled but can be changed
+   
 
 ### Retrieve journey Data
 

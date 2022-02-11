@@ -23,15 +23,20 @@ Creates a new journey for an Overseas Company, storing the journeyConfig against
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 
+The businessVerificationCheck field allows the calling service to bypass the business verification and
+continue to register where a successful match is found. The field will default to true if it is not provided.
+
 All other fields must be provided.
 
 ```
 {
+    "accessibilityUrl": "/accessibility",
+    "businessVerificationCheck" : true,
     "continueUrl" : "/test",
-    "optServiceName" : "Service Name",
     "deskProServiceId" : "abc",
+    "optServiceName" : "Service Name",
+    "regime" : "VATC"    
     "signOutUrl" : "/sign-out",
-    "accessibilityUrl": "/accessibility"
 }
 ```
 
@@ -43,15 +48,20 @@ Creates a new journey for a Trust, storing the journeyConfig against the journey
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 
+The businessVerificationCheck field allows the calling service to bypass the business verification and
+continue to register where a successful match is found. The field will default to true if it is not provided.
+
 All other fields must be provided.
 
 ```
 {
+    "accessibilityUrl": "/accessibility",
+    "businessVerificationCheck" : true,
     "continueUrl" : "/test",
-    "optServiceName" : "Service Name",
     "deskProServiceId" : "abc",
+    "optServiceName" : "Service Name",
+    "regime" : "VATC"    
     "signOutUrl" : "/sign-out",
-    "accessibilityUrl": "/accessibility"
 }
 ```
 
@@ -63,15 +73,20 @@ Creates a new journey for an Unincorporated Association, storing the journeyConf
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 
+The businessVerificationCheck field allows the calling service to bypass the business verification and
+continue to register where a successful match is found. The field will default to true if it is not provided.
+
 All other fields must be provided.
 
 ```
 {
+    "accessibilityUrl": "/accessibility",
+    "businessVerificationCheck" : true,
     "continueUrl" : "/test",
-    "optServiceName" : "Service Name",
     "deskProServiceId" : "abc",
+    "optServiceName" : "Service Name",
+    "regime" : "VATC"    
     "signOutUrl" : "/sign-out",
-    "accessibilityUrl": "/accessibility"
 }
 ```
 
