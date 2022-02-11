@@ -73,6 +73,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                 ))
                 case Trusts =>
                   auditService.auditJourney(journeyId, authInternalId)
+                  enable(TrustVerificationStub)
                   val pathToRedirect = if(isEnabled(TrustVerificationStub)) {
                     s"${appConfig.selfUrl}${trustControllerRoutes.TrustUtrController.show(journeyId).url}"
                   } else {

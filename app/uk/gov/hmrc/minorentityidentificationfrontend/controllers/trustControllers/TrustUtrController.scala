@@ -71,7 +71,7 @@ class TrustUtrController @Inject()(val authConnector: AuthConnector,
               },
             utr =>
               storageService.storeUtr(journeyId, utr).map {
-                _ => NotImplemented // TODO - once next page is implemented
+                _ => Redirect(routes.CaptureSaPostcodeController.show(journeyId))
               }
           )
         case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
@@ -82,7 +82,7 @@ class TrustUtrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised() {
         storageService.removeUtr(journeyId).map {
-          _ => NotImplemented // TODO - once next page is implemented
+          _ => Redirect(routes.CaptureSaPostcodeController.show(journeyId))
         }
       }
   }

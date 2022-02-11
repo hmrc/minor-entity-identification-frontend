@@ -76,9 +76,8 @@ class TrustUtrControllerISpec extends ComponentSpecHelper with AuthStub with Sto
         lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testUtr)
 
         result must have(
-          httpStatus(NOT_IMPLEMENTED),
-          // TODO once the next page has been merged in
-          // redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
         )
       }
     }
@@ -98,9 +97,8 @@ class TrustUtrControllerISpec extends ComponentSpecHelper with AuthStub with Sto
         lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testCtutr)
 
         result must have(
-          httpStatus(NOT_IMPLEMENTED),
-          // TODO once the next page has been merged in
-//          redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
         )
       }
     }
@@ -120,10 +118,8 @@ class TrustUtrControllerISpec extends ComponentSpecHelper with AuthStub with Sto
         lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testSautr)
 
         result must have(
-          httpStatus(NOT_IMPLEMENTED),
-          // TODO once the next page has been merged in
-
-          //          redirectUri(routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
         )
       }
     }
