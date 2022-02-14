@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches = Seq(OverseasVerificationStub)
+  val switches = Seq(OverseasVerificationStub, TrustVerificationStub)
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
@@ -37,4 +37,9 @@ class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 case object OverseasVerificationStub extends FeatureSwitch {
   override val configName: String = "feature-switch.overseas-further-verification-stub"
   override val displayName: String = "Use stub for Overseas Company further verification flow"
+}
+
+case object TrustVerificationStub extends FeatureSwitch {
+  override val configName: String = "feature-switch.trust-verification-stub"
+  override val displayName: String = "Use stub for Trusts further verification flow"
 }

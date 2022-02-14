@@ -1,0 +1,229 @@
+{
+  "responseHeader": {
+    "dfmcaReturnUserStatus": "Processed",
+    "formBundleNo": "000001230962"
+  },
+  "trustOrEstateDisplay": {
+    "applicationType": "01",
+    "matchData": {
+      "utr": "1234567891"
+    },
+    "correspondence": {
+      "abroadIndicator": true,
+      "name": "Test Abroad Trust",
+      "address": {
+        "line1": "Test Line 1",
+        "line2": "Test Line 2",
+        "country": "DE"
+      },
+      "phoneNumber": "+123456789012345678"
+    },
+    "declaration": {
+      "name": {
+        "firstName": "Joe",
+        "lastName": "Bloggs"
+      },
+      "address": {
+        "line1": "Test Line 1",
+        "line2": "Test Line 2",
+        "country": "DE"
+      }
+    },
+    "details": {
+      "trust": {
+        "details": {
+          "startDate": "2018-04-06",
+          "trustTaxable": true,
+          "expressTrust": false,
+          "trustRecorded": false,
+          "trustUKRelation": false,
+          "trustUKResident": false,
+          "trustUKProperty": true,
+          "lawCountry": "DE",
+          "administrationCountry": "DE",
+          "residentialStatus": {
+            "nonUK": {
+              "sch5atcgga92": true,
+              "trusteeStatus": "Non Resident Cease Resident"
+            }
+          },
+          "typeOfTrust": "Will Trust or Intestacy Trust"
+        },
+        "entities": {
+          "naturalPerson": [
+            {
+              "lineNo": "1",
+              "bpMatchStatus": "01",
+              "entityStart": "2017-02-28",
+              "name": {
+                "firstName": "Joe",
+                "lastName": "Bloggs"
+              },
+              "identification": {
+                "passport": {
+                  "number": "KSJDFKSDHF6456545147852369QWER",
+                  "expirationDate": "2020-02-02",
+                  "countryOfIssue": "DE"
+                },
+                "address": {
+                  "line1": "Test Line 1",
+                  "line2": "Test Line 2",
+                  "country": "DE"
+                }
+              }
+            }
+          ],
+          "beneficiary": {
+            "individualDetails": [
+              {
+                "lineNo": "1",
+                "bpMatchStatus": "01",
+                "entityStart": "2017-02-28",
+                "name": {
+                  "firstName": "Joe",
+                  "lastName": "Bloggs"
+                },
+                "dateOfBirth": "2015-03-20",
+                "vulnerableBeneficiary": false,
+                "beneficiaryDiscretion": true,
+                "identification": {
+                  "passport": {
+                    "number": "123456789",
+                    "expirationDate": "2020-02-02",
+                    "countryOfIssue": "DE"
+                  },
+                  "address": {
+                    "line1": "Test Line 1",
+                    "line2": "Test Line 2",
+                    "country": "DE"
+                  }
+                }
+              }
+            ]
+          },
+          "deceased": {
+            "lineNo": "1",
+            "bpMatchStatus": "01",
+            "entityStart": "2017-02-28",
+            "name": {
+              "firstName": "John",
+              "middleName": "Charles",
+              "lastName": "Smith"
+            },
+            "dateOfBirth": "1901-09-05",
+            "identification": {
+              "address": {
+                "line1": "Test Line 1",
+                "line2": "Test Line 2",
+                "country": "DE"
+              }
+            }
+          },
+          "leadTrustees": {
+            "lineNo": "1",
+            "bpMatchStatus": "01",
+            "entityStart": "2019-02-28",
+            "name": {
+              "firstName": "Joe Bloggs",
+              "lastName": "Joe Bloggs"
+            },
+            "dateOfBirth": "2015-03-20",
+            "identification": {
+              "passport": {
+                "number": "KSJDFKSDHF6456545147852369QWER",
+                "expirationDate": "2020-02-02",
+                "countryOfIssue": "DE"
+              },
+              "address": {
+                "line1": "Test Line 1",
+                "line2": "Test Line 2",
+                "country": "DE"
+              }
+            },
+            "phoneNumber": "2340773003196623",
+            "email": "xyz@gmail.com"
+          },
+          "trustees": [
+            {
+              "trusteeInd": {
+                "lineNo": "1",
+                "bpMatchStatus": "01",
+                "entityStart": "2019-02-28",
+                "name": {
+                  "firstName": "Jim",
+                  "lastName": "Ferguson"
+                },
+                "dateOfBirth": "1983-09-24",
+                "identification": {
+                  "passport": {
+                    "number": "345678901",
+                    "expirationDate": "2020-02-02",
+                    "countryOfIssue": "DE"
+                  },
+                  "address": {
+                    "line1": "Test Line 1",
+                    "line2": "Test Line 2",
+                    "country": "DE"
+                  }
+                }
+              }
+            }
+          ],
+          "protectors": {
+            "protector": [
+              {
+                "lineNo": "1",
+                "bpMatchStatus": "01",
+                "entityStart": "2019-02-28",
+                "name": {
+                  "firstName": "Joe",
+                  "lastName": "Bloggs"
+                },
+                "identification": {
+                  "nino": "AA000004A"
+                }
+              }
+            ]
+          },
+          "settlors": {
+            "settlor": [
+              {
+                "lineNo": "1",
+                "bpMatchStatus": "01",
+                "entityStart": "2019-02-28",
+                "name": {
+                  "firstName": "Joe",
+                  "lastName": "Bloggs"
+                },
+                "dateOfBirth": "1901-09-05",
+                "identification": {
+                  "passport": {
+                    "number": "234567890",
+                    "expirationDate": "2020-02-02",
+                    "countryOfIssue": "DE"
+                  },
+                  "address": {
+                    "line1": "Test Line 1",
+                    "line2": "Test Line 2",
+                    "country": "DE"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "assets": {
+          "shares": [
+            {
+              "numberOfShares": "999999999999",
+              "orgName": "Test Abroad Trust",
+              "shareClass": "Deferred ordinary shares",
+              "typeOfShare": "Quoted",
+              "value": 999999999999
+            }
+          ]
+        }
+      }
+    }
+  }
+}
