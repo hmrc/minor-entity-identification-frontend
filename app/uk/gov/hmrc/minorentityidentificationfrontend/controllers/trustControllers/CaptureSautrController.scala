@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms.TrustCaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trustViews.capture_utr_trust_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trustViews.capture_sa_utr_trust_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -34,7 +34,7 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
                                        journeyService: JourneyService,
                                        storageService: StorageService,
                                        mcc: MessagesControllerComponents,
-                                       trustView: capture_utr_trust_page
+                                       trustView: capture_sa_utr_trust_page
                                     )(implicit val config: AppConfig,
                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
