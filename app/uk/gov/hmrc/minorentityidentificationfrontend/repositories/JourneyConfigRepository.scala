@@ -67,10 +67,6 @@ object JourneyConfigRepository {
   val AuthInternalIdKey = "authInternalId"
   val CreationTimestampKey = "creationTimestamp"
   val BusinessEntityKey = "businessEntity"
-  val ContinueUrlKey = "continueUrl"
-  val PageConfigKey = "pageConfig"
-  val BusinessVerificationCheckKey = "businessVerificationCheck"
-  val RegimeKey = "regime"
 
   def timeToLiveIndex(timeToLiveDuration: Long): IndexModel = IndexModel(
     keys = ascending(CreationTimestampKey),
@@ -97,26 +93,6 @@ object JourneyConfigRepository {
     }
   }
 
-  implicit val journeyConfigFormat: OFormat[JourneyConfig] = new OFormat[JourneyConfig] {
-    override def reads(json: JsValue): JsResult[JourneyConfig] =
-      for {
-        continueUrl <- (json \ ContinueUrlKey).validate[String]
-        pageConfig <- (json \ PageConfigKey).validate[PageConfig]
-        businessEntity <- (json \ BusinessEntityKey).validate[BusinessEntity]
-        businessVerificationCheck <- (json \ BusinessVerificationCheckKey).validateOpt[Boolean]
-        regime <- (json \ RegimeKey).validateOpt[String]
-      } yield {
-        JourneyConfig(continueUrl, pageConfig, businessEntity, businessVerificationCheck.getOrElse(true), regime.getOrElse("VATC"))
-      }
-
-    override def writes(journeyConfig: JourneyConfig): JsObject = Json.obj(
-      ContinueUrlKey -> journeyConfig.continueUrl,
-      PageConfigKey -> journeyConfig.pageConfig,
-      BusinessEntityKey -> journeyConfig.businessEntity,
-      BusinessVerificationCheckKey -> journeyConfig.businessVerificationCheck,
-      RegimeKey -> journeyConfig.regime
-    )
-
-  }
+  implicit val journeyConfigFormat: OFormat[JourneyConfig] = Json.format[JourneyConfig]
 
 }

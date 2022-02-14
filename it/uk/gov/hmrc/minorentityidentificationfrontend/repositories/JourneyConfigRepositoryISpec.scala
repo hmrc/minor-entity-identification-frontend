@@ -19,9 +19,6 @@ package uk.gov.hmrc.minorentityidentificationfrontend.repositories
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
-import org.bson.Document
-import org.mongodb.scala.model.Updates
-import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 
 class JourneyConfigRepositoryISpec extends ComponentSpecHelper {
 
@@ -31,35 +28,6 @@ class JourneyConfigRepositoryISpec extends ComponentSpecHelper {
       val insertedJourneyConfig = await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId))
 
       insertedJourneyConfig mustBe Some(testOverseasCompanyJourneyConfig(businessVerificationCheck = true))
-    }
-
-    "default regime to VATC if not present in database" in {
-
-      await(journeyConfigRepository.insertJourneyConfig(testJourneyId, testInternalId, testOverseasCompanyJourneyConfig(businessVerificationCheck = true)))
-
-      await(journeyConfigRepository
-        .collection
-        .updateOne(new Document().append("_id", testJourneyId), Updates.unset("regime"))
-        .toFuture()
-      )
-      val retrievedJourneyConfig: JourneyConfig = await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)).get
-
-      retrievedJourneyConfig.regime mustBe "VATC"
-    }
-
-    "default BV to true if not in present database" in {
-
-      await(journeyConfigRepository.insertJourneyConfig(testJourneyId, testInternalId, testOverseasCompanyJourneyConfig(businessVerificationCheck = true)))
-
-      await(journeyConfigRepository
-        .collection
-        .updateOne(new Document().append("_id", testJourneyId), Updates.unset("businessVerificationCheck"))
-        .toFuture()
-      )
-
-      val retrievedJourneyConfig: JourneyConfig = await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)).get
-
-      retrievedJourneyConfig.businessVerificationCheck mustBe true
     }
   }
 }
