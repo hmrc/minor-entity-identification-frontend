@@ -21,12 +21,13 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
-class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with AuthStub with StorageStub {
+class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with AuthStub with StorageStub with FeatureSwitching {
 
   lazy val repo: JourneyConfigRepository = app.injector.instanceOf[JourneyConfigRepository]
 
@@ -132,7 +133,9 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "businessVerificationCheck" -> true,
       "regime" -> testRegime
     )
-    "return a created journey" in {
+
+    "return a created journey with the trust journey FS enabled" in {
+      enable(EnableFullTrustJourney)
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
@@ -143,7 +146,20 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       result.status mustBe CREATED
 
       await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig(businessVerificationCheck = true))
+    }
 
+    "return a created journey with the trust journey FS disabled" in {
+      disable(EnableFullTrustJourney)
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+
+      lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
+
+      (result.json \ "journeyStartUrl").as[String] must include(testContinueUrl + s"?journeyId=$testJourneyId")
+
+      result.status mustBe CREATED
+
+      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig(businessVerificationCheck = true))
     }
 
     "redirect to Sign In page" when {
