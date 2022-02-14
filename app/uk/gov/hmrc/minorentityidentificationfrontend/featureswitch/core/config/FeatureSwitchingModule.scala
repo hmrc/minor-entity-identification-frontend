@@ -38,3 +38,8 @@ case object EnableFullTrustJourney extends FeatureSwitch {
   override val configName: String = "feature-switch.trust-verification-stub"
   override val displayName: String = "Enable full trust journey"
 }
+
+case object TrustVerificationStub extends FeatureSwitch {
+  override val configName: String = "feature-switch.trust-verification-stub"
+  override val displayName: String = "Use stub for Trusts further verification flow"
+}
