@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms.TrustCaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_utr_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trustViews.capture_sa_utr_trust_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CaptureUtrController @Inject()(val authConnector: AuthConnector,
-                                     journeyService: JourneyService,
-                                     storageService: StorageService,
-                                     mcc: MessagesControllerComponents,
-                                     view: capture_utr_page
+class CaptureSautrController @Inject()(val authConnector: AuthConnector,
+                                       journeyService: JourneyService,
+                                       storageService: StorageService,
+                                       mcc: MessagesControllerComponents,
+                                       trustView: capture_sa_utr_trust_page
                                     )(implicit val config: AppConfig,
                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
@@ -43,13 +43,12 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig => Ok(view(
+            journeyConfig => Ok(trustView(
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureUtrController.submit(journeyId),
-                  form = CaptureUtrForm.form
-                )
-            )
+                  formAction = routes.CaptureSautrController.submit(journeyId),
+                  form = TrustCaptureUtrForm.trustForm
+                ))
           }
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
@@ -60,24 +59,22 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          CaptureUtrForm.form.bindFromRequest().fold(
+          TrustCaptureUtrForm.trustForm.bindFromRequest().fold(
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig => BadRequest(view(
+                journeyConfig => BadRequest(trustView(
                       journeyId = journeyId,
                       pageConfig = journeyConfig.pageConfig,
-                      formAction = routes.CaptureUtrController.submit(journeyId),
+                      formAction = routes.CaptureSautrController.submit(journeyId),
                       form = formWithErrors
-                    )
-                )
+                    ))
               },
             utr =>
               storageService.storeUtr(journeyId, utr).map {
-                _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+                _ => Redirect(routes.CaptureSaPostcodeController.show(journeyId))
               }
           )
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
+        case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
@@ -85,7 +82,7 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised() {
         storageService.removeUtr(journeyId).map {
-          _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+          _ => NotImplemented
         }
       }
   }

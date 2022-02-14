@@ -19,6 +19,13 @@ utr.no_utr_link                                             = The company does n
 utr.error_not_entered                                       = Enter the company‘s UK Unique Taxpayer Reference
 utr.error_invalid_characters                                = Enter the UK Unique Taxpayer Reference using numbers only
 utr.error_invalid_length                                    = Enter a UK Unique Taxpayer Reference that is 10 numbers
+utr.trust.title                                             = What is your Unique Taxpayer Reference?
+utr.trust.line_1                                            = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
+utr.trust.line_1_ending                                     = find a lost UTR number.
+utr.trust.no_utr_link                                       = The business does not have a Self Assessment UTR
+utr.trust.error_not_entered                                 = Enter a Unique Taxpayer Reference in the correct format
+utr.trust.error_invalid_characters                          = Enter a Unique Taxpayer Reference in the correct format
+utr.trust.error_invalid_length                              = Enter a Unique Taxpayer Reference in the correct format
 
 ## Overseas Tax Identifiers Page
 tax-identifiers.title                                        = What is the business’s overseas tax identifier?
