@@ -1,10 +1,10 @@
-->          /hmrc-frontend                               hmrcfrontend.Routes
-GET         /assets/*file                                controllers.Assets.versioned(path = "/public", file: Asset)
+->          /hmrc-frontend                                 hmrcfrontend.Routes
+GET         /assets/*file                                  controllers.Assets.versioned(path = "/public", file: Asset)
 
-GET         /:journeyId/sa-utr                           uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.TrustUtrController.show(journeyId)
-POST        /:journeyId/sa-utr                           uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.TrustUtrController.submit(journeyId)
-GET         /:journeyId/no-utr                           uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.TrustUtrController.noUtr(journeyId)
+GET         /:journeyId/sa-utr                             uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSautrController.show(journeyId)
+POST        /:journeyId/sa-utr                             uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSautrController.submit(journeyId)
+GET         /:journeyId/no-utr                             uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSautrController.noUtr(journeyId)
 
-GET         /:journeyId/self-assessment-postcode         uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.show(journeyId)
-POST        /:journeyId/self-assessment-postcode         uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.submit(journeyId)
-GET         /:journeyId/no-self-assessment-postcode      uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.noSaPostcode(journeyId)
+GET         /:journeyId/self-assessment-postcode           uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.show(journeyId)
+POST        /:journeyId/self-assessment-postcode           uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.submit(journeyId)
+GET         /:journeyId/no-self-assessment-postcode        uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.noSaPostcode(journeyId)

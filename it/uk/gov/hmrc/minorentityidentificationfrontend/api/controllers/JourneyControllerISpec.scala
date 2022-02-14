@@ -141,7 +141,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
 
       lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
-      (result.json \ "journeyStartUrl").as[String] must include(trustControllerRoutes.TrustUtrController.show(testJourneyId).url)
+      (result.json \ "journeyStartUrl").as[String] must include(trustControllerRoutes.CaptureSautrController.show(testJourneyId).url)
 
       result.status mustBe CREATED
 

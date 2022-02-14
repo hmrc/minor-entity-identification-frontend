@@ -24,7 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStu
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.TrustCaptureUtrViewTests
 
-class TrustUtrControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with TrustCaptureUtrViewTests {
+class CaptureSautrControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with TrustCaptureUtrViewTests {
 
   "GET /sa-utr" should {
     lazy val result = {

@@ -30,11 +30,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class TrustUtrController @Inject()(val authConnector: AuthConnector,
-                                   journeyService: JourneyService,
-                                   storageService: StorageService,
-                                   mcc: MessagesControllerComponents,
-                                   trustView: capture_utr_trust_page
+class CaptureSautrController @Inject()(val authConnector: AuthConnector,
+                                       journeyService: JourneyService,
+                                       storageService: StorageService,
+                                       mcc: MessagesControllerComponents,
+                                       trustView: capture_utr_trust_page
                                     )(implicit val config: AppConfig,
                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
@@ -46,7 +46,7 @@ class TrustUtrController @Inject()(val authConnector: AuthConnector,
             journeyConfig => Ok(trustView(
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.TrustUtrController.submit(journeyId),
+                  formAction = routes.CaptureSautrController.submit(journeyId),
                   form = TrustCaptureUtrForm.trustForm
                 ))
           }
@@ -65,7 +65,7 @@ class TrustUtrController @Inject()(val authConnector: AuthConnector,
                 journeyConfig => BadRequest(trustView(
                       journeyId = journeyId,
                       pageConfig = journeyConfig.pageConfig,
-                      formAction = routes.TrustUtrController.submit(journeyId),
+                      formAction = routes.CaptureSautrController.submit(journeyId),
                       form = formWithErrors
                     ))
               },
