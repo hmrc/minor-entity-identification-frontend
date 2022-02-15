@@ -35,7 +35,7 @@ class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 }
 
 case object EnableFullTrustJourney extends FeatureSwitch {
-  override val configName: String = "feature-switch.trust-verification-stub"
+  override val configName: String = "feature-switch.enable-full-trust-journey"
   override val displayName: String = "Enable full trust journey"
 }
 
