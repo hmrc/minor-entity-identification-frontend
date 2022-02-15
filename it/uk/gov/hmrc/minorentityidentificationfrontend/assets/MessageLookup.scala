@@ -58,9 +58,9 @@ object MessageLookup {
     val no_utr_link = "The company does not have a UTR"
 
     object Error {
-      val error_not_entered = "Enter a Unique Taxpayer Reference in the correct format"
-      val error_invalid_format = "Enter a Unique Taxpayer Reference in the correct format"
-      val error_invalid_length = "Enter a Unique Taxpayer Reference in the correct format"
+      val error_not_entered = "Enter your UK Unique Taxpayer Reference"
+      val error_invalid_format = "Enter the UK Unique Taxpayer Reference using numbers only"
+      val error_invalid_length = "Enter a UK Unique Taxpayer Reference that is 10 numbers"
     }
   }
 
