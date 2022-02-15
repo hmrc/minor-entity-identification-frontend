@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.forms
 import play.api.data.Form
 import play.api.data.Forms._
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.helpers.UtrCaptureHelper
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrMapping.utrMapping
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
@@ -33,7 +34,8 @@ object CaptureUtrForm {
     Form(
       UtrKey -> of(utrMapping(UtrNotEnteredErrorKey, UtrInvalidCharactersErrorKey))
         .verifying(
-          UtrCaptureHelper.utrInvalidLength(UtrInvalidLengthErrorKey)
+          UtrCaptureHelper.utrInvalidLength(UtrInvalidLengthErrorKey) andThen
+            UtrCaptureHelper.utrInvalidCharacters(UtrInvalidCharactersErrorKey)
         )
     )
 
