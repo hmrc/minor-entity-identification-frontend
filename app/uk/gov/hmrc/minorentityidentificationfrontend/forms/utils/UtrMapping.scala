@@ -18,28 +18,37 @@ package uk.gov.hmrc.minorentityidentificationfrontend.forms.utils
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr, Utr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
+
+import scala.util.matching.Regex
 
 object UtrMapping {
 
   private val SautrMinLimit = 30000
   private val SuffixLength = 5
+  private val Regex: Regex = "\\d+".r
 
-  private def getUtrType(utr: String): Utr = {
-    val suffix = utr.takeRight(SuffixLength).mkString.toInt
+  private def getUtrType(utr: String): Option[Utr] = {
+    val suffix = utr.takeRight(SuffixLength).mkString
 
-    if (suffix >= SautrMinLimit) Sautr(utr) else Ctutr(utr)
+    if(suffix matches Regex.regex) {
+      if (suffix.toInt >= SautrMinLimit) Some(Sautr(utr)) else Some(Ctutr(utr))
+    } else None
   }
 
-  def utrMapping(errorMessage: String): Formatter[Utr] = new Formatter[Utr] {
+  def utrMapping(utrNotEnteredErrorMessage: String, invalidCharactersErrorMessage: String): Formatter[Utr] = new Formatter[Utr] {
 
-    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Utr] =
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Utr] = {
       data.get(key) match {
         case Some(utr) if utr.nonEmpty =>
-          Right(getUtrType(utr))
+          getUtrType(utr) match {
+            case Some(utr) => Right (utr)
+            case None => Left(Seq(FormError(key, invalidCharactersErrorMessage)))
+          }
         case _ =>
-          Left(Seq(FormError(key, errorMessage)))
+          Left(Seq(FormError(key, utrNotEnteredErrorMessage)))
       }
+    }
 
     override def unbind(key: String, value: Utr): Map[String, String] =
       Map(key -> value.value)
