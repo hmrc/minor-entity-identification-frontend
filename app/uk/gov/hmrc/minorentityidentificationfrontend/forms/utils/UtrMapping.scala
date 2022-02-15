@@ -18,7 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.forms.utils
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr, Utr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import scala.util.matching.Regex
 
