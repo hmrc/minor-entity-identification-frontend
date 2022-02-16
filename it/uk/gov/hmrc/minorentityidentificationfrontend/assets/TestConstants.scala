@@ -28,6 +28,7 @@ object TestConstants {
   val testInternalId: String = UUID.randomUUID().toString
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
   val testSaPostcode: String =  "AA00 0AA"
+  val testCHRN: String = "AB99999"
   val testContinueUrl: String = "/test"
   val testDeskProServiceId: String = "vrs"
   val testSignOutUrl: String = "/sign-out"

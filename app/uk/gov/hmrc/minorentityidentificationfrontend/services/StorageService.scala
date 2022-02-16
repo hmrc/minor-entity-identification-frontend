@@ -52,6 +52,12 @@ class StorageService @Inject()(connector: StorageConnector) {
   def storeRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[RegistrationStatus](journeyId, RegistrationKey, registrationStatus)
 
+  def storeCHRN(journeyId: String, chrn: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeDataField[String](journeyId, ChrnKey, chrn)
+
+  def removeCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeDataField(journeyId, ChrnKey)
+
   def retrieveAllData(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     for {
       optUtr <- retrieveUtr(journeyId)
@@ -95,6 +101,7 @@ object StorageService {
   val UtrKey = "utr"
   val OverseasKey: String = "overseas"
   val SaPostcodeKey: String = "saPostcode"
+  val ChrnKey ="chrn"
   val RegistrationKey: String = "registration"
 
   implicit val utrStorageFormat: OFormat[Utr] = new OFormat[Utr] {

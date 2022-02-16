@@ -21,6 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.CheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
@@ -53,7 +54,7 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
               optUtr = utr)
           } yield Ok(view(
             pageConfig = journeyConfig.pageConfig,
-            formAction = routes.CheckYourAnswersController.submit(journeyId),
+            formAction = overseasControllerRoutes.CheckYourAnswersController.submit(journeyId),
             summaryRows = summaryRows
           ))
         case None =>

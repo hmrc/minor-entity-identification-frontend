@@ -21,7 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.routes
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureOverseasTaxIdentifiersForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_overseas_tax_identifiers_page
@@ -47,7 +47,7 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
               Ok(view(
                 journeyId = journeyId,
                 pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
+                formAction = overseasControllerRoutes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
                 form = CaptureOverseasTaxIdentifiersForm.form,
                 countries = config.orderedCountryList
 
@@ -71,7 +71,7 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
                   BadRequest(view(
                     journeyId = journeyId,
                     pageConfig = journeyConfig.pageConfig,
-                    formAction = routes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
+                    formAction = overseasControllerRoutes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
                     form = formWithErrors,
                     countries = config.orderedCountryList
                   ))
