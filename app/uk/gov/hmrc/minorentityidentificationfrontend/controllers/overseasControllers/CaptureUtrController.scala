@@ -21,6 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_utr_page
@@ -73,7 +74,7 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
               },
             utr =>
               storageService.storeUtr(journeyId, utr).map {
-                _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+                _ => Redirect(overseasControllerRoutes.CaptureOverseasTaxIdentifiersController.show(journeyId))
               }
           )
         case None =>

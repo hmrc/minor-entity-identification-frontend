@@ -82,7 +82,7 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised() {
         storageService.removeUtr(journeyId).map {
-          _ => NotImplemented
+          _ => Redirect(routes.CaptureCHRNController.show(journeyId))
         }
       }
   }

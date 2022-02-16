@@ -85,4 +85,21 @@ trait StorageStub extends WiremockMethods {
       status = status,
       body = body
     )
+
+  def stubStoreCHRN(journeyId: String, chrn: String)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/chrn",
+      body = JsString(chrn)
+    ).thenReturn(
+      status = status
+    )
+
+  def stubRemoveCHRN(journeyId: String)(status: Int, body: String = ""): Unit =
+    when(method = DELETE,
+      uri = s"/minor-entity-identification/journey/$journeyId/chrn"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
 }
