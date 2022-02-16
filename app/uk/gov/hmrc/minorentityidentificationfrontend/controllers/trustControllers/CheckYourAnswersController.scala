@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.OverseasCheckYourAnswersRowBuilder
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TrustCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -34,8 +34,7 @@ import scala.concurrent.ExecutionContext
 class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            journeyService: JourneyService,
                                            storageService: StorageService,
-                                           auditService: AuditService,
-                                           rowBuilder: OverseasCheckYourAnswersRowBuilder,
+                                           rowBuilder: TrustCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page
                                           )(implicit appConfig: AppConfig, ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
@@ -46,18 +45,16 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
         case Some(authInternalId) =>
           for {
             journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            utr <- storageService.retrieveUtr(journeyId)
-            optOverseasTaxIdentifiers <- storageService.retrieveOverseasTaxIdentifiers(journeyId)
-            summaryRows = rowBuilder.buildSummaryListRows(
-              journeyId = journeyId,
-              optOverseasTaxId = optOverseasTaxIdentifiers,
-              optUtr = utr)
+            optUtr <- storageService.retrieveUtr(journeyId)
+            optSaPostcode <- storageService.retrieveSaPostcode(journeyId)
+            optCharityHRMCReferenceNumber <- storageService.retrieveCHRN(journeyId)
+            summaryRows = rowBuilder.buildSummaryListRows(journeyId, optUtr, optSaPostcode, optCharityHRMCReferenceNumber)
           } yield Ok(view(
             pageConfig = journeyConfig.pageConfig,
-            formAction = overseasControllerRoutes.CheckYourAnswersController.submit(journeyId),
+            formAction = trustControllers.routes.CheckYourAnswersController.submit(journeyId),
             summaryRows = summaryRows
           ))
-        case None =>
+        case None                 =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
@@ -67,12 +64,9 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig => {
-              auditService.auditJourney(journeyId, authInternalId)
-              Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-            }
+            journeyConfig => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
           }
-        case None =>
+        case None                 =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }

@@ -26,6 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureSaPostcodeForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_sa_postcode_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -74,7 +75,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
               },
             postcode =>
               storageService.storeSaPostcode(journeyId, postcode).map {
-                _ => NotImplemented
+                _ => Redirect(trustControllersRoutes.CheckYourAnswersController.show(journeyId))
               }
           )
         case None =>
@@ -86,7 +87,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised() {
         storageService.removeSaPostcode(journeyId).map {
-          _ => NotImplemented
+          _ => Redirect(trustControllersRoutes.CheckYourAnswersController.show(journeyId))
         }
       }
   }

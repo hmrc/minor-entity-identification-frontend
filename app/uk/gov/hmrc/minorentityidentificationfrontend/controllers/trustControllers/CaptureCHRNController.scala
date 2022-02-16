@@ -21,7 +21,6 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms.CaptureCHRNForm
@@ -77,7 +76,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
                     ))
               },
               chrn => storageService.storeCHRN(journeyId, chrn).map {
-                _ => Redirect(overseasControllersRoutes.CheckYourAnswersController.show(journeyId)) // TODO Redirect to trusts CYA page
+                _ => Redirect(trustControllersRoutes.CheckYourAnswersController.show(journeyId))
               }
             )
           } else throw new InternalServerException("Trust journey is not enabled")
@@ -92,7 +91,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
       authorised() {
         if (isEnabled(EnableFullTrustJourney)) {
           storageService.removeCHRN(journeyId).map {
-            _ => Redirect(overseasControllersRoutes.CheckYourAnswersController.show(journeyId))
+            _ => Redirect(trustControllersRoutes.CheckYourAnswersController.show(journeyId))
           }
         } else
           throw new InternalServerException("Trust journey is not enabled")

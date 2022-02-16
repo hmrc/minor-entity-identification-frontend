@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CaptureSaPostcodeViewTests
@@ -77,10 +78,12 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
         lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
 
-        result.status mustBe NOT_IMPLEMENTED
-        //TODO: Update this to redirect to CYA page
+        result.status mustBe SEE_OTHER
+
+        result.header("Location") mustBe Some(trustControllersRoutes.CheckYourAnswersController.show(testJourneyId).url)
       }
     }
+
     "no SA postcode is submitted" should {
       lazy val result = {
         await(insertJourneyConfig(
@@ -131,7 +134,9 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
         val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
 
-        result.status mustBe NOT_IMPLEMENTED
+        result.status mustBe SEE_OTHER
+
+        result.header("Location") mustBe Some(trustControllersRoutes.CheckYourAnswersController.show(testJourneyId).url)
 
       }
     }

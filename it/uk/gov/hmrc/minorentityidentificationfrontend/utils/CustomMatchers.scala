@@ -47,9 +47,10 @@ trait CustomMatchers {
 
   def redirectUri(expectedValue: String): HavePropertyMatcher[WSResponse, String] =
     (response: WSResponse) => {
-      val redirectLocation: Option[String] = response.header("Location")
+      val redirectLocation: Option[String] = response.header(name = "Location")
 
-      val matchCondition = redirectLocation.exists(_.contains(expectedValue))
+      val matchCondition = redirectLocation.exists(_.equals(expectedValue))
+
       HavePropertyMatchResult(
         matchCondition,
         "redirectUri",

@@ -16,32 +16,19 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersViewTests
+import uk.gov.hmrc.minorentityidentificationfrontend.views.{CheckYourAnswersCommonViewTests, OverseasCheckYourAnswersSpecificViewTests}
 
-class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub with StorageStub with CheckYourAnswersViewTests with WiremockHelper {
-
-  def extraConfig: Map[String, String] = Map(
-    "auditing.enabled" -> "true",
-    "auditing.consumer.baseUri.host" -> mockHost,
-    "auditing.consumer.baseUri.port" -> mockPort
-  )
-
-  override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(config ++ extraConfig)
-    .build
-
-  override def beforeEach(): Unit = {
-    await(journeyConfigRepository.drop)
-    super.beforeEach()
-  }
+class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
+  with AuthStub
+  with StorageStub
+  with CheckYourAnswersCommonViewTests
+  with OverseasCheckYourAnswersSpecificViewTests {
 
   "GET /check-your-answers-business" when {
     "the applicant has a sautr and an overseas tax identifier" should {
@@ -64,25 +51,10 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       }
 
       "return a view which" should {
-        testCheckYourAnswersView(result, testJourneyId)
+        testCheckYourAnswersCommonView(result)
+        testOverseasSummaryViewWithUtrAndOverseasTaxIdentifier(result, testJourneyId)
       }
 
-      "redirect to sign in page" when {
-        "the user is UNAUTHORISED" in {
-          stubAuthFailure()
-          stubAudit()
-
-          lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri("/bas-gateway/sign-in" +
-              s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Fcheck-your-answers-business" +
-              "&origin=minor-entity-identification-frontend"
-            )
-          }
-        }
-      }
     }
 
     "the applicant does not provide a sautr and an overseas tax identifier" should {
@@ -96,6 +68,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
         stubAudit()
+
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
       }
 
@@ -104,23 +77,25 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
       }
 
       "return a view which" should {
-        testCheckYourAnswersViewWithAllRequestedDataNotProvided(result, testJourneyId)
+        testCheckYourAnswersCommonView(result)
+        testOverseasSummaryViewWithUtrAndOverseasTaxIdentifierNotProvided(result, testJourneyId)
       }
 
-      "redirect to sign in page" when {
-        "the user is UNAUTHORISED" in {
-          stubAuthFailure()
-          stubAudit()
+    }
 
-          lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
+    "the user is UNAUTHORISED" should {
+      "redirect to sign in page" in {
+        stubAuthFailure()
+        stubAudit()
 
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri("/bas-gateway/sign-in" +
-              s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Fcheck-your-answers-business" +
-              "&origin=minor-entity-identification-frontend"
-            )
-          }
+        lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri("/bas-gateway/sign-in" +
+            s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Fcheck-your-answers-business" +
+            "&origin=minor-entity-identification-frontend"
+          )
         }
       }
     }
@@ -142,7 +117,7 @@ class CheckYourAnswersControllerISpec extends ComponentSpecHelper with AuthStub 
 
       result must have {
         httpStatus(SEE_OTHER)
-        redirectUri(testContinueUrl)
+        redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
       }
       verifyAudit()
     }

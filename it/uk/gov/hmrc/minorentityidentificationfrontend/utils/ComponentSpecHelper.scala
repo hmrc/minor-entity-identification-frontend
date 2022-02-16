@@ -31,7 +31,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigR
 
 import scala.concurrent.Future
 
-trait ComponentSpecHelper extends AnyWordSpec with Matchers
+trait ComponentSpecHelper extends AnyWordSpec
+  with Matchers
   with CustomMatchers
   with WiremockHelper
   with BeforeAndAfterAll
@@ -39,7 +40,7 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
   with GuiceOneServerPerSuite {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(config)
+    .configure(config ++ extraConfig())
     .build
 
   val mockHost: String = WiremockHelper.wiremockHost
@@ -117,4 +118,7 @@ trait ComponentSpecHelper extends AnyWordSpec with Matchers
                           internalId: String,
                           journeyConfig: JourneyConfig): Future[InsertOneResult] =
     journeyConfigRepository.insertJourneyConfig(journeyId, internalId, journeyConfig)
+
+  def extraConfig(): Map[String, String] = Map()
+
 }

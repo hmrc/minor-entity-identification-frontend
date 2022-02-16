@@ -49,6 +49,12 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, SaPostcodeKey)
 
+  def retrieveSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+      connector.retrieveDataField[String](journeyId, SaPostcodeKey)
+
+  def retrieveCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+      connector.retrieveDataField[String](journeyId, ChrnKey)
+
   def storeRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[RegistrationStatus](journeyId, RegistrationKey, registrationStatus)
 

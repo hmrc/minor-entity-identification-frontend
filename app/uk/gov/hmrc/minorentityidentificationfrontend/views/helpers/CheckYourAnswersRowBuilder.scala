@@ -22,49 +22,26 @@ import uk.gov.hmrc.govukfrontend.views.Aliases
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Actions, Key, SummaryListRow, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
-import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.routes
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Overseas, Utr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
-import javax.inject.{Inject, Singleton}
+object CheckYourAnswersRowBuilder {
 
-@Singleton
-class CheckYourAnswersRowBuilder @Inject()() {
+  def utrSummaryRow(optUtr: Option[Utr], changeValuePageLink: Call, messages: Messages): Aliases.SummaryListRow = buildSummaryRow(
+    messages("check-your-answers.utr"),
+    optUtr match {
+      case Some(utr) => utr.value
+      case None      => messages("check-your-answers.no_utr")
+    },
+    changeValuePageLink,
+    messages
+  )
 
-  def buildSummaryListRows(journeyId: String,
-                           optOverseasTaxId: Option[Overseas],
-                           optUtr: Option[Utr])(implicit messages: Messages, config: AppConfig): Seq[SummaryListRow] = {
-
-    val utrRow: Aliases.SummaryListRow = buildSummaryRow(
-      messages("check-your-answers.utr"),
-      optUtr match {
-        case Some(utr) => utr.value
-        case None => messages("check-your-answers.no_utr")
-      },
-      routes.CaptureUtrController.show(journeyId),
-      messages
-    )
-
-    val overseasTaxIdentifiersRow: Aliases.SummaryListRow = buildSummaryRow(
-      messages("check-your-answers.tax_identifiers"),
-      optOverseasTaxId match {
-        case Some(overseasTaxId) => Seq(overseasTaxId.taxIdentifier, config.getCountryName(overseasTaxId.country)).mkString("<br>")
-        case None => messages("check-your-answers.no_tax-identifiers")
-      },
-      routes.CaptureOverseasTaxIdentifiersController.show(journeyId),
-      messages
-    )
-
-    Seq(utrRow, overseasTaxIdentifiersRow)
-
-  }
-
-  private def buildSummaryRow(key: String, value: String, changeLink: Call, messages: Messages): SummaryListRow = SummaryListRow(
+  def buildSummaryRow(key: String, value: String, changeValuePageLink: Call, messages: Messages): SummaryListRow = SummaryListRow(
     key = Key(content = Text(key)),
     value = Value(HtmlContent(value)),
     actions = Some(Actions(items = Seq(
       ActionItem(
-        href = changeLink.url,
+        href = changeValuePageLink.url,
         content = Text(messages("base.change")),
         visuallyHiddenText = Some(key)
       )

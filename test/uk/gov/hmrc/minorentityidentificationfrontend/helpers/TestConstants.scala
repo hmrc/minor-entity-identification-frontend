@@ -32,6 +32,8 @@ object TestConstants {
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testDefaultServiceName: String = "Entity Validation Service"
   val testRegime: String = "VATC"
+  val testPostcode: String = "AA1 1AA"
+  val testCharityHMRCReferenceNumber: String = UUID.randomUUID().toString
 
   def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
@@ -49,8 +51,8 @@ object TestConstants {
   val saUtr = "1234599999"
   val ctUtr = "1234500000"
 
-  val testSaUtr = Sautr(saUtr)
-  val testCtUtr = Ctutr(ctUtr)
+  val testSaUtr: Sautr = Sautr(saUtr)
+  val testCtUtr: Ctutr = Ctutr(ctUtr)
 
   val testOverseasSAUtrAuditEventJson: JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
