@@ -21,7 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.FeatureSwitching
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureSaPostcodeForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_sa_postcode_page
@@ -42,16 +42,18 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(internalId) {
-        case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig =>
-              Ok(view(
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-                form = CaptureSaPostcodeForm.form
-              ))
-          }
+          case Some(authInternalId) =>
+            if(isEnabled(EnableFullTrustJourney)) {
+              journeyService.getJourneyConfig(journeyId, authInternalId).map {
+              journeyConfig =>
+                Ok(view(
+                  journeyId = journeyId,
+                  pageConfig = journeyConfig.pageConfig,
+                  formAction = routes.CaptureSaPostcodeController.submit(journeyId),
+                  form = CaptureSaPostcodeForm.form
+                ))
+            }
+        }  else throw new InternalServerException("Trust journey is not enabled")
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
@@ -61,22 +63,24 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          CaptureSaPostcodeForm.form.bindFromRequest().fold(
-            formWithErrors =>
-              journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig =>
-                  BadRequest(view(
-                    journeyId = journeyId,
-                    pageConfig = journeyConfig.pageConfig,
-                    formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-                    form = formWithErrors
-                  ))
-              },
-            postcode =>
-              storageService.storeSaPostcode(journeyId, postcode).map {
-                _ => NotImplemented
-              }
-          )
+          if(isEnabled(EnableFullTrustJourney)) {
+            CaptureSaPostcodeForm.form.bindFromRequest().fold(
+              formWithErrors =>
+                journeyService.getJourneyConfig(journeyId, authInternalId).map {
+                  journeyConfig =>
+                    BadRequest(view(
+                      journeyId = journeyId,
+                      pageConfig = journeyConfig.pageConfig,
+                      formAction = routes.CaptureSaPostcodeController.submit(journeyId),
+                      form = formWithErrors
+                    ))
+                },
+              postcode =>
+                storageService.storeSaPostcode(journeyId, postcode).map {
+                  _ => NotImplemented
+                }
+            )
+          } else throw new InternalServerException("Trust journey is not enabled")
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
@@ -84,10 +88,12 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
 
   def noSaPostcode(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised() {
-        storageService.removeSaPostcode(journeyId).map {
-          _ => NotImplemented
+      if(isEnabled(EnableFullTrustJourney)) {
+        authorised() {
+          storageService.removeSaPostcode(journeyId).map {
+            _ => NotImplemented
+          }
         }
-      }
+      }  else throw new InternalServerException("Trust journey is not enabled")
   }
 }

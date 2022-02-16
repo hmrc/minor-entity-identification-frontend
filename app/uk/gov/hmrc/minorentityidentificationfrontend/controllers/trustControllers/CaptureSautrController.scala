@@ -21,6 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms.TrustCaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trustViews.capture_sa_utr_trust_page
@@ -36,20 +37,23 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
                                        mcc: MessagesControllerComponents,
                                        trustView: capture_sa_utr_trust_page
                                     )(implicit val config: AppConfig,
-                                      executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+                                      executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig => Ok(trustView(
+          if(isEnabled(EnableFullTrustJourney)) {
+            journeyService.getJourneyConfig(journeyId, authInternalId).map {
+              journeyConfig =>
+                Ok(trustView(
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureSautrController.submit(journeyId),
                   form = TrustCaptureUtrForm.trustForm
                 ))
-          }
+            }
+          } else throw new InternalServerException("Trust journey is not enabled")
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
@@ -59,21 +63,24 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          TrustCaptureUtrForm.trustForm.bindFromRequest().fold(
-            formWithErrors =>
-              journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig => BadRequest(trustView(
+          if(isEnabled(EnableFullTrustJourney)) {
+            TrustCaptureUtrForm.trustForm.bindFromRequest().fold(
+              formWithErrors =>
+                journeyService.getJourneyConfig(journeyId, authInternalId).map {
+                  journeyConfig =>
+                    BadRequest(trustView(
                       journeyId = journeyId,
                       pageConfig = journeyConfig.pageConfig,
                       formAction = routes.CaptureSautrController.submit(journeyId),
                       form = formWithErrors
                     ))
-              },
-            utr =>
-              storageService.storeUtr(journeyId, utr).map {
-                _ => Redirect(routes.CaptureSaPostcodeController.show(journeyId))
-              }
-          )
+                },
+              utr =>
+                storageService.storeUtr(journeyId, utr).map {
+                  _ => Redirect(routes.CaptureSaPostcodeController.show(journeyId))
+                }
+            )
+          } else throw new InternalServerException("Trust journey is not enabled")
         case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
@@ -81,9 +88,11 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
   def noUtr(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        storageService.removeUtr(journeyId).map {
-          _ => NotImplemented
-        }
+        if(isEnabled(EnableFullTrustJourney)) {
+          storageService.removeUtr(journeyId).map {
+            _ => NotImplemented
+          }
+        } else throw new InternalServerException("Trust journey is not enabled")
       }
   }
 
