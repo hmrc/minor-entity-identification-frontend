@@ -21,7 +21,7 @@ import play.api.data.Forms.{boolean, mapping, text}
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.MappingUtil.optText
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.validate
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 
 object TestCreateJourneyForm {

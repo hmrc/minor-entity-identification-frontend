@@ -22,7 +22,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CheckYourAnswers => messages}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testOverseasTaxIdentifiers, testSignOutUrl, testUtr}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.routes
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
@@ -72,7 +72,7 @@ trait CheckYourAnswersViewTests {
 
         utrRow.getSummaryListQuestion mustBe messages.utr
         utrRow.getSummaryListAnswer mustBe testUtr
-        utrRow.getSummaryListChangeLink mustBe routes.CaptureUtrController.show(testJourneyId).url
+        utrRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureUtrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }
 
@@ -81,7 +81,7 @@ trait CheckYourAnswersViewTests {
 
         taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
         taxIdentifierRow.getSummaryListAnswer mustBe s"${testOverseasTaxIdentifiers.taxIdentifier} Albania"
-        taxIdentifierRow.getSummaryListChangeLink mustBe routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
+        taxIdentifierRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
     }
@@ -136,7 +136,7 @@ trait CheckYourAnswersViewTests {
 
         utrRow.getSummaryListQuestion mustBe messages.utr
         utrRow.getSummaryListAnswer mustBe messages.noUtr
-        utrRow.getSummaryListChangeLink mustBe routes.CaptureUtrController.show(testJourneyId).url
+        utrRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureUtrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }
 
@@ -145,7 +145,7 @@ trait CheckYourAnswersViewTests {
 
         taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
         taxIdentifierRow.getSummaryListAnswer mustBe messages.overseasTaxIdentifierNotProvided
-        taxIdentifierRow.getSummaryListChangeLink mustBe routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
+        taxIdentifierRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
     }
