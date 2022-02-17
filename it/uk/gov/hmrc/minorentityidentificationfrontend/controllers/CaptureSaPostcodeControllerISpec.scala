@@ -29,39 +29,62 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
   with StorageStub
   with CaptureSaPostcodeViewTests with FeatureSwitching {
 
-  "GET /self-assessment-postcode" should {
-    lazy val result = {
-      await(insertJourneyConfig(
-        journeyId = testJourneyId,
-        internalId = testInternalId,
-        testTrustsJourneyConfig(businessVerificationCheck = true)
-      ))
-      enable(EnableFullTrustJourney)
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
-    }
+  "GET /self-assessment-postcode" when {
 
-    "return OK" in {
-      result.status mustBe OK
-    }
+    "FS is enabled and user is authenticated" should {
 
-    "return a view which" should {
-      testCaptureSaPostcodeView(result)
-    }
-
-    "redirect to sign in page" when {
-      "the user is UNAUTHORISED" in {
-        stubAuthFailure()
-        lazy val result: WSResponse = get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
-
-        result must have(
-          httpStatus(SEE_OTHER),
-          redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-trust%2F$testJourneyId%2Fself-assessment-postcode" +
-            "&origin=minor-entity-identification-frontend"
-          )
-        )
+      lazy val result = {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+        enable(EnableFullTrustJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
       }
+
+      "return OK" in {
+        result.status mustBe OK
+      }
+
+      "return a view which" should {
+        testCaptureSaPostcodeView(result)
+      }
+
+      "redirect to sign in page" when {
+        "the user is UNAUTHORISED" in {
+          stubAuthFailure()
+          lazy val result: WSResponse = get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
+
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectUri("/bas-gateway/sign-in" +
+              s"?continue_url=%2Fidentify-your-trust%2F$testJourneyId%2Fself-assessment-postcode" +
+              "&origin=minor-entity-identification-frontend"
+            )
+          )
+        }
+      }
+
+    }
+
+    "fs is disabled and user is authenticated" should {
+
+      "raise an internal server error" in {
+        lazy val result = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          disable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
+        }
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
+
     }
 
   }
