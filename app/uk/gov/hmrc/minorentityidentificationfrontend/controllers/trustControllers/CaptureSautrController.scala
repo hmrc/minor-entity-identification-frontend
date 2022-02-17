@@ -70,9 +70,11 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
                     ))
               },
             utr =>
-              storageService.storeUtr(journeyId, utr).map {
-                _ => Redirect(routes.CaptureSaPostcodeController.show(journeyId))
-              }
+              for {
+                _ <- storageService.storeUtr(journeyId, utr)
+                _ <- storageService.removeCHRN(journeyId)
+              } yield
+                Redirect(routes.CaptureSaPostcodeController.show(journeyId))
           )
         case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
@@ -81,9 +83,11 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
   def noUtr(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        storageService.removeUtr(journeyId).map {
-          _ => Redirect(routes.CaptureCHRNController.show(journeyId))
-        }
+        for {
+          _ <- storageService.removeUtr(journeyId)
+          _ <- storageService.removeSaPostcode(journeyId)
+        } yield
+          Redirect(routes.CaptureCHRNController.show(journeyId))
       }
   }
 
