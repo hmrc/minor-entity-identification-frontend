@@ -49,6 +49,12 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, SaPostcodeKey)
 
+  def retrieveSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+      connector.retrieveDataField[String](journeyId, SaPostcodeKey)
+
+  def retrieveCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+      connector.retrieveDataField[String](journeyId, ChrnKey)
+
   def storeRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[RegistrationStatus](journeyId, RegistrationKey, registrationStatus)
 
@@ -62,7 +68,19 @@ class StorageService @Inject()(connector: StorageConnector) {
     for {
       optUtr <- retrieveUtr(journeyId)
       optOverseasTaxIdentifiers <- retrieveOverseasTaxIdentifiers(journeyId)
+      optSaPostcode <- retrieveSaPostcode(journeyId)
+      optCharityHMRCReferenceNumber <- retrieveCHRN(journeyId)
     } yield {
+
+      val optCharityHMRCReferenceNumberBlock: JsObject = optCharityHMRCReferenceNumber match {
+        case Some(charityHMRCReferenceNumber) => Json.obj("chrn" -> charityHMRCReferenceNumber)
+        case None => Json.obj()
+      }
+
+      val utrSaPostcodeBlock: JsObject = optSaPostcode match {
+        case Some(saPostcode) => Json.obj("postcode" -> saPostcode)
+        case None => Json.obj()
+      }
 
       val utrBlock: JsObject = optUtr match {
         case Some(utr) => Json.obj(utr.utrType -> utr.value)
@@ -84,7 +102,9 @@ class StorageService @Inject()(connector: StorageConnector) {
         "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
       ) ++
         utrBlock ++
-        overseasTaxIdentifiersBlock
+        overseasTaxIdentifiersBlock ++
+        utrSaPostcodeBlock ++
+        optCharityHMRCReferenceNumberBlock
     }
 
   def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =

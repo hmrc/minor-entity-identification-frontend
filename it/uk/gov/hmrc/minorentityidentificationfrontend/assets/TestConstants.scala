@@ -34,6 +34,7 @@ object TestConstants {
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
   val testRegime: String = "VATC"
+  val testCharityHMRCReferenceNumber: String = "1597538264"
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
     "taxIdentifier" -> testOverseasTaxIdentifiers.taxIdentifier,
     "country" -> testOverseasTaxIdentifiers.country
