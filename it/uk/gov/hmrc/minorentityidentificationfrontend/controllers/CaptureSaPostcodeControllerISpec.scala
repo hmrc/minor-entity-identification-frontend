@@ -90,60 +90,90 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
   }
 
   "POST /self-assessment-postcode" when {
-    "the SA Postcode is correctly formatted" should {
-      "redirect to CYA page" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testTrustsJourneyConfig(businessVerificationCheck = true)
-        ))
-        enable(EnableFullTrustJourney)
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubStoreSaPostcode(testJourneyId, testSaPostcode)(status = OK)
 
-        lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
+    "fs is enabled and user is authenticated" when {
 
-        result.status mustBe NOT_IMPLEMENTED
-        //TODO: Update this to redirect to CYA page
+      "the SA Postcode is correctly formatted" should {
+        "redirect to CYA page" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          enable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubStoreSaPostcode(testJourneyId, testSaPostcode)(status = OK)
+
+          lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
+
+          result.status mustBe NOT_IMPLEMENTED
+          //TODO: Update this to redirect to CYA page
+        }
       }
+
+      "no SA postcode is submitted" should {
+        lazy val result = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          enable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> "")
+        }
+
+        "return a bad request" in {
+          result.status mustBe BAD_REQUEST
+        }
+
+        testCaptureSaPostcodeErrorMessageNoEntryPostcode(result)
+      }
+
+      "an invalid SA postcode is submitted" should {
+        lazy val result = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          enable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> "AA!0!!")
+        }
+
+        "return a bad request" in {
+          result.status mustBe BAD_REQUEST
+        }
+
+        testCaptureSaPostcodeErrorMessageInvalidPostcode(result)
+      }
+
     }
-    "no SA postcode is submitted" should {
-      lazy val result = {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testTrustsJourneyConfig(businessVerificationCheck = true)
-        ))
-        enable(EnableFullTrustJourney)
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> "")
+
+    "fs is disabled and user is authenticated" when {
+
+      "the SA Postcode is correctly formatted" should {
+
+        "return internal server exception" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          disable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubStoreSaPostcode(testJourneyId, testSaPostcode)(status = OK)
+
+          lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
+
+          result.status mustBe INTERNAL_SERVER_ERROR
+        }
+
       }
 
-      "return a bad request" in {
-        result.status mustBe BAD_REQUEST
-      }
-
-      testCaptureSaPostcodeErrorMessageNoEntryPostcode(result)
     }
 
-    "an invalid SA postcode is submitted" should {
-      lazy val result = {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testTrustsJourneyConfig(businessVerificationCheck = true)
-        ))
-        enable(EnableFullTrustJourney)
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> "AA!0!!")
-      }
-
-      "return a bad request" in {
-        result.status mustBe BAD_REQUEST
-      }
-
-      testCaptureSaPostcodeErrorMessageInvalidPostcode(result)
-    }
   }
 
   "GET /no-self-assessment-postcode" should {
