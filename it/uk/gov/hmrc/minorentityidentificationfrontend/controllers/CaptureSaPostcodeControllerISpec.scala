@@ -176,41 +176,71 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
   }
 
-  "GET /no-self-assessment-postcode" should {
-    "redirect to CYA page" when {
-      "the SA postcode is successfully removed" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testTrustsJourneyConfig(businessVerificationCheck = true)
-        ))
-        enable(EnableFullTrustJourney)
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
+  "GET /no-self-assessment-postcode" when {
 
-        val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
+    "fs is enabled and user is authenticated" should {
 
-        result.status mustBe NOT_IMPLEMENTED
+      "redirect to CYA page" when {
+        "the user wants to go forward with not having postcode" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          enable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
 
+          val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
+
+          result.status mustBe NOT_IMPLEMENTED // TODO - this needs to be updated
+
+        }
       }
+
+      "throw an exception" when {
+        "the backend returns a failure" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          enable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRemoveSaPostcode(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")
+
+          val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
+
+          result.status mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+
     }
 
-    "throw an exception" when {
-      "the backend returns a failure" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testTrustsJourneyConfig(businessVerificationCheck = true)
-        ))
-        enable(EnableFullTrustJourney)
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRemoveSaPostcode(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")
+    "fs is enabled and user is authenticated" should {
 
-        val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
+      "throw internal server exception" when {
 
-        result.status mustBe INTERNAL_SERVER_ERROR
+        "the user wants to go forward with not having postcode" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          disable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
+
+          val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
+
+          result.status mustBe INTERNAL_SERVER_ERROR
+
+        }
+
       }
+
     }
+
   }
 
 }
