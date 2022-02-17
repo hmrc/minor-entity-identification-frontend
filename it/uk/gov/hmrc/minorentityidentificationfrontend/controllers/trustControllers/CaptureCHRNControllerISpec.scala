@@ -35,7 +35,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
     s"?continue_url=%2Fidentify-your-trust%2F$testJourneyId%2F$redirectUri" +
     "&origin=minor-entity-identification-frontend"
 
-  "GET /CHRN" when {
+  "GET /chrn" when {
 
     "the user is authorized" when {
 
@@ -50,7 +50,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
           enable(EnableFullTrustJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          get(s"/identify-your-trust/$testJourneyId/CHRN")
+          get(s"/identify-your-trust/$testJourneyId/chrn")
         }
 
         "return OK" in {
@@ -76,7 +76,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             disable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            get(s"/identify-your-trust/$testJourneyId/CHRN")
+            get(s"/identify-your-trust/$testJourneyId/chrn")
           }
 
           result.status mustBe INTERNAL_SERVER_ERROR
@@ -92,11 +92,11 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
         stubAuthFailure()
 
-        lazy val result: WSResponse = get(s"/identify-your-trust/$testJourneyId/CHRN")
+        lazy val result: WSResponse = get(s"/identify-your-trust/$testJourneyId/chrn")
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(unauthorizedRedirectUri("CHRN"))
+          redirectUri(unauthorizedRedirectUri("chrn"))
         )
       }
 
@@ -104,7 +104,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
 }
 
-  "POST /CHRN" when {
+  "POST /chrn" when {
 
     "the user is authorized" when {
 
@@ -124,7 +124,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
             stubStoreCHRN(testJourneyId, testCHRN)(status = OK)
 
-            lazy val result = post(s"/identify-your-trust/$testJourneyId/CHRN")("chrn" -> testCHRN)
+            lazy val result = post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> testCHRN)
 
             result.status mustBe SEE_OTHER
 
@@ -145,7 +145,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            post(s"/identify-your-trust/$testJourneyId/CHRN")("chrn" -> "")
+            post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> "")
           }
 
           "return a bad request" in {
@@ -168,7 +168,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            post(s"/identify-your-trust/$testJourneyId/CHRN")("chrn" -> "ab99999")
+            post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> "ab99999")
           }
 
           "return a bad request" in {
@@ -190,7 +190,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            post(s"/identify-your-trust/$testJourneyId/CHRN")("chrn" -> "AB9999999")
+            post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> "AB9999999")
           }
 
           "return a bad request" in {
@@ -217,7 +217,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             disable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            lazy val result = post(s"/identify-your-trust/$testJourneyId/CHRN")("chrn" -> testCHRN)
+            lazy val result = post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> testCHRN)
 
             result.status mustBe INTERNAL_SERVER_ERROR
           }
@@ -234,17 +234,17 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
         stubAuthFailure()
 
-        val result = post(s"/identify-your-trust/$testJourneyId/CHRN")("chrn" -> testCHRN)
+        val result = post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> testCHRN)
 
         result must have(
           httpStatus(SEE_OTHER),
-            redirectUri(unauthorizedRedirectUri("CHRN"))
+            redirectUri(unauthorizedRedirectUri("chrn"))
         )
       }
     }
   }
 
-  "GET /no-CHRN" when {
+  "GET /no-chrn" when {
 
     "the user is authorized" when {
 
@@ -262,7 +262,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
 
-          lazy val result = get(s"/identify-your-trust/$testJourneyId/no-CHRN")
+          lazy val result = get(s"/identify-your-trust/$testJourneyId/no-chrn")
 
           result.status mustBe SEE_OTHER
 
@@ -281,7 +281,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRemoveCHRN(testJourneyId)(status = INTERNAL_SERVER_ERROR, body = "Failed to remove field")
 
-          lazy val result = get(s"/identify-your-trust/$testJourneyId/no-CHRN")
+          lazy val result = get(s"/identify-your-trust/$testJourneyId/no-chrn")
 
           result.status mustBe INTERNAL_SERVER_ERROR
         }
@@ -301,7 +301,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
 
-          lazy val result = get(s"/identify-your-trust/$testJourneyId/no-CHRN")
+          lazy val result = get(s"/identify-your-trust/$testJourneyId/no-chrn")
 
           result.status mustBe INTERNAL_SERVER_ERROR
         }
@@ -315,11 +315,11 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
         stubAuthFailure()
 
-        val result = get(s"/identify-your-trust/$testJourneyId/no-CHRN")
+        val result = get(s"/identify-your-trust/$testJourneyId/no-chrn")
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(unauthorizedRedirectUri("no-CHRN"))
+          redirectUri(unauthorizedRedirectUri("no-chrn"))
         )
       }
 

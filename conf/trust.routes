@@ -10,7 +10,7 @@ GET         /:journeyId/self-assessment-postcode           uk.gov.hmrc.minorenti
 POST        /:journeyId/self-assessment-postcode           uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.submit(journeyId)
 GET         /:journeyId/no-self-assessment-postcode        uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureSaPostcodeController.noSaPostcode(journeyId)
 
-GET         /:journeyId/CHRN                               uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.show(journeyId)
-POST        /:journeyId/CHRN                               uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.submit(journeyId)
-GET         /:journeyId/no-CHRN                            uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.noChrn(journeyId)
+GET         /:journeyId/chrn                               uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.show(journeyId)
+POST        /:journeyId/chrn                               uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.submit(journeyId)
+GET         /:journeyId/no-chrn                            uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.noChrn(journeyId)
 
