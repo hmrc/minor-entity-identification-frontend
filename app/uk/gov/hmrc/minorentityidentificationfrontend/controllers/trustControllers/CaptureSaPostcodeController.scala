@@ -36,8 +36,8 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
                                             journeyService: JourneyService,
                                             storageService: StorageService,
                                             val authConnector: AuthConnector
-                                           )(implicit val config: AppConfig,
-                                             executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
+                                           )(implicit val config: AppConfig, executionContext: ExecutionContext)
+  extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>

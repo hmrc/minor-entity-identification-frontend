@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CaptureSaPostcodeViewTests
@@ -26,7 +27,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.views.CaptureSaPostcodeView
 class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
   with AuthStub
   with StorageStub
-  with CaptureSaPostcodeViewTests {
+  with CaptureSaPostcodeViewTests with FeatureSwitching {
 
   "GET /self-assessment-postcode" should {
     lazy val result = {
@@ -35,6 +36,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
         internalId = testInternalId,
         testTrustsJourneyConfig(businessVerificationCheck = true)
       ))
+      enable(EnableFullTrustJourney)
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
     }
@@ -72,6 +74,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubStoreSaPostcode(testJourneyId, testSaPostcode)(status = OK)
 
@@ -88,6 +91,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> "")
       }
@@ -106,6 +110,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> "AA!0!!")
       }
@@ -126,6 +131,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
 
@@ -143,6 +149,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRemoveSaPostcode(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")
 
