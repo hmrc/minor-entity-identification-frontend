@@ -74,7 +74,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
               },
             postcode =>
               storageService.storeSaPostcode(journeyId, postcode).map {
-                _ => NotImplemented
+                _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
               }
           )
         case None =>
@@ -86,7 +86,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       authorised() {
         storageService.removeSaPostcode(journeyId).map {
-          _ => NotImplemented
+          _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
         }
       }
   }

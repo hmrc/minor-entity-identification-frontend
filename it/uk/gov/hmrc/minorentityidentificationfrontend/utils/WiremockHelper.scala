@@ -18,7 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.utils
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, delete, equalTo, get, getRequestedFor, patch, post, postRequestedFor, put, stubFor, urlEqualTo, urlMatching, verify}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.scalatest.concurrent.{Eventually, IntegrationPatience}
@@ -37,9 +37,9 @@ object WiremockHelper extends Eventually with IntegrationPatience {
     verify(postRequest)
   }
 
-  def verifyGet(uri: String): Unit = {
-    verify(getRequestedFor(urlEqualTo(uri)))
-  }
+  def verifyDelete(uri: String): Unit = verify(deleteRequestedFor(urlEqualTo(uri)))
+
+  def verifyGet(uri: String): Unit = verify(getRequestedFor(urlEqualTo(uri)))
 
   def stubGet(url: String, status: Integer, body: String): Unit =
     stubFor(get(urlMatching(url))

@@ -14,3 +14,5 @@ GET         /:journeyId/chrn                               uk.gov.hmrc.minorenti
 POST        /:journeyId/chrn                               uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.submit(journeyId)
 GET         /:journeyId/no-chrn                            uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CaptureCHRNController.noChrn(journeyId)
 
+GET         /:journeyId/check-your-answers-business      uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CheckYourAnswersController.show(journeyId)
+POST        /:journeyId/check-your-answers-business      uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.CheckYourAnswersController.submit(journeyId)

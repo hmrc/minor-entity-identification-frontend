@@ -19,11 +19,11 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControlle
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.CaptureCHRNumberViewTests
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 
 class CaptureCHRNControllerISpec extends ComponentSpecHelper
   with AuthStub
@@ -128,7 +128,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
             result.status mustBe SEE_OTHER
 
-            result.header("Location") mustBe Some(overseasControllersRoutes.CheckYourAnswersController.show(testJourneyId).url) // TODO Change location to trusts CYA
+            result.header("Location") mustBe Some(trustControllersRoutes.CheckYourAnswersController.show(testJourneyId).url)
           }
 
         }
@@ -266,7 +266,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
           result.status mustBe SEE_OTHER
 
-          result.header("Location") mustBe Some(overseasControllersRoutes.CheckYourAnswersController.show(testJourneyId).url) // TODO Change location to trusts CYA
+          result.header("Location") mustBe Some(trustControllersRoutes.CheckYourAnswersController.show(testJourneyId).url)
         }
 
         "return an internal server error when the back end raises an exception" in {
