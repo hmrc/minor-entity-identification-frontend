@@ -94,12 +94,31 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
+  def stubRetrieveSaPostcode(journeyId: String)(status: Int, saPostcode: String): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/saPostcode"
+    ).thenReturn(
+      status = status,
+      body = JsString(saPostcode)
+    )
+
   def stubRemoveCHRN(journeyId: String)(status: Int, body: String = ""): Unit =
     when(method = DELETE,
       uri = s"/minor-entity-identification/journey/$journeyId/chrn"
     ).thenReturn(
       status = status,
       body = body
+    )
+
+  def stubRetrieveCHRN(journeyId: String)(status: Int, optCharityHMRCReferenceNumber: Option[String]): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/chrn"
+    ).thenReturn(
+      status = status,
+      body = optCharityHMRCReferenceNumber match {
+        case Some(charityHMRCReferenceNumber) => JsString(charityHMRCReferenceNumber)
+        case None                             => JsObject.empty
+      }
     )
 
 }
