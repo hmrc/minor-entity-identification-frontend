@@ -72,53 +72,57 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
   }
 
   "GET /api/journey/:journeyId" should {
-    "return utr, business registration status and registration status" when {
-      "the utr exists in the database" in {
+    "return sautr, business registration status, registration status, postcode and chrn" when {
+      "they exist in the database" in {
         val testDetailsJson = Json.obj(
           "sautr" -> "1234567890",
           "identifiersMatch" -> false,
           "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
-          "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes)
+          "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes),
+          "postcode" -> testSaPostcode,
+          "chrn" -> testCharityHMRCReferenceNumber
         )
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveCHRN(testJourneyId)(OK, Some(testCharityHMRCReferenceNumber))
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
         result.status mustBe OK
         result.json mustBe testDetailsJson
       }
+    }
+    "return the business verification status and registration status (no sautr, no postcode and no chrn)" when {
+      "the utr, SAPostcode and CHRN do not exist in the database" in {
+        val testDetailsJson = Json.obj(
+          "identifiersMatch" -> false,
+          "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
+          "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes)
+        )
 
-      "return the business verification status and registration status" when {
-        "the utr does not exist in the database" in {
-          val testDetailsJson = Json.obj(
-            "identifiersMatch" -> false,
-            "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
-            "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes)
-          )
-          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
 
-          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
-          result.status mustBe OK
-          result.json mustBe testDetailsJson
-        }
+        result.status mustBe OK
+        result.json mustBe testDetailsJson
       }
+    }
 
-      "redirect to Sign In Page" when {
-        "the user is UNAUTHORISED" in {
-          stubAuthFailure()
+    "redirect to Sign In Page" when {
+      "the user is UNAUTHORISED" in {
+        stubAuthFailure()
 
-          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri("/bas-gateway/sign-in" +
-              s"?continue_url=%2Fminor-entity-identification%2Fapi%2Fjourney%2F$testJourneyId" +
-              "&origin=minor-entity-identification-frontend")
-          }
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri("/bas-gateway/sign-in" +
+            s"?continue_url=%2Fminor-entity-identification%2Fapi%2Fjourney%2F$testJourneyId" +
+            "&origin=minor-entity-identification-frontend")
         }
       }
     }
