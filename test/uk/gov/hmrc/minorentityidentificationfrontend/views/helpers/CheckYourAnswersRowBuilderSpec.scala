@@ -26,7 +26,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.routes
-import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testOverseas, testSaUtr}
+import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testOverseas, testSautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Sautr
 
 class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -38,7 +39,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Guic
 
   val testUtrRow = SummaryListRow(
     key = Key(content = Text("Unique taxpayers reference number")),
-    value = Value(content = HtmlContent(testSaUtr.value)),
+    value = Value(content = HtmlContent(testSautr)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = routes.CaptureUtrController.show(testJourneyId).url,
@@ -91,7 +92,7 @@ class CheckYourAnswersRowBuilderSpec extends AnyWordSpec with Matchers with Guic
         val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
           journeyId = testJourneyId,
           optOverseasTaxId = Some(testOverseas),
-          optUtr = Some(testSaUtr)
+          optUtr = Some(Sautr(testSautr))
         )(messages, mockAppConfig)
 
         actualSummaryList mustBe Seq(testUtrRow, testOverseasTaxIdentifiersRow)

@@ -22,7 +22,7 @@ import org.mongodb.scala.result.InsertOneResult
 import play.api.libs.json._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}

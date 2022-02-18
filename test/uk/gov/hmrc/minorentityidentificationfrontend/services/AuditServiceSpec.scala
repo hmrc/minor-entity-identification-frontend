@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationNotCalled
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, RegistrationNotCalled, Sautr}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,7 +52,7 @@ class AuditServiceSpec
     "send an event" when {
       "the entity is an OverseasCompany with SA Utr and no overseas tax identifiers." in {
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(testSaUtr))
+        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
         mockStorageService.retrieveOverseasTaxIdentifiers(testJourneyId) returns Future.successful(None)
         mockStorageService.retrieveRegistrationStatus(testJourneyId) returns Future.successful(Some(RegistrationNotCalled))
 
@@ -66,7 +66,7 @@ class AuditServiceSpec
     "send an event" when {
       "the entity is an OverseasCompany with CT Utr and no overseas tax identifiers." in {
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(testCtUtr))
+        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Ctutr(testCtutr)))
         mockStorageService.retrieveOverseasTaxIdentifiers(testJourneyId) returns Future.successful(None)
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
@@ -79,7 +79,7 @@ class AuditServiceSpec
     "send an event" when {
       "the entity is an OverseasCompany and the user provided an overseas tax identifiers." in {
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(testCtUtr))
+        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Ctutr(testCtutr)))
         mockStorageService.retrieveOverseasTaxIdentifiers(testJourneyId) returns Future.successful(Some(testOverseas))
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
