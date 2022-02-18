@@ -31,7 +31,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
   "GET /self-assessment-postcode" when {
 
-    "FS is enabled and user is authenticated" should {
+    "fs is enabled and user is authenticated" should {
 
       lazy val result = {
         await(insertJourneyConfig(
@@ -69,7 +69,27 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
     }
 
-    "fs is disabled and user is authenticated" should {
+    "fs is enabled and user is not authenticated" should {
+
+      lazy val result = {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+        enable(EnableFullTrustJourney)
+        stubAuthFailure()
+        get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
+      }
+
+      "return SEE_OTHER" in {
+        result.status mustBe SEE_OTHER
+      }
+
+    }
+
+
+      "fs is disabled and user is authenticated" should {
 
       "raise an internal server error" in {
         lazy val result = {
@@ -87,7 +107,24 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
     }
 
-  }
+    "fs is disabled and user is not authenticated" should {
+      lazy val result = {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+        disable(EnableFullTrustJourney)
+        stubAuthFailure()
+        get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
+      }
+
+      "return SEE_OTHER" in {
+        result.status mustBe SEE_OTHER
+      }
+    }
+
+    }
 
   "POST /self-assessment-postcode" when {
 
@@ -151,6 +188,24 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
     }
 
+    "fs is enabled and user is not authenticated" when {
+      "the SA Postcode is correctly formatted" should {
+        "return INTERNAL_SERVER_ERROR" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          disable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+
+          lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
+
+          result.status mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+    }
+
     "fs is disabled and user is authenticated" when {
 
       "the SA Postcode is correctly formatted" should {
@@ -163,8 +218,6 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
           ))
           disable(EnableFullTrustJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubStoreSaPostcode(testJourneyId, testSaPostcode)(status = OK)
-
           lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
 
           result.status mustBe INTERNAL_SERVER_ERROR
@@ -172,6 +225,24 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
       }
 
+    }
+
+    "fs is disabled and user is not authenticated" when {
+      "the SA Postcode is correctly formatted" should {
+        "return SEE_OTHER" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          disable(EnableFullTrustJourney)
+          stubAuthFailure()
+
+          lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
+
+          result.status mustBe SEE_OTHER
+        }
+      }
     }
 
   }
@@ -217,7 +288,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
     }
 
-    "fs is enabled and user is authenticated" should {
+    "fs is disabled and user is authenticated" should {
 
       "throw internal server exception" when {
 

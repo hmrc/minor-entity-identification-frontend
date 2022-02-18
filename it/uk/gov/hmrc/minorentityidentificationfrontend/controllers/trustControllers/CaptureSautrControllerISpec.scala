@@ -18,7 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControlle
 
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
 import play.api.libs.ws.WSResponse
-import play.api.test.Helpers.{OK, SEE_OTHER, await, defaultAwaitTimeout}
+import play.api.test.Helpers.{OK, SEE_OTHER, UNAUTHORIZED, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Sautr
@@ -88,6 +88,39 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       }
 
     }
+
+    "the user is not authorized" when {
+
+      "the feature switch is enabled" in {
+        lazy val result = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          enable(EnableFullTrustJourney)
+          stubAuthFailure()
+          get(s"/identify-your-trust/$testJourneyId/sa-utr")
+        }
+          result.status mustBe SEE_OTHER
+      }
+
+      "the feature switch is disabled" in {
+        lazy val result = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+          disable(EnableFullTrustJourney)
+          stubAuthFailure()
+          get(s"/identify-your-trust/$testJourneyId/sa-utr")
+        }
+        result.status mustBe SEE_OTHER
+      }
+
+    }
+
   }
 
   "POST /sa-utr" when {
@@ -223,6 +256,43 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       }
 
     }
-  }
+
+      "the user is not authorized" when {
+
+        "the feature switch is enabled" in {
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          enable(EnableFullTrustJourney)
+          stubAuthFailure()
+
+          lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> "1234567891")
+
+          result.status mustBe SEE_OTHER
+
+        }
+
+        "the feature switch is disabled" in {
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          disable(EnableFullTrustJourney)
+          stubAuthFailure()
+
+          lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> "1234567891")
+
+          result.status mustBe SEE_OTHER
+
+        }
+
+      }
+
+    }
 
 }
