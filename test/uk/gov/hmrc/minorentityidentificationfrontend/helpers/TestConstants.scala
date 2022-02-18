@@ -29,9 +29,13 @@ object TestConstants {
   val testContinueUrl: String = "/test"
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
-  val testOverseas: Overseas = Overseas("134124532", "AL")
   val testDefaultServiceName: String = "Entity Validation Service"
   val testRegime: String = "VATC"
+
+  val testSautr = "1234599999"
+  val testCtutr = "1234500000"
+  val testOverseas: Overseas = Overseas("134124532", "AL")
+  val testSaPostcode = "AA1 1AA"
 
   def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
@@ -46,19 +50,13 @@ object TestConstants {
     testRegime
   )
 
-  val saUtr = "1234599999"
-  val ctUtr = "1234500000"
-
-  val testSaUtr = Sautr(saUtr)
-  val testCtUtr = Ctutr(ctUtr)
-
   val testOverseasSAUtrAuditEventJson: JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Overseas Company",
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
     "RegisterApiStatus" ->  "not called",
     "sautrMatch" -> false,
-    "userSAUTR" -> saUtr)
+    "userSAUTR" -> testSautr)
 
   val testOverseasCTUtrAuditEventJson: JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
@@ -66,7 +64,7 @@ object TestConstants {
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
     "RegisterApiStatus" ->  "not called",
     "cTUTRMatch" -> false,
-    "userCTUTR" -> ctUtr)
+    "userCTUTR" -> testCtutr)
 
   val testUnincorporatedAssociationAuditEventJson: JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
@@ -86,5 +84,8 @@ object TestConstants {
     "overseasTaxIdentifier" -> testOverseas.taxIdentifier,
     "overseasTaxIdentifierCountry" -> testOverseas.country
   )
+
+  val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testSaPostcode), Some(testSaPostcode), isAbroad = false)
+  val testTrustKnownFactsAbroadResponse: TrustKnownFacts = TrustKnownFacts(None, None, isAbroad = true)
 
 }

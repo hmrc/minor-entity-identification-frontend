@@ -21,12 +21,13 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Country
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject()(config: Configuration,
-                          servicesConfig: ServicesConfig, environment: Environment) {
+                          servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
   lazy val timeToLiveSeconds: Long = servicesConfig.getInt("mongodb.timeToLiveSeconds").toLong
@@ -58,6 +59,13 @@ class AppConfig @Inject()(config: Configuration,
     s"$contactHost/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
   def minorEntityIdentificationUrl(journeyId: String): String = s"$backendUrl/minor-entity-identification/journey/$journeyId"
+
+  lazy val trustsUrl: String = servicesConfig.baseUrl("trusts")
+
+  def retrieveTrustsKnownFactsUrl(sautr: String): String = {
+    val baseUrl: String = if (isEnabled(TrustVerificationStub)) s"$selfBaseUrl/identify-your-trust/test-only" else trustsUrl
+    baseUrl + s"/trusts/$sautr/refresh"
+  }
 
   lazy val countries: Map[String, Country] = {
     environment.resourceAsStream("/countries.json") match {
