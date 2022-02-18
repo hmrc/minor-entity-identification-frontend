@@ -18,7 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig, TrustKnownFacts}
 
 import java.util.UUID
 
@@ -28,6 +28,7 @@ object TestConstants {
   val testInternalId: String = UUID.randomUUID().toString
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
   val testSaPostcode: String =  "AA00 0AA"
+  val testPostcode: String = "AA1 1AA"
   val testCHRN: String = "AB99999"
   val testContinueUrl: String = "/test"
   val testDeskProServiceId: String = "vrs"
@@ -69,4 +70,118 @@ object TestConstants {
       "value" -> testUtr
     )
   }
+
+  val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testPostcode), Some(testSaPostcode), isAbroad = false)
+
+  val knownFactsJson: JsObject = Json.obj(
+    "trustOrEstateDisplay" -> Json.obj(
+      "declaration" -> Json.obj(
+        "name" -> Json.obj(
+          "firstName" -> "Joe",
+          "lastName" -> "Bloggs"
+        ),
+        "address" -> Json.obj(
+          "postCode" -> "AA00 0AA",
+          "country" -> "GB",
+          "line1" -> "Test Line 1",
+          "line2" -> "Test Line 2"
+        )
+      ),
+      "matchData" -> (
+        "utr" -> "1234567890"
+        ),
+      "applicationType" -> "01",
+      "submissionDate" -> "2021-03-31",
+      "correspondence" -> Json.obj(
+        "abroadIndicator" -> false,
+        "name" -> "Test UK Trust",
+        "address" -> Json.obj(
+          "line1" -> "Test Line 1",
+          "line2" -> "Test Lane",
+          "postCode" -> "AA1 1AA",
+          "country" -> "GB"
+        ),
+        "phoneNumber" -> "0191 2929292"
+      ),
+      "details" -> Json.obj(
+        "trust" -> Json.obj(
+          "details" -> Json.obj(
+            "administrationCountry" -> "GB",
+            "trustUKResident" -> true,
+            "trustUKProperty" -> false,
+            "trustRecorded" -> false,
+            "residentialStatus" -> Json.obj(
+              "uk" -> Json.obj(
+                "scottishLaw" -> false
+              )
+            ),
+            "startDate" -> "2021-03-31",
+            "expressTrust" -> true,
+            "typeOfTrust" -> "Will Trust or Intestacy Trust",
+            "trustTaxable" -> true
+          ),
+          "entities" -> Json.obj(
+            "beneficiary" -> Json.obj(
+              "unidentified" -> Json.arr(
+                Json.obj(
+                  "lineNo" -> "3",
+                  "description" -> "Grandchildren of John",
+                  "entityStart" -> "2021-03-31"
+                )
+              )
+            ),
+            "deceased" -> Json.obj(
+              "name" -> Json.obj(
+                "firstName" -> "Adam",
+                "lastName" -> "Conder"
+              ),
+              "bpMatchStatus" -> "98",
+              "dateOfDeath" -> "2019-08-27",
+              "dateOfBirth" -> "1990-06-21",
+              "entityStart" -> "2021-03-31",
+              "lineNo" -> "2"
+            ),
+            "leadTrustees" -> Json.obj(
+              "name" -> Json.obj(
+                "firstName" -> "John",
+                "lastName" -> "Whitfield"
+              ),
+              "bpMatchStatus" -> "02",
+              "phoneNumber" -> "0191 2929292",
+              "identification" -> Json.obj(
+                "address" -> Json.obj(
+                  "line1" -> "33 New Crest",
+                  "line2" -> "Lane",
+                  "postCode" -> "NE7 8JP",
+                  "country" -> "GB"
+                ),
+                "passport" -> Json.obj(
+                  "number" -> "987345987398457",
+                  "expirationDate" -> "2025-05-21",
+                  "countryOfIssue" -> "GB"
+                ),
+                "safeId" -> "XF0000100351861"
+              ),
+              "dateOfBirth" -> "1980-10-10",
+              "entityStart" -> "2021-03-31",
+              "lineNo" -> "1",
+              "nationality" -> "GB",
+              "countryOfResidence" -> "GB"
+            )
+          ),
+          "assets" -> Json.obj(
+            "monetary" -> Json.arr(
+              (
+                "assetMonetaryAmount" -> 10000
+                )
+            )
+          )
+        )
+      )
+    ),
+    "responseHeader" -> Json.obj(
+      "dfmcaReturnUserStatus" -> "Processed",
+      "formBundleNo" -> "000001230962"
+    )
+  )
 }

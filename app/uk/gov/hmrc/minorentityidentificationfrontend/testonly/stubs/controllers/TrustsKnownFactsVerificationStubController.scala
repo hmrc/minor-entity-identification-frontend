@@ -28,6 +28,7 @@ class TrustsKnownFactsVerificationStubController @Inject()(controllerComponents:
   def stubTrustKnownFacts(sautr: String): Action[AnyContent] = Action.async {
     sautr match {
       case "1234567891" => Future.successful(Ok(jsonFromFile("resources/TrustsKnownFactsVerificationStub/AbroadResponse")))
+      case "1234567892" => Future.successful(NotFound)
       case _ => Future.successful(Ok(jsonFromFile("resources/TrustsKnownFactsVerificationStub/GBResponse")))
     }
   }
