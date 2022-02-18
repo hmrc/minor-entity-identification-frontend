@@ -288,6 +288,21 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
     }
 
+    "fs is enabled and user is not authenticated" should {
+      "throw a SEE_OTHER" in {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+        enable(EnableFullTrustJourney)
+        stubAuthFailure()
+        val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
+
+        result.status mustBe SEE_OTHER
+      }
+    }
+
     "fs is disabled and user is authenticated" should {
 
       "throw internal server exception" when {
@@ -310,6 +325,21 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
       }
 
+    }
+
+    "fs is disabled and user is not authenticated" should {
+      "throw a INTERNAL_SERVER_ERROR" in {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+        disable(EnableFullTrustJourney)
+        stubAuthFailure()
+        val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
+
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
     }
 
   }
