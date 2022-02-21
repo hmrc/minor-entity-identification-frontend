@@ -102,7 +102,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
           stubAuthFailure()
           get(s"/identify-your-trust/$testJourneyId/sa-utr")
         }
-          result.status mustBe SEE_OTHER
+        result.status mustBe SEE_OTHER
       }
 
       "the feature switch is disabled" in {
@@ -139,7 +139,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
             stubStoreUtr(testJourneyId, Sautr(testUtr))(OK)
-        stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
+            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
 
             lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testUtr)
 
@@ -148,10 +148,10 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
               redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
             )
 
-        verifyRemoveCHRN(testJourneyId)
+            verifyRemoveCHRN(testJourneyId)
 
-      }
-    }
+          }
+        }
 
         "the utr is an sautr" should {
           "redirect to check your answers and remove CHRN (maybe we arrived to SautrController from from CYA page and CHRN could have been set during the previous journey)" in {
@@ -174,9 +174,9 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
               redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
             )
 
-        verifyRemoveCHRN(testJourneyId)
-      }
-    }
+            verifyRemoveCHRN(testJourneyId)
+          }
+        }
 
         "no utr is submitted" should {
           lazy val result = {
@@ -264,67 +264,67 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
 
     }
 
-      "the user is not authorized" when {
+    "the user is not authorized" when {
 
-        "the feature switch is enabled" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
-          ))
+      "the feature switch is enabled" in {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
 
-          enable(EnableFullTrustJourney)
-          stubAuthFailure()
+        enable(EnableFullTrustJourney)
+        stubAuthFailure()
 
-          lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> "1234567891")
+        lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> "1234567891")
 
-          result.status mustBe SEE_OTHER
+        result.status mustBe SEE_OTHER
 
-        }
+      }
 
-        "the feature switch is disabled" in {
-          await(journeyConfigRepository.insertJourneyConfig(
-            journeyId = testJourneyId,
-            authInternalId = testInternalId,
-            journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
-          ))
+      "the feature switch is disabled" in {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
 
-          disable(EnableFullTrustJourney)
-          stubAuthFailure()
+        disable(EnableFullTrustJourney)
+        stubAuthFailure()
 
-          lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> "1234567891")
+        lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> "1234567891")
 
-          result.status mustBe SEE_OTHER
-
-        }
+        result.status mustBe SEE_OTHER
 
       }
 
     }
 
+  }
+
   "GET /no-utr" should {
-      "redirect to enter your CHRN, remove UTR and remove SaPostcode (maybe we arrived to SautrController from CYA page and SaPostcode could have been set during the previous journey)" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testTrustsJourneyConfig(businessVerificationCheck = true)
-        ))
-        enable(EnableFullTrustJourney)
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRemoveUtr(testJourneyId)(status = NO_CONTENT)
-        stubRemoveSaPostcode(testJourneyId)(status = NO_CONTENT)
+    "redirect to enter your CHRN, remove UTR and remove SaPostcode (maybe we arrived to SautrController from CYA page and SaPostcode could have been set during the previous journey)" in {
+      await(insertJourneyConfig(
+        journeyId = testJourneyId,
+        internalId = testInternalId,
+        testTrustsJourneyConfig(businessVerificationCheck = true)
+      ))
+      enable(EnableFullTrustJourney)
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubRemoveUtr(testJourneyId)(status = NO_CONTENT)
+      stubRemoveSaPostcode(testJourneyId)(status = NO_CONTENT)
 
-        lazy val result = get(s"/identify-your-trust/$testJourneyId/no-utr")
+      lazy val result = get(s"/identify-your-trust/$testJourneyId/no-utr")
 
-        result must have(
-          httpStatus(SEE_OTHER),
-          redirectUri(routes.CaptureCHRNController.show(testJourneyId).url)
-        )
+      result must have(
+        httpStatus(SEE_OTHER),
+        redirectUri(routes.CaptureCHRNController.show(testJourneyId).url)
+      )
 
-        verifyRemoveUtr(testJourneyId)
-        verifyRemoveSaPostcode(testJourneyId)
+      verifyRemoveUtr(testJourneyId)
+      verifyRemoveSaPostcode(testJourneyId)
 
-      }
+    }
 
     "redirect to Sign In page" when {
       "the user is UNAUTHORISED" in {
@@ -340,7 +340,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       }
     }
 
-    }
+  }
 
 
 }
