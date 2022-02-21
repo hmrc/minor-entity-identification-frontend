@@ -32,10 +32,11 @@ object TestConstants {
   val testDefaultServiceName: String = "Entity Validation Service"
   val testRegime: String = "VATC"
 
-  val testSautr = "1234599999"
-  val testCtutr = "1234500000"
+  val testSautr: String = "1234599999"
+  val testCtutr: String = "1234500000"
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testSaPostcode = "AA1 1AA"
+  val testCharityHMRCReferenceNumber: String = UUID.randomUUID().toString
 
   def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
