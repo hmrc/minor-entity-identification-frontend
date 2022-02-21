@@ -190,7 +190,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
 
     }
 
-    "fs is enabled and user is not authenticated" when {
+    "fs is disabled and user is not authenticated" when {
       "the SA Postcode is correctly formatted" should {
         "return INTERNAL_SERVER_ERROR" in {
           await(insertJourneyConfig(

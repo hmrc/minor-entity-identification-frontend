@@ -165,7 +165,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
             stubStoreUtr(testJourneyId, Sautr(testSautr))(OK)
-        stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
+            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
 
             lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testSautr)
 
@@ -309,6 +309,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRemoveUtr(testJourneyId)(status = NO_CONTENT)
         stubRemoveSaPostcode(testJourneyId)(status = NO_CONTENT)
