@@ -52,6 +52,10 @@ check-your-answers.utr                                      = Unique taxpayers r
 check-your-answers.no_utr                                   = The business does not have a UTR
 check-your-answers.tax_identifiers                          = Overseas tax identifier
 check-your-answers.no_tax-identifiers                       = I do not want to provide an identifier
+check-your-answers.charity_hmrc_reference_number            = HMRC reference number
+check-your-answers.no_charity_hmrc_reference_number         = The charity does not have a HMRC reference number
+check-your-answers.sa_postcode                              = Self Assessment postcode
+check-your-answers.no_sa_postcode                           = The business does not have a Self Assessment postcode
 
 ## Capture Charity HMRC Reference number
 chrn.title                                                  = What is the charity’s HMRC reference number?

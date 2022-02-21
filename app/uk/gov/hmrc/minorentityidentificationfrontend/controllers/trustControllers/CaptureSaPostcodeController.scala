@@ -77,7 +77,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
                 },
               postcode =>
                 storageService.storeSaPostcode(journeyId, postcode).map {
-                  _ => NotImplemented
+                  _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
                 }
             )
           } else throw new InternalServerException("Trust journey is not enabled")
@@ -91,7 +91,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
       if(isEnabled(EnableFullTrustJourney)) {
         authorised() {
           storageService.removeSaPostcode(journeyId).map {
-            _ => NotImplemented
+            _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
           }
         }
       }  else throw new InternalServerException("Trust journey is not enabled")

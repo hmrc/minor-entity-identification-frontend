@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControlle
 
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
 import play.api.libs.ws.WSResponse
+import play.api.test.Helpers.{BAD_REQUEST, NO_CONTENT, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import play.api.test.Helpers.{OK, SEE_OTHER, UNAUTHORIZED, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
@@ -130,7 +131,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       "the feature switch is enabled" when {
 
         "the utr is correctly formatted" should {
-          "redirect to enter your postcode" in {
+          "redirect to enter your postcode and remove CHRN (maybe we arrived to SautrController from from CYA page and CHRN could have been set during the previous journey)" in {
             await(insertJourneyConfig(
               journeyId = testJourneyId,
               internalId = testInternalId,
@@ -139,6 +140,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
             stubStoreUtr(testJourneyId, Sautr(testUtr))(OK)
+        stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
 
             lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testUtr)
 
@@ -146,11 +148,14 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
               httpStatus(SEE_OTHER),
               redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
             )
-          }
-        }
+
+        verifyRemoveCHRN(testJourneyId)
+
+      }
+    }
 
         "the utr is an sautr" should {
-          "redirect to check your answers" in {
+          "redirect to check your answers and remove CHRN (maybe we arrived to SautrController from from CYA page and CHRN could have been set during the previous journey)" in {
             val testSautr = "1234530000"
 
             await(insertJourneyConfig(
@@ -161,6 +166,7 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
             stubStoreUtr(testJourneyId, Sautr(testSautr))(OK)
+        stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
 
             lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testSautr)
 
@@ -168,8 +174,10 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
               httpStatus(SEE_OTHER),
               redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
             )
-          }
-        }
+
+        verifyRemoveCHRN(testJourneyId)
+      }
+    }
 
         "no utr is submitted" should {
           lazy val result = {
@@ -294,5 +302,45 @@ class CaptureSautrControllerISpec extends ComponentSpecHelper
       }
 
     }
+
+  "GET /no-utr" should {
+      "redirect to enter your CHRN, remove UTR and remove SaPostcode (maybe we arrived to SautrController from CYA page and SaPostcode could have been set during the previous journey)" in {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRemoveUtr(testJourneyId)(status = NO_CONTENT)
+        stubRemoveSaPostcode(testJourneyId)(status = NO_CONTENT)
+
+        lazy val result = get(s"/identify-your-trust/$testJourneyId/no-utr")
+
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CaptureCHRNController.show(testJourneyId).url)
+        )
+
+        verifyRemoveUtr(testJourneyId)
+        verifyRemoveSaPostcode(testJourneyId)
+
+      }
+
+    "redirect to Sign In page" when {
+      "the user is UNAUTHORISED" in {
+        stubAuthFailure()
+
+        lazy val result = get(s"/identify-your-trust/$testJourneyId/no-utr")
+
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(expectedValue = s"/bas-gateway/sign-in?continue_url=%2Fidentify-your-trust%2F$testJourneyId%2Fno-utr&origin=minor-entity-identification-frontend"
+          )
+        )
+      }
+    }
+
+    }
+
 
 }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.{WiremockHelper, WiremockMethods}
 
 trait StorageStub extends WiremockMethods {
 
@@ -94,7 +94,7 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
-  def stubRetrieveSaPostcode(journeyId: String)(status: Int, saPostcode: String): Unit =
+  def stubRetrieveSaPostcode(journeyId: String)(status: Int, saPostcode: String = ""): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/saPostcode"
     ).thenReturn(
@@ -110,7 +110,7 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
-  def stubRetrieveCHRN(journeyId: String)(status: Int, optCharityHMRCReferenceNumber: Option[String]): Unit =
+  def stubRetrieveCHRN(journeyId: String)(status: Int, optCharityHMRCReferenceNumber: Option[String] = None): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/chrn"
     ).thenReturn(
@@ -120,5 +120,14 @@ trait StorageStub extends WiremockMethods {
         case None                             => JsObject.empty
       }
     )
+
+  def verifyRemoveCHRN(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/chrn")
+
+  def verifyRemoveSaPostcode(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/saPostcode")
+
+  def verifyRemoveUtr(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/utr")
 
 }
