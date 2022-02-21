@@ -18,8 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControlle
 
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
 import play.api.libs.ws.WSResponse
-import play.api.test.Helpers.{BAD_REQUEST, NO_CONTENT, OK, SEE_OTHER, await, defaultAwaitTimeout}
-import play.api.test.Helpers.{OK, SEE_OTHER, UNAUTHORIZED, await, defaultAwaitTimeout}
+import play.api.test.Helpers.{NO_CONTENT, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Sautr
