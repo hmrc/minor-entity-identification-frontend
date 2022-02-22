@@ -71,6 +71,9 @@ class StorageService @Inject()(connector: StorageConnector) {
   def storeTrustsKnownFacts(journeyId: String, knownFacts: TrustKnownFacts)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[TrustKnownFacts](journeyId, TrustKnownFactsKey, knownFacts)
 
+  def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeAllData(journeyId)
+
   def retrieveAllData(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     for {
       optUtr <- retrieveUtr(journeyId)

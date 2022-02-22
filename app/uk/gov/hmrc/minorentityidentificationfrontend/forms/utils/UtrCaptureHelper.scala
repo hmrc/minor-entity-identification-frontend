@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms.helpers
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.utils
 
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}

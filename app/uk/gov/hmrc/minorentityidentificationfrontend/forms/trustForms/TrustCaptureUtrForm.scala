@@ -18,8 +18,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms
 
 import play.api.data.Form
 import play.api.data.Forms._
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.helpers.UtrCaptureHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrCaptureHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrMapping.utrMapping
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 

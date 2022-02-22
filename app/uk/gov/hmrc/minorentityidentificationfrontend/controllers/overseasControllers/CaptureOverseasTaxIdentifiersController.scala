@@ -24,7 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureOverseasTaxIdentifiersForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_overseas_tax_identifiers_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_overseas_tax_identifiers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
@@ -57,7 +57,6 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
-
 
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {

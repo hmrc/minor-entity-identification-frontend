@@ -23,6 +23,9 @@ object MessageLookup {
     val saveAndContinue = "Save and continue"
     val getHelp = "Is this page not working properly?"
     val change = "Change"
+    val continue = "Continue"
+    val yes = "Yes"
+    val no = "No"
 
     object Error {
       val title = "There is a problem"
@@ -119,6 +122,17 @@ object MessageLookup {
 
     val overseasTaxIdentifier = "Overseas tax identifier"
     val overseasTaxIdentifierNotProvided = "I do not want to provide an identifier"
+  }
+
+  object CannotConfirmBusiness {
+    val title = "The details you provided do not match records held by HMRC"
+    val heading = "The details you provided do not match records held by HMRC"
+    val line_1 = "If these details are correct, you can still register. If you entered the wrong details, go back and make changes."
+    val question = "Do you want to continue registering with the details you provided?"
+
+    object Error {
+      val no_selection = "Select yes if you want to continue registering with the details you provided"
+    }
   }
 
 }

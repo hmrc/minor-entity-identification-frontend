@@ -5,7 +5,11 @@ getpagehelp.linkText                                        = Is this page not w
 base.save_and_continue                                      = Save and continue
 base.change                                                 = Change
 base.confirm_and_continue                                   = Confirm and continue
+base.continue                                               = Continue
 error.title-prefix                                          = 'Error: '
+
+app.common.yes                                              = Yes
+app.common.no                                               = No
 
 ## Banner
 phase.banner.before                                         = This is a new service - your
@@ -66,4 +70,9 @@ chrn.error_not_entered                                      = Enter the HMRC ref
 chrn.error_invalid_characters                               = Enter the HMRC reference number in the correct format
 chrn.error_invalid_length                                   = Enter a HMRC reference number that is 7 characters or less
 
-
+## Cannot confirm business
+cannot-confirm-business.title                               = The details you provided do not match records held by HMRC
+cannot-confirm-business.heading                             = The details you provided do not match records held by HMRC
+cannot-confirm-business.line_1                              = If these details are correct, you can still register. If you entered the wrong details, go back and make changes.
+cannot-confirm-business.line_2                              = Do you want to continue registering with the details you provided?
+cannot-confirm-business.no_selection                        = Select yes if you want to continue registering with the details you provided
