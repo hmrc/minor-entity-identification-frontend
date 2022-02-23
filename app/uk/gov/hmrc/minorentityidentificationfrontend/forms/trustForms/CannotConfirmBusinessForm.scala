@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcLayout
-@import views.html.helper.CSPNonce
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms
 
-@this(
-    appConfig: AppConfig,
-    hmrcLayout: HmrcLayout
-)
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+import play.api.data.Form
+import play.api.data.Forms.of
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.YesNoMapping.yesNoMapping
 
-@hmrcLayout(
-    pageTitle = pageTitle,
-    nonce = CSPNonce.get,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-)(contentBlock)
+object CannotConfirmBusinessForm {
+
+  val cannotConfirmBusinessForm: Form[Boolean] = Form(
+    "yes_no" -> of(yesNoMapping("cannot-confirm-business.no_selection"))
+  )
+}

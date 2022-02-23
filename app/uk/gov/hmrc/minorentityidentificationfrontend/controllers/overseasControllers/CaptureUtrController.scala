@@ -24,7 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.capture_utr_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_utr_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -44,13 +44,14 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig => Ok(view(
-                  journeyId = journeyId,
-                  pageConfig = journeyConfig.pageConfig,
-                  formAction = routes.CaptureUtrController.submit(journeyId),
-                  form = CaptureUtrForm.form
-                )
-            )
+            journeyConfig =>
+              Ok(view(
+                journeyId = journeyId,
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CaptureUtrController.submit(journeyId),
+                form = CaptureUtrForm.form
+              )
+              )
           }
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
@@ -64,13 +65,14 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
           CaptureUtrForm.form.bindFromRequest().fold(
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
-                journeyConfig => BadRequest(view(
-                      journeyId = journeyId,
-                      pageConfig = journeyConfig.pageConfig,
-                      formAction = routes.CaptureUtrController.submit(journeyId),
-                      form = formWithErrors
-                    )
-                )
+                journeyConfig =>
+                  BadRequest(view(
+                    journeyId = journeyId,
+                    pageConfig = journeyConfig.pageConfig,
+                    formAction = routes.CaptureUtrController.submit(journeyId),
+                    form = formWithErrors
+                  )
+                  )
               },
             utr =>
               storageService.storeUtr(journeyId, utr).map {

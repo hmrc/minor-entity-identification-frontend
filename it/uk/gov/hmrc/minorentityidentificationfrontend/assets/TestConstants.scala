@@ -27,7 +27,7 @@ object TestConstants {
   val testJourneyId: String = UUID.randomUUID().toString
   val testInternalId: String = UUID.randomUUID().toString
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
-  val testSaPostcode: String =  "AA00 0AA"
+  val testSaPostcode: String = "AA00 0AA"
   val testPostcode: String = "AA1 1AA"
   val testCHRN: String = "AB99999"
   val testContinueUrl: String = "/test"
@@ -35,7 +35,6 @@ object TestConstants {
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
   val testRegime: String = "VATC"
-  val testCharityHMRCReferenceNumber: String = "1597538264"
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
     "taxIdentifier" -> testOverseasTaxIdentifiers.taxIdentifier,
     "country" -> testOverseasTaxIdentifiers.country
@@ -172,9 +171,7 @@ object TestConstants {
           ),
           "assets" -> Json.obj(
             "monetary" -> Json.arr(
-              (
-                "assetMonetaryAmount" -> 10000
-                )
+              "assetMonetaryAmount" -> 10000
             )
           )
         )

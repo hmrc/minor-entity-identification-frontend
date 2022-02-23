@@ -110,15 +110,20 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
-  def stubRetrieveCHRN(journeyId: String)(status: Int, optCharityHMRCReferenceNumber: Option[String] = None): Unit =
+  def stubRetrieveCHRN(journeyId: String)(status: Int, optCharityHMRCReferenceNumber:  String = ""): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/chrn"
     ).thenReturn(
       status = status,
-      body = optCharityHMRCReferenceNumber match {
-        case Some(charityHMRCReferenceNumber) => JsString(charityHMRCReferenceNumber)
-        case None                             => JsObject.empty
-      }
+      body = JsString(optCharityHMRCReferenceNumber)
+    )
+
+  def stubRemoveAllData(journeyId: String)(status: Int, body: String = ""): Unit =
+    when(method = DELETE,
+      uri = s"/minor-entity-identification/journey/$journeyId"
+    ).thenReturn(
+      status = status,
+      body = body
     )
 
   def verifyRemoveCHRN(journeyId: String): Unit =

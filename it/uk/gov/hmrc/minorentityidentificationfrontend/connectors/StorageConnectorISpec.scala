@@ -79,4 +79,13 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
     }
   }
 
+  "removeAllData" should {
+    "return SuccessfullyRemoved" in {
+      stubRemoveAllData(testJourneyId)(NO_CONTENT)
+
+      val result = await(storageConnector.removeAllData(testJourneyId))
+
+      result mustBe SuccessfullyRemoved
+    }
+  }
 }

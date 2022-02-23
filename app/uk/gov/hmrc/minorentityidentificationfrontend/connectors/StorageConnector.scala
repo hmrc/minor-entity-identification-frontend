@@ -48,4 +48,7 @@ class StorageConnector @Inject()(http: HttpClient,
   def removeDataField(journeyId: String, dataKey: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     http.DELETE[SuccessfullyRemoved.type](s"${appConfig.minorEntityIdentificationUrl(journeyId)}/$dataKey")
 
+  def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    http.DELETE[SuccessfullyRemoved.type](appConfig.minorEntityIdentificationUrl(journeyId))
+
 }

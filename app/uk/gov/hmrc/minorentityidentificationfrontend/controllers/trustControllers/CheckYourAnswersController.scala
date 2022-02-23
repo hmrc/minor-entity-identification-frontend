@@ -22,6 +22,8 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.errorControllers.{routes => errorRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TrustCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
@@ -37,24 +39,27 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            rowBuilder: TrustCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page
-                                          )(implicit appConfig: AppConfig, ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
+                                          )(implicit appConfig: AppConfig, ec: ExecutionContext
+                                          ) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            optUtr <- storageService.retrieveUtr(journeyId)
-            optSaPostcode <- storageService.retrieveSaPostcode(journeyId)
-            optCharityHRMCReferenceNumber <- storageService.retrieveCHRN(journeyId)
-            summaryRows = rowBuilder.buildSummaryListRows(journeyId, optUtr, optSaPostcode, optCharityHRMCReferenceNumber)
-          } yield Ok(view(
-            pageConfig = journeyConfig.pageConfig,
-            formAction = trustControllers.routes.CheckYourAnswersController.submit(journeyId),
-            summaryRows = summaryRows
-          ))
-        case None                 =>
+          if (isEnabled(EnableFullTrustJourney)) {
+            for {
+              journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+              optUtr <- storageService.retrieveUtr(journeyId)
+              optSaPostcode <- storageService.retrieveSaPostcode(journeyId)
+              optCharityHRMCReferenceNumber <- storageService.retrieveCHRN(journeyId)
+              summaryRows = rowBuilder.buildSummaryListRows(journeyId, optUtr, optSaPostcode, optCharityHRMCReferenceNumber)
+            } yield Ok(view(
+              pageConfig = journeyConfig.pageConfig,
+              formAction = trustControllers.routes.CheckYourAnswersController.submit(journeyId),
+              summaryRows = summaryRows
+            ))
+          } else throw new InternalServerException("Trust journey is not enabled")
+        case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
@@ -63,10 +68,19 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
-            journeyConfig => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-          }
-        case None                 =>
+          if (isEnabled(EnableFullTrustJourney)) {
+            journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
+              journeyConfig =>
+                for {
+                  optSautr <- storageService.retrieveUtr(journeyId)
+                  optChrn <- storageService.retrieveCHRN(journeyId)
+                } yield (optSautr, optChrn) match {
+                  case (None, None) => Redirect(errorRoutes.CannotConfirmBusinessController.show(journeyId))
+                  case _ => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+                }
+            }
+          } else throw new InternalServerException("Trust journey is not enabled")
+        case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }

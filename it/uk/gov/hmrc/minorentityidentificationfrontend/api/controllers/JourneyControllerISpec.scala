@@ -49,9 +49,6 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       (result.json \ "journeyStartUrl").as[String] must include(overseasControllerRoutes.CaptureUtrController.show(testJourneyId).url)
 
       result.status mustBe CREATED
-
-//      await(repo.getJourneyConfig(testJourneyId, testInternalId)).map(_.-("creationTimestamp")) mustBe
-//        Some(Json.obj("_id" -> testJourneyId, "authInternalId" -> testInternalId) ++ Json.toJsObject(testJourneyConfig))
     }
 
     "redirect to Sign In page" when {
@@ -80,13 +77,13 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
           "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
           "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes),
           "postcode" -> testSaPostcode,
-          "chrn" -> testCharityHMRCReferenceNumber
+          "chrn" -> testCHRN
         )
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-        stubRetrieveCHRN(testJourneyId)(OK, Some(testCharityHMRCReferenceNumber))
+        stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
