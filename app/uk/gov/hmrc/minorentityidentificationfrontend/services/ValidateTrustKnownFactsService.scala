@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RetrieveTrustKnownFactsConnector
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, KnownFactsMatchingResult, SuccessfulMatch}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,24 +28,30 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
                                                storageService: StorageService) {
 
   def validateTrustKnownFacts(journeyId: String,
-                              sautr: String,
-                              saPostcode: Option[String]
-                             )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] = {
-    for {
-      knownFactsMatchResult <- retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(sautr).flatMap {
-        case Some(knownFacts) =>
-          storageService.storeTrustsKnownFacts(journeyId, knownFacts).map {
-            _ =>
-              if (saPostcode.isEmpty && knownFacts.isAbroad | saPostcode == knownFacts.declarationPostcode | saPostcode == knownFacts.correspondencePostcode) {
-                SuccessfulMatch
+                              optSaUtr: Option[String],
+                              optSaPostcode: Option[String],
+                              optCHRN: Option[String])
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] =
+    optSaUtr match {
+      case None        =>
+        val identifiersMatchFailure: KnownFactsMatchFailure = if (optCHRN.isEmpty) UnMatchableWithRetry else UnMatchableWithoutRetry
+        storageService.storeIdentifiersMatch(journeyId, identifiersMatchFailure).map(_ => identifiersMatchFailure)
+      case Some(saUtr) =>
+        for {
+          knownFactsMatchResult <- retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(saUtr).flatMap {
+            case Some(knownFacts) =>
+              storageService.storeTrustsKnownFacts(journeyId, knownFacts).map {
+                _ =>
+                  if (optSaPostcode.isEmpty && knownFacts.isAbroad | optSaPostcode == knownFacts.declarationPostcode | optSaPostcode == knownFacts.correspondencePostcode) {
+                    SuccessfulMatch
+                  }
+                  else DetailsMismatch
               }
-              else DetailsMismatch
+            case None => Future.successful(DetailsNotFound)
           }
-        case None => Future.successful(DetailsNotFound)
-        case _ => throw new InternalServerException("Unexpected status returned from RetrieveTrustKnownFactsConnector")
-      }
-      _ <- storageService.storeIdentifiersMatch(journeyId, knownFactsMatchResult)
-    } yield knownFactsMatchResult
-  }
+          _ <- storageService.storeIdentifiersMatch(journeyId, knownFactsMatchResult)
+        } yield knownFactsMatchResult
+    }
 
 }
+

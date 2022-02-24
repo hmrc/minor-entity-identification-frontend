@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.models
+package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
+import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
+import org.scalatest.Suite
+import uk.gov.hmrc.minorentityidentificationfrontend.services.ValidateTrustKnownFactsService
 
-case class JourneyConfig(continueUrl: String,
-                         pageConfig: PageConfig,
-                         businessEntity: BusinessEntity,
-                         businessVerificationCheck: Boolean,
-                         regime: String) {
-  def continueUrl(journeyId: String): String = continueUrl + s"?journeyId=$journeyId"
+trait MockValidateTrustKnownFactsService extends IdiomaticMockito with ResetMocksAfterEachTest {
+  self: Suite =>
+
+  val mockValidateTrustKnownFactsService: ValidateTrustKnownFactsService = mock[ValidateTrustKnownFactsService]
+
 }
-

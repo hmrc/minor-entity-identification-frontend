@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
+import play.api.http.Status.OK
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.errorControllers.{routes => errorRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
+import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, RetrieveTrustKnownFactsStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.{CheckYourAnswersCommonViewTests, TrustCheckYourAnswersSpecificViewTests}
 
@@ -30,6 +31,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   with StorageStub
   with CheckYourAnswersCommonViewTests
   with TrustCheckYourAnswersSpecificViewTests
+  with RetrieveTrustKnownFactsStub
   with FeatureSwitching {
 
   "GET /identify-your-trust/<testJourneyId>/check-your-answers-business" when {
@@ -157,9 +159,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   }
 
   "POST /identify-your-trust/check-your-answers-business" when {
-    "the EnableFullTrustJourney is enabled" should {
-      "redirect to the provided continueUrl" in {
+    "the EnableFullTrustJourney is enabled and identifier match is SuccessfulMatch (for example all postcodes are the same)" should {
+      "redirect to the provided continueUrl after contacting TrustKnownFacts api" in {
         enable(EnableFullTrustJourney)
+
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
@@ -167,8 +170,13 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         ))
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
-        stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
+
+        stubStoreStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))(OK)
+        stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))(OK)
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -176,56 +184,133 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           httpStatus(SEE_OTHER)
           redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
         }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))
+        verifyStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
+
       }
-      "redirect to the Cannot Confirm Business error page" when {
-        "the user has no sautr and no chrn" in {
-          enable(EnableFullTrustJourney)
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            testTrustsJourneyConfig(businessVerificationCheck = true)
-          ))
+    }
+    "the EnableFullTrustJourney is enabled and identifier match is DetailsMismatch (for example all postcodes are different)" should {
+      "redirect to the Cannot Confirm Business error page after contacting TrustKnownFacts api" in {
+        enable(EnableFullTrustJourney)
 
-          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
 
-          val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(expectedValue = errorRoutes.CannotConfirmBusinessController.show(testJourneyId).url)
-          }
+        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+
+        val correspondencePostcode = testSaPostcode + "X"
+        val declarationPostcode = testSaPostcode + "Y"
+
+        stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode, declarationPostcode))
+
+        stubStoreStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode, declarationPostcode))(OK)
+        stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(DetailsMismatchKey))(OK)
+
+        val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(DetailsMismatchKey))
+        verifyStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode, declarationPostcode))
+
+      }
+    }
+    "the EnableFullTrustJourney is enabled and identifier match is UnMatchableWithoutRetry (No SaUtr but CHRN provided)" should {
+      "redirect to the provided continueUrl without contacting TrustKnownFacts api" in {
+        enable(EnableFullTrustJourney)
+
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
+        stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
+
+        stubStoreIdentifiersMatch(testJourneyId, testIdentifiersMatchJson(UnMatchableWithoutRetryKey))(OK)
+
+        val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithoutRetryKey))
+
+      }
+    }
+
+    "the EnableFullTrustJourney is enabled and identifier match is UnMatchableWithRetry (No SaUtr and No CHRN provided)" should {
+      "redirect to the Cannot Confirm Business error page without contacting TrustKnownFacts api" in {
+        enable(EnableFullTrustJourney)
+
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+
+        stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithRetryKey))(OK)
+
+        val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithRetryKey))
+
+      }
+    }
+
+    "the user is UNAUTHORISED" should {
+      "redirect to sign in page" in {
+        enable(EnableFullTrustJourney)
+        stubAuthFailure()
+
+        lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri("/bas-gateway/sign-in" +
+            s"?continue_url=%2Fidentify-your-trust%2F$testJourneyId%2Fcheck-your-answers-business" +
+            "&origin=minor-entity-identification-frontend"
+          )
         }
       }
+    }
 
-      "the user is UNAUTHORISED" should {
-        "redirect to sign in page" in {
-          enable(EnableFullTrustJourney)
-          stubAuthFailure()
+    "return an INTERNAL_SERVER_ERROR status" when {
+      "the user does not have an internal ID" in {
+        enable(EnableFullTrustJourney)
+        stubAuth(OK, successfulAuthResponse(internalId = None))
 
-          lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
+        lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri("/bas-gateway/sign-in" +
-              s"?continue_url=%2Fidentify-your-trust%2F$testJourneyId%2Fcheck-your-answers-business" +
-              "&origin=minor-entity-identification-frontend"
-            )
-          }
-        }
-      }
+        result.status mustBe INTERNAL_SERVER_ERROR
 
-      "return an INTERNAL_SERVER_ERROR status" when {
-        "the user does not have an internal ID" in {
-          enable(EnableFullTrustJourney)
-          stubAuth(OK, successfulAuthResponse(internalId = None))
-
-          lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
-
-          result.status mustBe INTERNAL_SERVER_ERROR
-
-        }
       }
     }
     "the EnableFullTrustJourney is disabled" should {

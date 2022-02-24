@@ -110,20 +110,18 @@ class StorageService @Inject()(connector: StorageConnector) {
         case None => Json.obj()
       }
 
-      val identifiersMatchString: Boolean =  optIdentifiersMatch match {
-        case Some(SuccessfulMatch) => true
-        case _ => false
-      }
+      val identifiersMatchBlock: JsObject =
+        Json.obj("identifiersMatch" -> optIdentifiersMatch.contains(SuccessfulMatch))
 
       Json.obj(
-        "identifiersMatch" -> identifiersMatchString,
         "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(bvFormat.writes),
         "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
       ) ++
         utrBlock ++
         overseasTaxIdentifiersBlock ++
         utrSaPostcodeBlock ++
-        optCharityHMRCReferenceNumberBlock
+        optCharityHMRCReferenceNumberBlock ++
+        identifiersMatchBlock
     }
 
   def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =
