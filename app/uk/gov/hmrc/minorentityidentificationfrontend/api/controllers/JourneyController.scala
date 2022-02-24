@@ -25,7 +25,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyCont
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaControllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services._
@@ -83,8 +84,13 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                   ))
                 case UnincorporatedAssociation => {
                   auditService.auditJourney(journeyId, authInternalId)
+                  val pathToRedirect = if(isEnabled(EnableFullUAJourney)) {
+                    s"${appConfig.selfUrl}${uaControllerRoutes.CaptureCtutrController.show(journeyId).url}"
+                  } else {
+                    (req.body.continueUrl + s"?journeyId=$journeyId")
+                  }
                   Created(Json.obj(
-                    journeyStartUrl -> (req.body.continueUrl + s"?journeyId=$journeyId")
+                    journeyStartUrl -> pathToRedirect
                   ))
                 }
               }

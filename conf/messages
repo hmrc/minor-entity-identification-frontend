@@ -30,6 +30,13 @@ utr.trust.no_utr_link                                       = The business does 
 utr.trust.error_not_entered                                 = Enter your UK Unique Taxpayer Reference
 utr.trust.error_invalid_characters                          = Enter the UK Unique Taxpayer Reference using numbers only
 utr.trust.error_invalid_length                              = Enter a UK Unique Taxpayer Reference that is 10 numbers
+utr.ua.title                                                = What is the association’s Unique Taxpayer Reference?
+utr.ua.line_1                                               = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
+utr.ua.line_1_ending                                        = find a lost UTR number.
+utr.ua.no_utr_link                                          = The association does not have a UTR
+utr.ua.error_not_entered                                    = Enter the association’s UK Unique Taxpayer Reference
+utr.ua.error_invalid_characters                             = Enter the UK Unique Taxpayer Reference using numbers only
+utr.ua.error_invalid_length                                 = Enter a UK Unique Taxpayer Reference that is 10 numbers
 
 ## Overseas Tax Identifiers Page
 tax-identifiers.title                                        = What is the business’s overseas tax identifier?

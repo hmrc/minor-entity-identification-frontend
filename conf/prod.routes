@@ -2,6 +2,7 @@
 ->         /minor-entity-identification-frontend              app.Routes
 ->         /identify-your-overseas-business                   overseas.Routes
 ->         /identify-your-trust                               trust.Routes
+->         /unnicorporated-association                        ua.Routes
 ->         /minor-entity-identification/api                   api.Routes
 ->         /                                                  health.Routes
 
