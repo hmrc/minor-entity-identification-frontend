@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationNotEnoughInfoToCallKey, BusinessVerificationNotEnoughInfoToChallengeKey, BusinessVerificationPassKey, BusinessVerificationStatusKey}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig, TrustKnownFacts}
 
 import java.util.UUID
@@ -27,7 +28,8 @@ object TestConstants {
   val testJourneyId: String = UUID.randomUUID().toString
   val testInternalId: String = UUID.randomUUID().toString
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
-  val testSaPostcode: String = "AA00 0AA"
+  val testSautr: String = "1234567890"
+  val testSaPostcode: String =  "AA00 0AA"
   val testPostcode: String = "AA1 1AA"
   val testCHRN: String = "AB99999"
   val testContinueUrl: String = "/test"
@@ -182,4 +184,11 @@ object TestConstants {
       "formBundleNo" -> "000001230962"
     )
   )
+
+  val testBusinessVerificationRedirectUrl = "/business-verification-start"
+  val testBusinessVerificationJourneyId = "TestBusinessVerificationJourneyId"
+  val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
+  val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
+  val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
+  val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey)
 }

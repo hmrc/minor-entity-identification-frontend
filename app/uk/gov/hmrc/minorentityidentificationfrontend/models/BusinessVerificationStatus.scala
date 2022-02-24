@@ -24,12 +24,16 @@ case object BusinessVerificationPass extends BusinessVerificationStatus
 
 case object BusinessVerificationFail extends BusinessVerificationStatus
 
-case object BusinessVerificationUnchallenged extends BusinessVerificationStatus
+case object BusinessVerificationNotEnoughInformationToChallenge extends BusinessVerificationStatus
+
+case object BusinessVerificationNotEnoughInformationToCallBV extends BusinessVerificationStatus
 
 object BusinessVerificationStatus {
   val BusinessVerificationPassKey = "PASS"
   val BusinessVerificationFailKey = "FAIL"
   val BusinessVerificationUnchallengedKey = "UNCHALLENGED"
+  val BusinessVerificationNotEnoughInfoToChallengeKey = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"
+  val BusinessVerificationNotEnoughInfoToCallKey = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"
   val BusinessVerificationStatusKey = "verificationStatus"
 
   implicit val format: Format[BusinessVerificationStatus] = new Format[BusinessVerificationStatus] {
@@ -37,9 +41,8 @@ object BusinessVerificationStatus {
       val businessVerificationStatusString = businessVerificationStatus match {
         case BusinessVerificationPass => BusinessVerificationPassKey
         case BusinessVerificationFail => BusinessVerificationFailKey
-        case BusinessVerificationUnchallenged => BusinessVerificationUnchallengedKey
+        case BusinessVerificationNotEnoughInformationToChallenge | BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationUnchallengedKey
       }
-
       Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusString)
     }
 
@@ -47,8 +50,8 @@ object BusinessVerificationStatus {
       (json \ BusinessVerificationStatusKey).validate[String].collect(JsonValidationError("Invalid business validation state")) {
         case BusinessVerificationPassKey => BusinessVerificationPass
         case BusinessVerificationFailKey => BusinessVerificationFail
-        case BusinessVerificationUnchallengedKey => BusinessVerificationUnchallenged
+        case BusinessVerificationNotEnoughInfoToChallengeKey => BusinessVerificationNotEnoughInformationToChallenge
+        case BusinessVerificationNotEnoughInfoToCallKey => BusinessVerificationNotEnoughInformationToCallBV
       }
   }
-
 }

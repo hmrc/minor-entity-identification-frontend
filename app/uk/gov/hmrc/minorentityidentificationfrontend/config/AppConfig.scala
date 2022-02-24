@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.config
 import play.api.{Configuration, Environment}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Country
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
@@ -48,6 +49,22 @@ class AppConfig @Inject()(config: Configuration,
   lazy val vatRegFeedbackUrl: String = s"$feedbackUrl/feedback/$vatRegExitSurveyOrigin"
 
   def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier"
+
+  private lazy val businessVerificationUrl = servicesConfig.getString("microservice.services.business-verification.url")
+
+  def createBusinessVerificationJourneyUrl: String = {
+    if (isEnabled(BusinessVerificationStub))
+      s"$selfBaseUrl/identify-your-trust/test-only/business-verification/journey"
+    else
+      s"$businessVerificationUrl/journey"
+  }
+
+  def getBusinessVerificationResultUrl(journeyId: String): String = {
+    if (isEnabled(BusinessVerificationStub))
+      s"$selfBaseUrl/identify-your-trust/test-only/business-verification/journey/$journeyId/status"
+    else
+      s"$businessVerificationUrl/journey/$journeyId/status"
+  }
 
   lazy val accessibilityStatementPath: String = servicesConfig.getString("accessibility-statement.host")
   lazy val vatRegAccessibilityStatementUrl: String = s"$accessibilityStatementPath/accessibility-statement/vat-registration"

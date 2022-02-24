@@ -74,7 +74,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
         val testDetailsJson = Json.obj(
           "sautr" -> "1234567890",
           "identifiersMatch" -> false,
-          "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
+          "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(BusinessVerificationStatus.format.writes),
           "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes),
           "postcode" -> testSaPostcode,
           "chrn" -> testCHRN
@@ -95,7 +95,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "the utr, SAPostcode and CHRN do not exist in the database" in {
         val testDetailsJson = Json.obj(
           "identifiersMatch" -> false,
-          "businessVerification" -> Json.toJson(BusinessVerificationUnchallenged)(BusinessVerificationStatus.format.writes),
+          "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(BusinessVerificationStatus.format.writes),
           "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes)
         )
 

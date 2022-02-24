@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.utils
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, delete, equalTo, get, getRequestedFor, patch, post, postRequestedFor, put, putRequestedFor, stubFor, urlEqualTo, urlMatching, verify}
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -89,6 +90,15 @@ object WiremockHelper extends Eventually with IntegrationPatience {
   def stubAudit(): Unit = {
     stubPost("/write/audit", 200, "{}")
     stubPost("/write/audit/merged", 200, "{}")
+  }
+
+  def verifyPut(uri: String, optBody: Option[String] = None): Unit = {
+    val uriMapping = putRequestedFor(urlEqualTo(uri))
+    val putRequest = optBody match {
+      case Some(body) => uriMapping.withRequestBody(equalTo(body))
+      case None => uriMapping
+    }
+    verify(putRequest)
   }
 
   def verifyAudit(): Unit = {
