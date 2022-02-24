@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class FeatureSwitchingModule extends Module with FeatureSwitchRegistry {
 
-  val switches = Seq(EnableFullTrustJourney, TrustVerificationStub)
+  val switches = Seq(EnableFullTrustJourney, TrustVerificationStub, EnableFullUAJourney)
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
@@ -42,4 +42,9 @@ case object EnableFullTrustJourney extends FeatureSwitch {
 case object TrustVerificationStub extends FeatureSwitch {
   override val configName: String = "feature-switch.trust-verification-stub"
   override val displayName: String = "Use stub for Trusts further verification flow"
+}
+
+case object EnableFullUAJourney extends FeatureSwitch {
+  override val configName: String = "feature-switch.enable-full-unincorporated-association-journey"
+  override val displayName: String = "Enable full Unincorporated association journey"
 }
