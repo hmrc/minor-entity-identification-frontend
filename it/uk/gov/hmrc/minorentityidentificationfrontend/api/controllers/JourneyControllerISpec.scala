@@ -84,6 +84,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
         stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
@@ -101,6 +102,9 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveSaPostcode(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(status = NOT_FOUND)
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
@@ -139,6 +143,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       enable(EnableFullTrustJourney)
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+      stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+      stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
 
       lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
@@ -202,6 +208,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
     )
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+      stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
 
       lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)

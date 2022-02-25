@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks.MockRetrieveTrustKnownFactsConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.SuccessfullyStored
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatching.{DetailsMismatch, SuccessfulMatch}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, SuccessfulMatch}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks.MockStorageService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,54 +38,66 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
   "validateTrustKnownFacts" should {
     "return SuccessfulMatch" when {
       "the user's postcode matches a postcode received from the known facts call" in {
-        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Right(testTrustKnownFactsResponse))
+        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsResponse))
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = true) returns Future.successful(SuccessfullyStored)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
 
         val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, Some(testSaPostcode)))
 
         result mustBe SuccessfulMatch
 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) was called
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = true) was called
+        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) was called
       }
       "the user enters no postcode but the abroad indicator received from the known facts call is true" in {
-        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Right(testTrustKnownFactsAbroadResponse))
+        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsAbroadResponse))
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsAbroadResponse) returns Future.successful(SuccessfullyStored)
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = true) returns Future.successful(SuccessfullyStored)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
 
         val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, None))
 
         result mustBe SuccessfulMatch
 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsAbroadResponse) was called
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = true) was called
+        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) was called
       }
     }
     "return DetailsMismatch" when {
       "the user's postcode doesn't match what is received from the known facts call" in {
-        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Right(testTrustKnownFactsResponse))
+        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsResponse))
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = false) returns Future.successful(SuccessfullyStored)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch) returns Future.successful(SuccessfullyStored)
 
         val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, Some("AB0 0AA")))
 
         result mustBe DetailsMismatch
 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) was called
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = false) was called
+        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch) was called
       }
       "the user provides no postcode but the abroad indicator received from the known facts call is false" in {
-        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Right(testTrustKnownFactsResponse))
+        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsResponse))
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = false) returns Future.successful(SuccessfullyStored)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch) returns Future.successful(SuccessfullyStored)
 
         val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, None))
 
         result mustBe DetailsMismatch
 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) was called
-        mockStorageService.storeIdentifiersMatch(testJourneyId, identifiersMatch = false) was called
+        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch) was called
+      }
+    }
+    "return DetailsNotFound" when {
+      "the trusts proxy call returns not found" in {
+        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(None)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound) returns Future.successful(SuccessfullyStored)
+
+        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, Some("AB0 0AA")))
+
+        result mustBe DetailsNotFound
+
+        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound) was called
       }
     }
   }
