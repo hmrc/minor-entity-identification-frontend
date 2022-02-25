@@ -158,4 +158,12 @@ trait StorageStub extends WiremockMethods {
     WiremockHelper.verifyPut(uri = s"/minor-entity-identification/journey/$journeyId/businessVerification", optBody = Some(jsonBody.toString()))
   }
 
+  def stubRetrieveRegistrationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/registration"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
 }

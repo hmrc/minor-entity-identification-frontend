@@ -56,6 +56,9 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, ChrnKey)
 
+  def retrieveIdentifiersMatch(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[KnownFactsMatchingResult]] =
+    connector.retrieveDataField[KnownFactsMatchingResult](journeyId, IdentifiersMatchKey)
+
   def storeRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[RegistrationStatus](journeyId, RegistrationKey, registrationStatus)
 
@@ -65,8 +68,8 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, ChrnKey)
 
-  def storeIdentifiersMatch(journeyId: String, identifiersMatch: Boolean)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
-    connector.storeDataField[Boolean](journeyId, IdentifiersMatchKey, identifiersMatch)
+  def storeIdentifiersMatch(journeyId: String, identifiersMatch: KnownFactsMatchingResult)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeDataField[KnownFactsMatchingResult](journeyId, IdentifiersMatchKey, identifiersMatch)
 
   def storeTrustsKnownFacts(journeyId: String, knownFacts: TrustKnownFacts)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[TrustKnownFacts](journeyId, TrustKnownFactsKey, knownFacts)
@@ -80,6 +83,7 @@ class StorageService @Inject()(connector: StorageConnector) {
       optOverseasTaxIdentifiers <- retrieveOverseasTaxIdentifiers(journeyId)
       optSaPostcode <- retrieveSaPostcode(journeyId)
       optCharityHMRCReferenceNumber <- retrieveCHRN(journeyId)
+      optIdentifiersMatch <- retrieveIdentifiersMatch(journeyId)
     } yield {
 
       val optCharityHMRCReferenceNumberBlock: JsObject = optCharityHMRCReferenceNumber match {
@@ -106,8 +110,13 @@ class StorageService @Inject()(connector: StorageConnector) {
         case None => Json.obj()
       }
 
+      val identifiersMatchString: Boolean =  optIdentifiersMatch match {
+        case Some(SuccessfulMatch) => true
+        case _ => false
+      }
+
       Json.obj(
-        "identifiersMatch" -> false,
+        "identifiersMatch" -> identifiersMatchString,
         "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(bvFormat.writes),
         "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
       ) ++
