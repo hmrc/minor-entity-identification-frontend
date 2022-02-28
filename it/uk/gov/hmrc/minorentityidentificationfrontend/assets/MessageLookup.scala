@@ -67,6 +67,19 @@ object MessageLookup {
     }
   }
 
+  object CaptureUaUtr {
+    val title = "What is the association’s Unique Taxpayer Reference?"
+    val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can"
+    val line_1_ending = "find a lost UTR number."
+    val no_utr_link = "The association does not have a UTR"
+
+    object Error {
+      val error_not_entered = "Enter the association’s UK Unique Taxpayer Reference"
+      val error_invalid_format = "Enter the UK Unique Taxpayer Reference using numbers only"
+      val error_invalid_length = "Enter a UK Unique Taxpayer Reference that is 10 numbers"
+    }
+  }
+
   object CaptureOverseasTaxIdentifiers {
 
     val title = "What is the business’s overseas tax identifier?"

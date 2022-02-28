@@ -1,6 +1,11 @@
 ->          /hmrc-frontend                                 hmrcfrontend.Routes
 GET         /assets/*file                                  controllers.Assets.versioned(path = "/public", file: Asset)
 
+
+GET         /:journeyId/ct-utr                             uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureCtutrController.show(journeyId)
+POST        /:journeyId/ct-utr                             uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureCtutrController.submit(journeyId)
+GET         /:journeyId/no-utr                             uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureCtutrController.noUtr(journeyId)
+
 GET         /:journeyId/registered-office-postcode         uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureOfficePostcodeController.show(journeyId)
 POST        /:journeyId/registered-office-postcode         uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureOfficePostcodeController.submit(journeyId)
 
