@@ -108,6 +108,17 @@ object MessageLookup {
     }
   }
 
+  object CaptureOfficePostcode {
+
+    val title = "What is the postcode used to register the association?"
+    val hint = "For example, AB1 2YZ"
+
+    object Error {
+      val invalid_format_office_postcode = "Enter a UK postcode"
+      val no_entry_office_postcode = "Enter a postcode"
+    }
+  }
+
   object CaptureCHRN {
     val title = "What is the charity’s HMRC reference number?"
     val inset = "If the charity has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register."

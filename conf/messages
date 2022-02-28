@@ -56,6 +56,12 @@ sa-postcode.no.postcodeLink                                  = The trust does no
 error.invalid_format_sa-postcode                             = Enter a UK postcode
 error.no_entry_sa-postcode                                   = Enter a postcode
 
+## Office Postcode Page
+office-postcode.title                                        = What is the postcode used to register the association?
+office-postcode.hint                                         = For example, AB1 2YZ
+error.invalid_format_office_postcode                         = Enter a UK postcode
+error.no_entry_office_postcode                               = Enter a postcode
+
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers
 check-your-answers.heading                                  = Check your answers

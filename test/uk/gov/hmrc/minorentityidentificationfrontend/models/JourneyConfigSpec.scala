@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.models
 
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
+import org.scalatest.matchers.should.Matchers._
+import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testTrustJourneyConfig}
 
-case class JourneyConfig(continueUrl: String,
-                         pageConfig: PageConfig,
-                         businessEntity: BusinessEntity,
-                         businessVerificationCheck: Boolean,
-                         regime: String) {
-  def continueUrl(journeyId: String): String = continueUrl + s"?journeyId=$journeyId"
+class JourneyConfigSpec extends org.scalatest.flatspec.AnyFlatSpec {
+
+  "continueUrl" should "append the journeyId query parameter to the continue url" in {
+    testTrustJourneyConfig.continueUrl(testJourneyId) should be(testTrustJourneyConfig.continueUrl + s"?journeyId=$testJourneyId")
+  }
+
 }
-

@@ -22,3 +22,6 @@ POST       /:journey/test-only/feature-switches                                 
 GET        /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches(journey)
 + nocsrf
 POST       /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches(journey)
+
++ nocsrf
+POST       /identify-your-trust/test-only/trusts/:sautr/refresh                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.TrustsKnownFactsVerificationStubController.stubTrustKnownFacts(sautr)

@@ -22,9 +22,8 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.errorControllers.{routes => errorRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService, SubmissionService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TrustCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -36,6 +35,7 @@ import scala.concurrent.ExecutionContext
 class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            journeyService: JourneyService,
                                            storageService: StorageService,
+                                           submissionService: SubmissionService,
                                            rowBuilder: TrustCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page
@@ -59,7 +59,7 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
               summaryRows = summaryRows
             ))
           } else throw new InternalServerException("Trust journey is not enabled")
-        case None =>
+        case None                 =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
@@ -69,18 +69,14 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           if (isEnabled(EnableFullTrustJourney)) {
-            journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
-              journeyConfig =>
-                for {
-                  optSautr <- storageService.retrieveUtr(journeyId)
-                  optChrn <- storageService.retrieveCHRN(journeyId)
-                } yield (optSautr, optChrn) match {
-                  case (None, None) => Redirect(errorRoutes.CannotConfirmBusinessController.show(journeyId))
-                  case _ => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-                }
-            }
-          } else throw new InternalServerException("Trust journey is not enabled")
-        case None =>
+            for {
+              journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+              nextUrl <- submissionService.submit(journeyId, journeyConfig)
+            } yield
+              Redirect(nextUrl)
+          } else
+            throw new InternalServerException("Trust journey is not enabled")
+        case None                 =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }

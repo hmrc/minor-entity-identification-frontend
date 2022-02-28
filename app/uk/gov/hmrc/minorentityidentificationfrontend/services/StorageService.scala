@@ -53,6 +53,15 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, SaPostcodeKey)
 
+  def storeOfficePostcode(journeyId: String, officePostcode: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeDataField(journeyId, OfficePostcodeKey, officePostcode)
+
+  def removeOfficePostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeDataField(journeyId, OfficePostcodeKey)
+
+  def retrieveOfficePostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+    connector.retrieveDataField[String](journeyId, OfficePostcodeKey)
+
   def retrieveCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, ChrnKey)
 
@@ -110,20 +119,18 @@ class StorageService @Inject()(connector: StorageConnector) {
         case None => Json.obj()
       }
 
-      val identifiersMatchString: Boolean =  optIdentifiersMatch match {
-        case Some(SuccessfulMatch) => true
-        case _ => false
-      }
+      val identifiersMatchBlock: JsObject =
+        Json.obj("identifiersMatch" -> optIdentifiersMatch.contains(SuccessfulMatch))
 
       Json.obj(
-        "identifiersMatch" -> identifiersMatchString,
         "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(bvFormat.writes),
         "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
       ) ++
         utrBlock ++
         overseasTaxIdentifiersBlock ++
         utrSaPostcodeBlock ++
-        optCharityHMRCReferenceNumberBlock
+        optCharityHMRCReferenceNumberBlock ++
+        identifiersMatchBlock
     }
 
   def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =
@@ -150,6 +157,7 @@ object StorageService {
   val OverseasKey: String = "overseas"
   val SaPostcodeKey: String = "saPostcode"
   val ChrnKey = "chrn"
+  val OfficePostcodeKey: String = "officePostcode"
   val RegistrationKey: String = "registration"
   val IdentifiersMatchKey: String = "identifiersMatch"
   val TrustKnownFactsKey: String = "trustKnownFacts"
