@@ -74,7 +74,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                 ))
                 case Trusts =>
                   auditService.auditJourney(journeyId, authInternalId)
-                  val pathToRedirect = if(isEnabled(EnableFullTrustJourney)) {
+                  val pathToRedirect = if (isEnabled(EnableFullTrustJourney)) {
                     s"${appConfig.selfUrl}${trustControllerRoutes.CaptureSautrController.show(journeyId).url}"
                   } else {
                     (req.body.continueUrl + s"?journeyId=$journeyId")
@@ -82,7 +82,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                   Created(Json.obj(
                     journeyStartUrl -> pathToRedirect
                   ))
-                case UnincorporatedAssociation => {
+                case UnincorporatedAssociation =>
                   auditService.auditJourney(journeyId, authInternalId)
                   val pathToRedirect = if(isEnabled(EnableFullUAJourney)) {
                     s"${appConfig.selfUrl}${uaControllerRoutes.CaptureCtutrController.show(journeyId).url}"
@@ -92,7 +92,6 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                   Created(Json.obj(
                     journeyStartUrl -> pathToRedirect
                   ))
-                }
               }
             }
           )

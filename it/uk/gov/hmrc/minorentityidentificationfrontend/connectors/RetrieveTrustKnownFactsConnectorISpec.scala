@@ -21,7 +21,6 @@ import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{knownFactsJson, testTrustKnownFactsResponse, testUtr}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatching.DetailsNotFound
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.RetrieveTrustKnownFactsStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
@@ -38,7 +37,7 @@ class RetrieveTrustKnownFactsConnectorISpec extends ComponentSpecHelper with Ret
         stubRetrieveTrustKnownFacts(testUtr)(OK, knownFactsJson)
         val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr))
 
-        result mustBe Right(testTrustKnownFactsResponse)
+        result mustBe Some(testTrustKnownFactsResponse)
       }
       "the TrustVerificationStub feature switch is on" in {
         enable(TrustVerificationStub)
@@ -46,10 +45,10 @@ class RetrieveTrustKnownFactsConnectorISpec extends ComponentSpecHelper with Ret
 
         val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr))
 
-        result mustBe Right(testTrustKnownFactsResponse)
+        result mustBe Some(testTrustKnownFactsResponse)
       }
     }
-    "return DetailsNotFound" when {
+    "return None" when {
       "the Trust proxy endpoint returns 404" in {
         disable(TrustVerificationStub)
 
@@ -57,7 +56,7 @@ class RetrieveTrustKnownFactsConnectorISpec extends ComponentSpecHelper with Ret
 
         val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr))
 
-        result mustBe Left(DetailsNotFound)
+        result mustBe None
       }
     }
     "throw an Internal Server Exception" in {

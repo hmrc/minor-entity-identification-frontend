@@ -18,7 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RetrieveTrustKnownFactsConnector
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatching.{DetailsMismatch, DetailsNotFound, KnownFactsMatchingResult, SuccessfulMatch}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, KnownFactsMatchingResult, SuccessfulMatch}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,22 +33,18 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
                              )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] = {
     for {
       knownFactsMatchResult <- retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(sautr).flatMap {
-        case Right(knownFacts) =>
+        case Some(knownFacts) =>
           storageService.storeTrustsKnownFacts(journeyId, knownFacts).map {
             _ =>
-              if (saPostcode.isEmpty && knownFacts.isAbroad) {
+              if (saPostcode.isEmpty && knownFacts.isAbroad | saPostcode == knownFacts.declarationPostcode | saPostcode == knownFacts.correspondencePostcode) {
                 SuccessfulMatch
               }
-              else if (saPostcode == knownFacts.declarationPostcode | saPostcode == knownFacts.correspondencePostcode) SuccessfulMatch
               else DetailsMismatch
           }
-        case Left(DetailsNotFound) => Future.successful(DetailsNotFound)
+        case None => Future.successful(DetailsNotFound)
         case _ => throw new InternalServerException("Unexpected status returned from RetrieveTrustKnownFactsConnector")
       }
-      _ <- knownFactsMatchResult match {
-        case SuccessfulMatch => storageService.storeIdentifiersMatch(journeyId, identifiersMatch = true)
-        case _ => storageService.storeIdentifiersMatch(journeyId, identifiersMatch = false)
-      }
+      _ <- storageService.storeIdentifiersMatch(journeyId, knownFactsMatchResult)
     } yield knownFactsMatchResult
   }
 

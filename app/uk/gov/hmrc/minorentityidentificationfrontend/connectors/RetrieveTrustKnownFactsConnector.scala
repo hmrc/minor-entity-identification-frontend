@@ -22,7 +22,6 @@ import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.KnownFactsHttpParser.KnownFactsHttpReads
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatching.{DetailsNotFound, TrustsProxyResponse}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.TrustKnownFacts
 
 import javax.inject.{Inject, Singleton}
@@ -31,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RetrieveTrustKnownFactsConnector @Inject()(httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
-  def retrieveTrustKnownFacts(sautr: String)(implicit hc: HeaderCarrier): Future[TrustsProxyResponse] = {
+  def retrieveTrustKnownFacts(sautr: String)(implicit hc: HeaderCarrier): Future[Option[TrustKnownFacts]] = {
     httpClient.POSTEmpty(appConfig.retrieveTrustsKnownFactsUrl(sautr))(
       KnownFactsHttpReads,
       hc,
@@ -53,16 +52,16 @@ object KnownFactsHttpParser {
       (JsPath \ CorrespondenceKey \ AbroadIndicator).read[Boolean]
     ) (TrustKnownFacts.apply _)
 
-  implicit object KnownFactsHttpReads extends HttpReads[TrustsProxyResponse] {
-    override def read(method: String, url: String, response: HttpResponse): TrustsProxyResponse = {
+  implicit object KnownFactsHttpReads extends HttpReads[Option[TrustKnownFacts]] {
+    override def read(method: String, url: String, response: HttpResponse): Option[TrustKnownFacts] = {
       response.status match {
         case OK =>
           (response.json \ TrustKey).validate[TrustKnownFacts](knownFactsRead) match {
-            case JsSuccess(details, _) => Right(details)
+            case JsSuccess(details, _) => Some(details)
             case JsError(errors) =>
               throw new InternalServerException(s"Invalid JSON returned from Trusts Known Facts Call. Errors - $errors")
           }
-        case NOT_FOUND => Left(DetailsNotFound)
+        case NOT_FOUND => None
         case status =>
           throw new InternalServerException(s"Unexpected status from Trusts Known Facts Call. Status returned - $status")
       }

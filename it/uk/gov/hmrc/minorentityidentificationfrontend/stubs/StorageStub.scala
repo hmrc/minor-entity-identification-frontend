@@ -135,4 +135,35 @@ trait StorageStub extends WiremockMethods {
   def verifyRemoveUtr(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/utr")
 
+  def stubStoreBusinessVerificationStatus(journeyId: String,
+                                          businessVerificationStatus: BusinessVerificationStatus
+                                         )(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/businessVerification",
+      body = Json.toJson(businessVerificationStatus)
+    ).thenReturn(
+      status = status
+    )
+
+  def stubRetrieveBusinessVerificationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/businessVerification"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
+  def verifyStoreBusinessVerificationStatus(journeyId: String, businessVerificationStatus: BusinessVerificationStatus): Unit = {
+    val jsonBody = Json.toJson(businessVerificationStatus)
+    WiremockHelper.verifyPut(uri = s"/minor-entity-identification/journey/$journeyId/businessVerification", optBody = Some(jsonBody.toString()))
+  }
+
+  def stubRetrieveRegistrationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/registration"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
 }
