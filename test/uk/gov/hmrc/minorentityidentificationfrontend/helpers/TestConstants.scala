@@ -17,7 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.helpers
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, Trusts}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import java.util.UUID
@@ -37,6 +37,8 @@ object TestConstants {
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testSaPostcode = "AA1 1AA"
   val testCharityHMRCReferenceNumber: String = UUID.randomUUID().toString
+
+  val testTrustJourneyConfig: JourneyConfig = testJourneyConfig(Trusts)
 
   def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,

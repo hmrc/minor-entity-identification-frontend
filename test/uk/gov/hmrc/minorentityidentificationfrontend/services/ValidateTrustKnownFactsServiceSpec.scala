@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks.MockRetrieveTrustKnownFactsConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.SuccessfullyStored
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, SuccessfulMatch}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks.MockStorageService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,7 +42,7 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
         mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
 
-        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, Some(testSaPostcode)))
+        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), Some(testSaPostcode), optCHRN = None))
 
         result mustBe SuccessfulMatch
 
@@ -54,7 +54,7 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsAbroadResponse) returns Future.successful(SuccessfullyStored)
         mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
 
-        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, None))
+        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), None,  optCHRN = None))
 
         result mustBe SuccessfulMatch
 
@@ -68,7 +68,7 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch) returns Future.successful(SuccessfullyStored)
 
-        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, Some("AB0 0AA")))
+        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), Some("AB0 0AA"), optCHRN = None))
 
         result mustBe DetailsMismatch
 
@@ -80,7 +80,7 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch) returns Future.successful(SuccessfullyStored)
 
-        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, None))
+        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), None, optCHRN = None))
 
         result mustBe DetailsMismatch
 
@@ -93,11 +93,54 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(None)
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound) returns Future.successful(SuccessfullyStored)
 
-        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, testSautr, Some("AB0 0AA")))
+        val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
+          optSaUtr = Some(testSautr),
+          optSaPostcode = Some("AB0 0AA"),
+          optCHRN = None)
+        )
 
         result mustBe DetailsNotFound
 
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound) was called
+      }
+    }
+
+    "return UnMatchableWithoutRetry" when {
+      "the user provides no Sautr but provides CHRN" in {
+
+          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) returns Future.successful(SuccessfullyStored)
+
+          val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
+            optSaUtr = None,
+            optSaPostcode = None,
+            optCHRN = Some(testCharityHMRCReferenceNumber))
+          )
+
+          result mustBe UnMatchableWithoutRetry
+
+          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) was called
+
+          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) wasNever called
+
+      }
+    }
+
+    "return UnMatchableWithRetry" when {
+      "the user provides no Sautr and no CHRN" in {
+          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) returns Future.successful(SuccessfullyStored)
+
+          val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
+            optSaUtr = None,
+            optSaPostcode = None,
+            optCHRN = None)
+          )
+
+          result mustBe UnMatchableWithRetry
+
+          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) was called
+
+          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) wasNever called
+
       }
     }
   }

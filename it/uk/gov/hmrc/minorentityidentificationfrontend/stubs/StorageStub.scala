@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{WiremockHelper, WiremockMethods}
 
@@ -33,16 +33,28 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
+  def stubStoreStoreTrustsKnownFacts(journeyId: String, expBody: JsValue)(status: Int): Unit =
+    when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/trustKnownFacts", expBody)
+      .thenReturn(status = status)
+
+  def stubStoreIdentifiersMatch(journeyId: String, expBody: JsValue)(status: Int): Unit =
+    when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch", expBody)
+      .thenReturn(status = status)
+
+  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, identifiersMatchJson: JsObject = Json.obj()): Unit =
+    when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch").thenReturn(
+      status = status,
+      body = identifiersMatchJson
+    )
+
   def stubRetrieveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
-    when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/utr"
-    ).thenReturn(
+    when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/utr").thenReturn(
       status = status,
       body = body
     )
 
   def stubRemoveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
-    when(method = DELETE, uri = s"/minor-entity-identification/journey/$journeyId/utr"
-    ).thenReturn(
+    when(method = DELETE, uri = s"/minor-entity-identification/journey/$journeyId/utr").thenReturn(
       status = status,
       body = body
     )
@@ -126,7 +138,7 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
-  def stubRetrieveCHRN(journeyId: String)(status: Int, optCharityHMRCReferenceNumber:  String = ""): Unit =
+  def stubRetrieveCHRN(journeyId: String)(status: Int, optCharityHMRCReferenceNumber: String = ""): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/chrn"
     ).thenReturn(
@@ -140,6 +152,18 @@ trait StorageStub extends WiremockMethods {
     ).thenReturn(
       status = status,
       body = body
+    )
+
+  def verifyStoreTrustsKnownFacts(journeyId: String, expBody: JsValue): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/minor-entity-identification/journey/$journeyId/trustKnownFacts",
+      optBody = Some(Json.stringify(expBody))
+    )
+
+  def verifyStoreIdentifiersMatch(journeyId: String, expBody: JsValue): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch",
+      optBody = Some(Json.stringify(expBody))
     )
 
   def verifyRemoveCHRN(journeyId: String): Unit =

@@ -18,14 +18,18 @@ package uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers
 
 import play.api.libs.json.{JsValue, Json}
 
-import scala.io.Source
+import scala.io.{BufferedSource, Source}
 
 object JsonUtils {
 
   def jsonFromFile(path: String): JsValue = {
-    val resource = Source.fromURL(getClass.getResource(path))
-    val json = Json.parse(resource.mkString)
-    resource.close()
-    json
+    var optResource: Option[BufferedSource] = None
+    try {
+      optResource = Some(Source.fromResource(path))
+      Json.parse(optResource.get.mkString)
+    } finally
+      if (optResource.isDefined)
+        optResource.get.close()
   }
+
 }

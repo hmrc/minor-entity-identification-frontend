@@ -20,21 +20,23 @@ import play.api.libs.json._
 
 sealed trait KnownFactsMatchingResult
 
-sealed trait KnownFactsMatchFailure extends KnownFactsMatchingResult
-
 case object SuccessfulMatch extends KnownFactsMatchingResult
 
-case object NotEnoughInformationToMatch extends KnownFactsMatchingResult
+sealed trait KnownFactsMatchFailure extends KnownFactsMatchingResult
+
+case object UnMatchableWithRetry extends KnownFactsMatchFailure
+
+case object UnMatchableWithoutRetry extends KnownFactsMatchFailure
 
 case object DetailsMismatch extends KnownFactsMatchFailure
 
 case object DetailsNotFound extends KnownFactsMatchFailure
 
-
 object KnownFactsMatchingResult {
   val KnownFactsMatchingResultKey = "identifiersMatch"
   val SuccessfulMatchKey = "SuccessfulMatch"
-  val NotEnoughInformationToMatchKey = "NotEnoughInfoToMatch"
+  val UnMatchableWithoutRetryKey = "UnMatchableWithoutRetry"
+  val UnMatchableWithRetryKey = "UnMatchableWithRetry"
   val DetailsMismatchKey = "DetailsMismatch"
   val DetailsNotFoundKey = "DetailsNotFound"
 
@@ -42,7 +44,8 @@ object KnownFactsMatchingResult {
     override def writes(knownFactsMatchingResult: KnownFactsMatchingResult): JsObject = {
       val knownFactsMatchingResultString = knownFactsMatchingResult match {
         case SuccessfulMatch => SuccessfulMatchKey
-        case NotEnoughInformationToMatch => NotEnoughInformationToMatchKey
+        case UnMatchableWithoutRetry => UnMatchableWithoutRetryKey
+        case UnMatchableWithRetry => UnMatchableWithRetryKey
         case DetailsMismatch => DetailsMismatchKey
         case DetailsNotFound => DetailsNotFoundKey
       }
@@ -53,7 +56,8 @@ object KnownFactsMatchingResult {
     override def reads(json: JsValue): JsResult[KnownFactsMatchingResult] =
       (json \ KnownFactsMatchingResultKey).validate[String].collect(JsonValidationError("Invalid business validation state")) {
         case SuccessfulMatchKey => SuccessfulMatch
-        case NotEnoughInformationToMatchKey => NotEnoughInformationToMatch
+        case UnMatchableWithRetryKey => UnMatchableWithRetry
+        case UnMatchableWithoutRetryKey => UnMatchableWithoutRetry
         case DetailsMismatchKey => DetailsMismatch
         case DetailsNotFoundKey => DetailsNotFound
       }

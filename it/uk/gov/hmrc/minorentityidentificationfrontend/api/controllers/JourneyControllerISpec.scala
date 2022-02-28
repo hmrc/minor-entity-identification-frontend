@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, Json, __}
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
@@ -40,6 +41,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "businessVerificationCheck" -> true,
       "regime" -> testRegime
     )
+
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
@@ -69,11 +71,11 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
   }
 
   "GET /api/journey/:journeyId" should {
-    "return sautr, business registration status, registration status, postcode and chrn" when {
-      "they exist in the database" in {
+    "return sautr, business registration status, registration status, postcode, chrn and identifiersMatch true" when {
+      "they exist in the database and KnownFactsMatchingResult is SuccessfulMatch" in {
         val testDetailsJson = Json.obj(
           "sautr" -> "1234567890",
-          "identifiersMatch" -> false,
+          "identifiersMatch" -> true,
           "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(BusinessVerificationStatus.format.writes),
           "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes),
           "postcode" -> testSaPostcode,
@@ -85,6 +87,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
         stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
@@ -92,8 +95,8 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
         result.json mustBe testDetailsJson
       }
     }
-    "return the business verification status and registration status (no sautr, no postcode and no chrn)" when {
-      "the utr, SAPostcode and CHRN do not exist in the database" in {
+    "return the business verification status, registration status and identifiersMatch false (no sautr, no postcode, no chrn)" when {
+      "the utr, SAPostcode, CHRN and identifiersMatch do not exist in the database" in {
         val testDetailsJson = Json.obj(
           "identifiersMatch" -> false,
           "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(BusinessVerificationStatus.format.writes),
@@ -105,12 +108,34 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
         stubRetrieveSaPostcode(testJourneyId)(status = NOT_FOUND)
         stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
         result.status mustBe OK
         result.json mustBe testDetailsJson
       }
+    }
+
+    "maps all KnownFactsMatchingResult different from SuccessfulMatch to identifiersMatch false" in {
+
+      List(UnMatchableWithoutRetryKey, UnMatchableWithRetryKey, DetailsMismatchKey, DetailsNotFoundKey).foreach(aNonSuccessfulMatch => {
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveSaPostcode(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(status = NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(aNonSuccessfulMatch))
+
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+        result.status mustBe OK
+
+        result.json.as[Boolean]((__ \ "identifiersMatch").read[Boolean]) mustBe false
+
+      })
+
     }
 
     "redirect to Sign In Page" when {

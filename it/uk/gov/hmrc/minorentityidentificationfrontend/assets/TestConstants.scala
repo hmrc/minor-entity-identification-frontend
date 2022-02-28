@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.{BusinessVerificationFailKey, BusinessVerificationNotEnoughInfoToCallKey, BusinessVerificationNotEnoughInfoToChallengeKey, BusinessVerificationPassKey, BusinessVerificationStatusKey}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig, TrustKnownFacts}
 
 import java.util.UUID
@@ -67,16 +67,16 @@ object TestConstants {
   val testUtr: String = "1234567890"
   val testUtrType: String = "sautr"
 
-  val testUtrJson: JsObject = {
-    Json.obj(
+  val testUtrJson: JsObject = Json.obj(
       "type" -> testUtrType,
       "value" -> testUtr
     )
-  }
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testPostcode), Some(testSaPostcode), isAbroad = false)
 
-  val knownFactsJson: JsObject = Json.obj(
+  val testKnownFactsJson: JsObject = testKnownFactsJson(correspondencePostcode = "AA1 1AA",declarationPostcode = "AA00 0AA")
+
+  def testKnownFactsJson(correspondencePostcode: String, declarationPostcode: String): JsObject = Json.obj(
     "trustOrEstateDisplay" -> Json.obj(
       "declaration" -> Json.obj(
         "name" -> Json.obj(
@@ -84,7 +84,7 @@ object TestConstants {
           "lastName" -> "Bloggs"
         ),
         "address" -> Json.obj(
-          "postCode" -> "AA00 0AA",
+          "postCode" -> declarationPostcode,
           "country" -> "GB",
           "line1" -> "Test Line 1",
           "line2" -> "Test Line 2"
@@ -101,7 +101,7 @@ object TestConstants {
         "address" -> Json.obj(
           "line1" -> "Test Line 1",
           "line2" -> "Test Lane",
-          "postCode" -> "AA1 1AA",
+          "postCode" -> correspondencePostcode,
           "country" -> "GB"
         ),
         "phoneNumber" -> "0191 2929292"
@@ -192,4 +192,12 @@ object TestConstants {
   val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
   val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
   val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey)
+
+  def testTrustKnownFactsJson(correspondencePostcode: String, declarationPostcode: String): JsValue = Json.obj(
+    "correspondencePostcode" -> correspondencePostcode,
+    "declarationPostcode" -> declarationPostcode,
+    "isAbroad" -> false
+  )
+
+  def testIdentifiersMatchJson(identifiersMatchValue:String): JsObject = Json.obj("identifiersMatch" -> identifiersMatchValue)
 }
