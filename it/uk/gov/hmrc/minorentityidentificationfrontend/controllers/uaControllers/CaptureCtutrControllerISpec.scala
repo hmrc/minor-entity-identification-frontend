@@ -42,7 +42,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           ))
           enable(EnableFullUAJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          get(s"/unnicorporated-association/$testJourneyId/ct-utr")
+          get(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")
         }
 
         "return OK" in {
@@ -56,12 +56,12 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
         "redirect to sign in page" when {
           "the user is UNAUTHORISED" in {
             stubAuthFailure()
-            lazy val result: WSResponse = get(s"/unnicorporated-association/$testJourneyId/ct-utr")
+            lazy val result: WSResponse = get(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")
 
             result must have(
               httpStatus(SEE_OTHER),
               redirectUri("/bas-gateway/sign-in" +
-                s"?continue_url=%2Funnicorporated-association%2F$testJourneyId%2Fct-utr" +
+                s"?continue_url=%2Fidentify-your-unincorporated-association%2F$testJourneyId%2Fct-utr" +
                 "&origin=minor-entity-identification-frontend"
               )
             )
@@ -80,7 +80,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             ))
             disable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-            get(s"/unnicorporated-association/$testJourneyId/ct-utr")
+            get(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")
           }
           result.status mustBe INTERNAL_SERVER_ERROR
         }
@@ -99,7 +99,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           ))
           enable(EnableFullUAJourney)
           stubAuthFailure()
-          get(s"/unnicorporated-association/$testJourneyId/ct-utr")
+          get(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")
         }
         result.status mustBe SEE_OTHER
       }
@@ -113,7 +113,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           ))
           disable(EnableFullUAJourney)
           stubAuthFailure()
-          get(s"/unnicorporated-association/$testJourneyId/ct-utr")
+          get(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")
         }
         result.status mustBe SEE_OTHER
       }
@@ -186,7 +186,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             ))
             enable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-            post(s"/unnicorporated-association/$testJourneyId/ct-utr")("utr" -> "")
+            post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "")
           }
 
           "return a bad request" in {
@@ -205,7 +205,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             ))
             enable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-            post(s"/unnicorporated-association/$testJourneyId/ct-utr")("utr" -> "1@34567890")
+            post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1@34567890")
           }
 
           "return a bad request" in {
@@ -224,7 +224,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             ))
             enable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-            post(s"/unnicorporated-association/$testJourneyId/ct-utr")("utr" -> "123456789123456789")
+            post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "123456789123456789")
           }
 
           "return a bad request" in {
@@ -252,7 +252,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             disable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            lazy val result = post(s"/unnicorporated-association/$testJourneyId/ct-utr")("utr" -> "1234567891")
+            lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1234567891")
 
             result.status mustBe INTERNAL_SERVER_ERROR
           }
@@ -275,7 +275,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
         enable(EnableFullUAJourney)
         stubAuthFailure()
 
-        lazy val result = post(s"/unnicorporated-association/$testJourneyId/ct-utr")("utr" -> "1234567891")
+        lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1234567891")
 
         result.status mustBe SEE_OTHER
 
@@ -291,7 +291,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
         disable(EnableFullUAJourney)
         stubAuthFailure()
 
-        lazy val result = post(s"/unnicorporated-association/$testJourneyId/ct-utr")("utr" -> "1234567891")
+        lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1234567891")
 
         result.status mustBe SEE_OTHER
 
@@ -329,12 +329,12 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
 
-        lazy val result = get(s"/unnicorporated-association/$testJourneyId/no-utr")
+        lazy val result = get(s"/identify-your-unincorporated-association/$testJourneyId/no-utr")
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri(
-            s"/bas-gateway/sign-in?continue_url=%2Funnicorporated-association%2F$testJourneyId%2Fno-utr&origin=minor-entity-identification-frontend"
+            s"/bas-gateway/sign-in?continue_url=%2Fidentify-your-unincorporated-association%2F$testJourneyId%2Fno-utr&origin=minor-entity-identification-frontend"
           )
         )
       }
