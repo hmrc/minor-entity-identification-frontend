@@ -87,7 +87,7 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                   val pathToRedirect = if(isEnabled(EnableFullUAJourney)) {
                     s"${appConfig.selfUrl}${uaControllerRoutes.CaptureCtutrController.show(journeyId).url}"
                   } else {
-                    (req.body.continueUrl + s"?journeyId=$journeyId")
+                    req.body.continueUrl + s"?journeyId=$journeyId"
                   }
                   Created(Json.obj(
                     journeyStartUrl -> pathToRedirect

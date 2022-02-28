@@ -77,7 +77,7 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
                 },
               postcode =>
                 storageService.storeOfficePostcode(journeyId, postcode).map {
-                  _ => NotImplemented //TODO: Update this to redirect to CYA page when ready
+                  _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
                 }
             )
           } else throw new InternalServerException("Unincorporated association journey is not enabled")

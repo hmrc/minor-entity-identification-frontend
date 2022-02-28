@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
@@ -22,7 +22,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.{CheckYourAnswersCommonViewTests, OverseasCheckYourAnswersSpecificViewTests}
+import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersCommonViewTests
+import uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews.OverseasCheckYourAnswersSpecificViewTests
 
 class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   with AuthStub

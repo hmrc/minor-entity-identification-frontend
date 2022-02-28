@@ -12,3 +12,8 @@ POST        /:journeyId/registered-office-postcode         uk.gov.hmrc.minorenti
 GET         /:journeyId/chrn                               uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureCHRNController.show(journeyId)
 POST        /:journeyId/chrn                               uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureCHRNController.submit(journeyId)
 GET         /:journeyId/no-chrn                            uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CaptureCHRNController.noChrn(journeyId)
+
+
+GET         /:journeyId/check-your-answers-business        uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CheckYourAnswersController.show(journeyId)
+POST        /:journeyId/check-your-answers-business        uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CheckYourAnswersController.submit(journeyId)
+

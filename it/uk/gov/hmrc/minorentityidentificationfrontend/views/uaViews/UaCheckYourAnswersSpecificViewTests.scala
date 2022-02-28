@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views
+package uk.gov.hmrc.minorentityidentificationfrontend.views.uaViews
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, CheckYourAnswers => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testSaPostcode, testUtr}
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testCtutr, testJourneyId, testOfficePostcode}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
-trait TrustCheckYourAnswersSpecificViewTests {
+trait UaCheckYourAnswersSpecificViewTests {
 
   this: ComponentSpecHelper =>
 
-  def testTrustWithUtrAndPostcodeSummaryListView(response: => WSResponse, journeyId: String): Unit = {
+  def testUaWithCtutrAndOfficePostcodeSummaryListView(response: => WSResponse, journeyId: String): Unit = {
     lazy val summaryListRows: List[Element] = extractSummaryListRows(response)
 
     "have a summary list which" should {
@@ -44,24 +44,24 @@ trait TrustCheckYourAnswersSpecificViewTests {
         val utrRow = summaryListRows.head
 
         utrRow.getSummaryListQuestion mustBe messages.utr
-        utrRow.getSummaryListAnswer mustBe testUtr
-        utrRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSautrController.show(testJourneyId).url
+        utrRow.getSummaryListAnswer mustBe testCtutr
+        utrRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCtutrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }
 
-      "have an sa postcode row" in {
+      "have an registered office postcode row" in {
         val postcodeRow = summaryListRows(1)
 
-        postcodeRow.getSummaryListQuestion mustBe messages.postcode
-        postcodeRow.getSummaryListAnswer mustBe testSaPostcode
-        postcodeRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSaPostcodeController.show(journeyId).url
-        postcodeRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.postcode}"
+        postcodeRow.getSummaryListQuestion mustBe messages.uaPostcode
+        postcodeRow.getSummaryListAnswer mustBe testOfficePostcode
+        postcodeRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureOfficePostcodeController.show(journeyId).url
+        postcodeRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaPostcode}"
       }
     }
 
   }
 
-  def testTrustWithNoUtrAndNoCharityHRMCReferenceNumberSummaryListView(response: => WSResponse, journeyId: String): Unit = {
+  def testUaWithNoCtutrAndNoCHRNSummaryListView(response: => WSResponse, journeyId: String): Unit = {
     lazy val summaryListRows: List[Element] = extractSummaryListRows(response)
 
     "have a summary list which" should {
@@ -70,13 +70,13 @@ trait TrustCheckYourAnswersSpecificViewTests {
         summaryListRows.size mustBe 2
       }
 
-      "have a utr row saying utr not provided" in {
+      "have a Ctutr row saying utr not provided" in {
         val utrRow = summaryListRows.head
 
-        utrRow.getSummaryListQuestion mustBe messages.utr
+        utrRow.getSummaryListQuestion mustBe messages.uaNoUtr
         utrRow.getSummaryListAnswer mustBe messages.noUtr
-        utrRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSautrController.show(testJourneyId).url
-        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
+        utrRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCtutrController.show(testJourneyId).url
+        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaNoUtr}"
       }
 
       "have an charity HRMC reference number row saying charity HRMC reference number not provided" in {
@@ -84,7 +84,7 @@ trait TrustCheckYourAnswersSpecificViewTests {
 
         charityHRMCReferenceNumberRow.getSummaryListQuestion mustBe messages.charityHRMCReferenceNumber
         charityHRMCReferenceNumberRow.getSummaryListAnswer mustBe messages.charityHRMCReferenceNumberNotProvided
-        charityHRMCReferenceNumberRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureCHRNController.show(journeyId).url
+        charityHRMCReferenceNumberRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCHRNController.show(journeyId).url
         charityHRMCReferenceNumberRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.charityHRMCReferenceNumber}"
       }
     }
