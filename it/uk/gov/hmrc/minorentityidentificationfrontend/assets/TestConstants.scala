@@ -31,6 +31,7 @@ object TestConstants {
   val testSautr: String = "1234567890"
   val testSaPostcode: String =  "AA00 0AA"
   val testPostcode: String = "AA1 1AA"
+  val testOfficePostcode: String =  "AA22 2AA"
   val testCHRN: String = "AB99999"
   val testContinueUrl: String = "/test"
   val testDeskProServiceId: String = "vrs"

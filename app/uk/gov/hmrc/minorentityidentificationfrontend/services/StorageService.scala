@@ -53,6 +53,15 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveSaPostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, SaPostcodeKey)
 
+  def storeOfficePostcode(journeyId: String, officePostcode: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeDataField(journeyId, OfficePostcodeKey, officePostcode)
+
+  def removeOfficePostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeDataField(journeyId, OfficePostcodeKey)
+
+  def retrieveOfficePostcode(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+    connector.retrieveDataField[String](journeyId, OfficePostcodeKey)
+
   def retrieveCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, ChrnKey)
 
@@ -150,6 +159,7 @@ object StorageService {
   val OverseasKey: String = "overseas"
   val SaPostcodeKey: String = "saPostcode"
   val ChrnKey = "chrn"
+  val OfficePostcodeKey: String = "officePostcode"
   val RegistrationKey: String = "registration"
   val IdentifiersMatchKey: String = "identifiersMatch"
   val TrustKnownFactsKey: String = "trustKnownFacts"

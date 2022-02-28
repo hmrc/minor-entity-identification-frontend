@@ -86,6 +86,22 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
+  def stubStoreOfficePostcode(journeyId: String, officePostcode: String)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/officePostcode",
+      body = JsString(officePostcode)
+    ).thenReturn(
+      status = status
+    )
+
+  def stubRemoveOfficePostcode(journeyId: String)(status: Int, body: String = ""): Unit =
+    when(method = DELETE,
+      uri = s"/minor-entity-identification/journey/$journeyId/officePostcode"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
   def stubStoreCHRN(journeyId: String, chrn: String)(status: Int): Unit =
     when(method = PUT,
       uri = s"/minor-entity-identification/journey/$journeyId/chrn",
