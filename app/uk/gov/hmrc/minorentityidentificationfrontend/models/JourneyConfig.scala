@@ -23,6 +23,6 @@ case class JourneyConfig(continueUrl: String,
                          businessEntity: BusinessEntity,
                          businessVerificationCheck: Boolean,
                          regime: String) {
-  def continueUrl(journeyId: String): String = continueUrl + s"?journeyId=$journeyId"
+  def fullContinueUrl(journeyId: String): String = continueUrl + s"?journeyId=$journeyId"
 }
 

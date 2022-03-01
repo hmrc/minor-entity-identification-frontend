@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig, TrustKnownFacts}
 
@@ -205,16 +206,29 @@ object TestConstants {
   val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj("verificationStatus" -> "NOT_ENOUGH_INFORMATION_TO_CHALLENGE")
   val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj("verificationStatus" -> "NOT_ENOUGH_INFORMATION_TO_CALL_BV")
 
-  def testTrustKnownFactsJson(correspondencePostcode: String, declarationPostcode: String): JsValue = Json.obj(
-    "correspondencePostcode" -> correspondencePostcode,
-    "declarationPostcode" -> declarationPostcode,
-    "isAbroad" -> false
-  )
-
-  def testIdentifiersMatchJson(identifiersMatchValue:String): JsObject = Json.obj("identifiersMatch" -> identifiersMatchValue)
   val testSuccessfulRegistrationJson: JsObject = Json.obj(
     "registrationStatus" -> "REGISTERED",
     "registeredBusinessPartnerId" -> testSafeId)
 
   val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
+
+  def testIdentifiersMatchJson(identifiersMatchValue: String): JsObject = Json.obj("identifiersMatch" -> identifiersMatchValue)
+
+  def testVerificationStatusJson(verificationStatusValue: String): JsObject =
+    Json.obj("verificationStatus" -> verificationStatusValue)
+
+  def testCreateBusinessVerificationJourneyJson(sautr: String,
+                                                journeyId: String,
+                                                accessibilityUrl: String,
+                                                regime: String): JsObject =
+    Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
+      "origin" -> regime,
+      "identifiers" -> Json.arr(
+        Json.obj(
+          "saUtr" -> sautr
+        )
+      ),
+      "continueUrl" -> trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+      "accessibilityStatementUrl" -> accessibilityUrl
+    )
 }

@@ -22,7 +22,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{test
 class JourneyConfigSpec extends org.scalatest.flatspec.AnyFlatSpec {
 
   "continueUrl" should "append the journeyId query parameter to the continue url" in {
-    testTrustJourneyConfig.continueUrl(testJourneyId) should be(testTrustJourneyConfig.continueUrl + s"?journeyId=$testJourneyId")
+    testTrustJourneyConfig.fullContinueUrl(testJourneyId) should be(testTrustJourneyConfig.continueUrl + s"?journeyId=$testJourneyId")
   }
 
 }

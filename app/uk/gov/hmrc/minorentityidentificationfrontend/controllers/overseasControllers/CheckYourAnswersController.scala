@@ -68,7 +68,7 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
           journeyService.getJourneyConfig(journeyId, authInternalId).map {
             journeyConfig => {
               auditService.auditJourney(journeyId, authInternalId)
-              Redirect(journeyConfig.continueUrl(journeyId))
+              Redirect(journeyConfig.fullContinueUrl(journeyId))
             }
           }
         case None =>

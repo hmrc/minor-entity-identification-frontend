@@ -20,7 +20,7 @@ import play.api.http.Status.FORBIDDEN
 import play.api.libs.json.Json
 import play.api.test.Helpers.{CREATED, NOT_FOUND, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testAccessibilityUrl, testContinueUrl, testJourneyId, testRegime, testSautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.{BusinessVerificationJourneyCreated, NotEnoughEvidence, UserLockedOut}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.BusinessVerificationStub
@@ -73,7 +73,7 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         "the journey creation has been successful" in {
           disable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl, testRegime)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
 
@@ -85,7 +85,7 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           disable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl, testRegime)(NOT_FOUND, Json.obj())
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(NOT_FOUND, Json.obj())
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
 
@@ -94,7 +94,7 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           disable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourney(testSautr, testJourneyId, testAccessibilityUrl, testRegime)(FORBIDDEN, Json.obj())
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(FORBIDDEN, Json.obj())
 
           val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
 

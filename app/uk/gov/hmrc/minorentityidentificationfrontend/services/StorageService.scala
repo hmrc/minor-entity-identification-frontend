@@ -21,7 +21,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.StorageConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.{SuccessfullyRemoved, SuccessfullyStored}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.{format => bvFormat}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.writeForJourneyContinuation
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService._
@@ -91,6 +90,7 @@ class StorageService @Inject()(connector: StorageConnector) {
       optCharityHMRCReferenceNumber <- retrieveCHRN(journeyId)
       optIdentifiersMatch <- retrieveIdentifiersMatch(journeyId)
       optOfficePostcode <- retrieveOfficePostcode(journeyId)
+      optBVStatus <- retrieveBusinessVerificationStatus(journeyId)
     } yield {
 
       val optCharityHMRCReferenceNumberBlock: JsObject = optCharityHMRCReferenceNumber match {
@@ -125,16 +125,22 @@ class StorageService @Inject()(connector: StorageConnector) {
       val identifiersMatchBlock: JsObject =
         Json.obj("identifiersMatch" -> optIdentifiersMatch.contains(SuccessfulMatch))
 
-      Json.obj(
-        "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(writeForJourneyContinuation),
-        "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
-      ) ++
+      val businessVerificationStatusBlock: JsObject = {
+        val value = optBVStatus match {
+          case None           => BusinessVerificationStatus.writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge)
+          case Some(bvStatus) => BusinessVerificationStatus.writeForJourneyContinuation(bvStatus)
+        }
+        Json.obj("businessVerification" -> value)
+      }
+
+      Json.obj("registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)) ++
         utrBlock ++
         overseasTaxIdentifiersBlock ++
         utrSaPostcodeBlock ++
         optCharityHMRCReferenceNumberBlock ++
         identifiersMatchBlock ++
-        registeredOfficePostcodeBlock
+        registeredOfficePostcodeBlock ++
+        businessVerificationStatusBlock
     }
 
   def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =

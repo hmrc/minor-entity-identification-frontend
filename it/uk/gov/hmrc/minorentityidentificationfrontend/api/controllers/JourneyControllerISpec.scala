@@ -17,11 +17,13 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
 import play.api.libs.json.{JsObject, Json, __}
+import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
@@ -87,7 +89,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
         stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(SuccessfulMatchKey))
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
@@ -119,25 +121,122 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       }
     }
 
-    "maps all KnownFactsMatchingResult different from SuccessfulMatch to identifiersMatch false" in {
+    "map verificationStatus in the right way for all journey types:" when {
 
-      List(UnMatchableWithoutRetryKey, UnMatchableWithRetryKey, DetailsMismatchKey, DetailsNotFoundKey).foreach(aNonSuccessfulMatch => {
+      def extractActualBusinessVerificationStatus(response: WSResponse): String = response.json.as[String]((__ \ "businessVerification" \ "verificationStatus").read)
 
+      "BV is BusinessVerificationPass in the DB it returns PASS" in {
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveSaPostcode(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(aNonSuccessfulMatch))
+        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
+
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
+
+        lazy val result: WSResponse = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+        result.status mustBe OK
+
+        extractActualBusinessVerificationStatus(response = result) mustBe "PASS"
+
+      }
+
+      "BV is BusinessVerificationFail in the DB it returns FAIL" in {
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
+
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationFailJson)
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
         result.status mustBe OK
 
-        result.json.as[Boolean]((__ \ "identifiersMatch").read[Boolean]) mustBe false
+        extractActualBusinessVerificationStatus(response = result) mustBe "FAIL"
 
-      })
-      
+      }
+
+      "BV is BusinessVerificationNotEnoughInformationToCallBV in the DB it returns UNCHALLENGED" in {
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
+
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToChallengeJson)
+
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+        result.status mustBe OK
+
+        extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
+
+      }
+
+      "BV is BusinessVerificationNotEnoughInformationToChallenge in the DB it returns UNCHALLENGED" in {
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
+
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
+
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+        result.status mustBe OK
+
+        extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
+
+      }
+
+      "BV is not present (OverseasCompany and UnincorporatedAssociation) in the DB it returns UNCHALLENGED" in {
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
+
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+        result.status mustBe OK
+
+        extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
+
+      }
+    }
+
+    "return identifiersMatch false" when {
+      "identifiersMatch is different from SuccessfulMatch in the DB" in {
+
+        List(UnMatchableWithoutRetryKey, UnMatchableWithRetryKey, DetailsMismatchKey, DetailsNotFoundKey).foreach(aNonSuccessfulMatch => {
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
+          stubRetrieveSaPostcode(testJourneyId)(status = NOT_FOUND)
+          stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
+          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(status = NOT_FOUND)
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(aNonSuccessfulMatch))
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          result.json.as[Boolean]((__ \ "identifiersMatch").read[Boolean]) mustBe false
+
+        })
+
+      }
     }
 
     "redirect to Sign In Page" when {
