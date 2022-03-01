@@ -7,12 +7,13 @@
 1. [Setting up an Overseas Company Journey](TestREADME.md#get-identify-your-overseas-businesstest-onlycreate-overseas-company-journey)
 2. [Setting up a Trust Journey](TestREADME.md#get-identify-your-trusttest-onlycreate-trusts-journey)
 3. [Retrieving Journey Data](TestREADME.md#get-minor-entity-identificationtest-onlyretrieve-journeyjourneyid-or-minor-entity-identificationtest-onlyretrieve-journey)
-
+4. [Using the Trust Known Facts Stub](TestREADME.md#using-the-trusts-known-facts-stub)
 
 ### GET /identify-your-overseas-business/test-only/create-overseas-company-journey
 
 ---
-This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an Overseas Company.
+This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an
+Overseas Company.
 
 1. Continue URL (Required)
 
@@ -33,17 +34,17 @@ This is a test entry point which simulates a service by triggering the initial P
     - Shown in the HMRC header - typically a link to a feedback questionnaire
     - This is currently autofilled but can be changed
 
-5. Business verification checkbox 
+5. Business verification checkbox
 
-   - Used for skipping further verification checks carried out currently by Business Verification (SI)
-   - This is currently autofilled but can be changed
+    - Used for skipping further verification checks carried out currently by Business Verification (SI)
+    - This is currently autofilled but can be changed
 
 6. Regime (Required)
 
-   - This is the Tax Regime Identifier
-   - It is passed down to the Registration API
-   - This is currently defaulted to VATC but accepted values are PPT or VATC
-   
+    - This is the Tax Regime Identifier
+    - It is passed down to the Registration API
+    - This is currently defaulted to VATC but accepted values are PPT or VATC
+
 7. Accessibility Statement Link (Required)
 
     - Shown in the HMRC footer
@@ -52,118 +53,127 @@ This is a test entry point which simulates a service by triggering the initial P
 ### GET /identify-your-trust/test-only/create-trusts-journey
 
 ---
-This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for a Trust.
+This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for a
+Trust.
 
 1. Continue URL (Required)
 
-   - Where to redirect the user after the journey has been completed
+    - Where to redirect the user after the journey has been completed
 
 2. Service Name (Optional)
 
-   - Service Name to use throughout the service
-   - Currently, this is empty by default, so the default service name will be used
+    - Service Name to use throughout the service
+    - Currently, this is empty by default, so the default service name will be used
 
 3. DeskPro Service ID (Required)
 
-   - Used for the `Get help with this page` link
-   - This is currently autofilled but can be changed
+    - Used for the `Get help with this page` link
+    - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)
 
-   - Shown in the HMRC header - typically a link to a feedback questionnaire
-   - This is currently autofilled but can be changed
+    - Shown in the HMRC header - typically a link to a feedback questionnaire
+    - This is currently autofilled but can be changed
 
 5. Business verification checkbox
 
-   - Used for skipping further verification checks carried out currently by Business Verification (SI)
-   - This is currently autofilled but can be changed
+    - Used for skipping further verification checks carried out currently by Business Verification (SI)
+    - This is currently autofilled but can be changed
 
 6. Regime (Required)
 
-   - This is the Tax Regime Identifier
-   - It is passed down to the Registration API
-   - This is currently defaulted to VATC but accepted values are PPT or VATC
+    - This is the Tax Regime Identifier
+    - It is passed down to the Registration API
+    - This is currently defaulted to VATC but accepted values are PPT or VATC
 
 7. Accessibility Statement Link (Required)
 
-   - Shown in the HMRC footer
-   - This is currently autofilled but can be changed
+    - Shown in the HMRC footer
+    - This is currently autofilled but can be changed
 
 ### GET /identify-your-unincorporated-association/test-only/create-unincorporated-association-journey
 
 ---
-This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an Unincorporated Association.
+This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an
+Unincorporated Association.
 
 1. Continue URL (Required)
 
-   - Where to redirect the user after the journey has been completed
+    - Where to redirect the user after the journey has been completed
 
 2. Service Name (Optional)
 
-   - Service Name to use throughout the service
-   - Currently, this is empty by default, so the default service name will be used
+    - Service Name to use throughout the service
+    - Currently, this is empty by default, so the default service name will be used
 
 3. DeskPro Service ID (Required)
 
-   - Used for the `Get help with this page` link
-   - This is currently autofilled but can be changed
+    - Used for the `Get help with this page` link
+    - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)
 
-   - Shown in the HMRC header - typically a link to a feedback questionnaire
-   - This is currently autofilled but can be changed
+    - Shown in the HMRC header - typically a link to a feedback questionnaire
+    - This is currently autofilled but can be changed
 
 5. Business verification checkbox
 
-   - Used for skipping further verification checks carried out currently by Business Verification (SI)
-   - This is currently autofilled but can be changed
+    - Used for skipping further verification checks carried out currently by Business Verification (SI)
+    - This is currently autofilled but can be changed
 
 6. Regime (Required)
 
-   - This is the Tax Regime Identifier
-   - It is passed down to the Registration API
-   - This is currently defaulted to VATC but accepted values are PPT or VATC
+    - This is the Tax Regime Identifier
+    - It is passed down to the Registration API
+    - This is currently defaulted to VATC but accepted values are PPT or VATC
 
 7. Accessibility Statement URL (Required)
 
-   - Shown in the footer - a link to the accessibility statement for the calling service
-   - This is currently autofilled but can be changed
-   
+    - Shown in the footer - a link to the accessibility statement for the calling service
+    - This is currently autofilled but can be changed
 
 ### Retrieve journey Data
 
 ---
+
 #### Retrieve journey data from an Overseas Company journey:
-- GET /identify-your-overseas-business/test-only/retrieve-journey/:journeyId or 
+
+- GET /identify-your-overseas-business/test-only/retrieve-journey/:journeyId or
 - GET /identify-your-overseas-business/test-only/retrieve-journey
 
 #### Retrieve journey data from a Trust journey:
+
 - GET /identify-your-trust/test-only/retrieve-journey/:journeyId or
 - GET /identify-your-trust/test-only/retrieve-journey
 
 #### Retrieve journey data from an Unincorporated Association journey:
+
 - GET /identify-your-unincorporated-association/test-only/retrieve-journey/:journeyId or
 - GET /identify-your-unincorporated-association/test-only/retrieve-journey
+
 ---
 Retrieves all the journey data that is stored against a specific journeyID.
 
 #### Request:
+
 A valid journeyId must be sent in the URI or as a query parameter. Example of using the query parameter:
 
 `test-only/retrieve-journey?journeyId=1234567`
 
 #### Response:
+
 Status:
 
-| Expected Response                       | Reason
-|-----------------------------------------|------------------------------
-| ```OK(200)```                           |  ```JourneyId exists```
-| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
+| Expected Response                       | Reason                          |
+|-----------------------------------------|---------------------------------|
+| ```OK(200)```                           | ```JourneyId exists```          |
+| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```   |
 
 Example response bodies:
 
 ---
 Overseas Company:
+
 ```
 {
     "sautr": "0000030000",
@@ -180,7 +190,9 @@ Overseas Company:
     }
 }
 ```
+
 Trust:
+
 ```
 {
     "identifiersMatch": "false",
@@ -192,7 +204,9 @@ Trust:
     }
 }
 ```
+
 Unincorporated Association:
+
 ```
 {
     "identifiersMatch": "false",
@@ -204,3 +218,26 @@ Unincorporated Association:
     }
 }
 ```
+
+### Using the Trusts Known Facts stub
+
+POST /identify-your-trust/test-only/trusts/:sautr/refresh
+
+___
+
+Stubs the call to the Trusts Microservice to retrieve the known facts associated with the sautr provided.
+
+The Use stub for Trusts further verification flow feature switch will need to be enabled to use this stub.
+
+#### Request:
+
+No body is required for this request but a sautr must be sent in the url
+
+#### Response:
+
+| Sautr                  | Response        | Postcode returned | Is Abroad      |
+|------------------------|-----------------|-------------------|----------------|
+| ```1234567891```       | ```Ok```        | ```None```        | ```True```     |
+| ```1234567892```       | ```Not Found``` | ```-```           | ```-```        |
+| ```Any other sautr```  | ```Ok```        |```AA1 1AA```      | ```False```    |
+

@@ -37,24 +37,38 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
 
   "validateTrustKnownFacts" should {
     "return SuccessfulMatch" when {
-      "the user's postcode matches a postcode received from the known facts call" in {
-        mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsResponse))
-        mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
-        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
+      "the user's postcode matches a postcode received from the known facts call" when {
+        "the postcode is lower case" in {
+          mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsResponse))
+          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
+          mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
 
-        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), Some(testSaPostcode), optCHRN = None))
+          val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), Some("aa11aa"), optCHRN = None))
 
-        result mustBe SuccessfulMatch
+          result mustBe SuccessfulMatch
 
-        mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) was called
-        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) was called
+          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) was called
+          mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) was called
+        }
+        "the postcode is uppercase" in {
+          mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsResponse))
+          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) returns Future.successful(SuccessfullyStored)
+          mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
+
+          val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), Some(testSaPostcode), optCHRN = None))
+
+          result mustBe SuccessfulMatch
+
+          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) was called
+          mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) was called
+        }
       }
       "the user enters no postcode but the abroad indicator received from the known facts call is true" in {
         mockRetrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr) returns Future.successful(Some(testTrustKnownFactsAbroadResponse))
         mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsAbroadResponse) returns Future.successful(SuccessfullyStored)
         mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) returns Future.successful(SuccessfullyStored)
 
-        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), None,  optCHRN = None))
+        val result = await(TestJourneyService.validateTrustKnownFacts(testJourneyId, Some(testSautr), None, optCHRN = None))
 
         result mustBe SuccessfulMatch
 
@@ -104,43 +118,37 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound) was called
       }
     }
-
     "return UnMatchableWithoutRetry" when {
       "the user provides no Sautr but provides CHRN" in {
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) returns Future.successful(SuccessfullyStored)
 
-          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) returns Future.successful(SuccessfullyStored)
+        val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
+          optSaUtr = None,
+          optSaPostcode = None,
+          optCHRN = Some(testCharityHMRCReferenceNumber))
+        )
 
-          val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
-            optSaUtr = None,
-            optSaPostcode = None,
-            optCHRN = Some(testCharityHMRCReferenceNumber))
-          )
+        result mustBe UnMatchableWithoutRetry
 
-          result mustBe UnMatchableWithoutRetry
-
-          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) was called
-
-          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) wasNever called
-
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) was called
+        mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) wasNever called
       }
     }
 
     "return UnMatchableWithRetry" when {
       "the user provides no Sautr and no CHRN" in {
-          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) returns Future.successful(SuccessfullyStored)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) returns Future.successful(SuccessfullyStored)
 
-          val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
-            optSaUtr = None,
-            optSaPostcode = None,
-            optCHRN = None)
-          )
+        val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
+          optSaUtr = None,
+          optSaPostcode = None,
+          optCHRN = None)
+        )
 
-          result mustBe UnMatchableWithRetry
+        result mustBe UnMatchableWithRetry
 
-          mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) was called
-
-          mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) wasNever called
-
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) was called
+        mockStorageService.storeTrustsKnownFacts(testJourneyId, testTrustKnownFactsResponse) wasNever called
       }
     }
   }

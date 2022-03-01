@@ -33,7 +33,7 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
                               optCHRN: Option[String])
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] =
     optSaUtr match {
-      case None        =>
+      case None =>
         val identifiersMatchFailure: KnownFactsMatchFailure = if (optCHRN.isEmpty) UnMatchableWithRetry else UnMatchableWithoutRetry
         storageService.storeIdentifiersMatch(journeyId, identifiersMatchFailure).map(_ => identifiersMatchFailure)
       case Some(saUtr) =>
@@ -42,9 +42,8 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
             case Some(knownFacts) =>
               storageService.storeTrustsKnownFacts(journeyId, knownFacts).map {
                 _ =>
-                  if (optSaPostcode.isEmpty && knownFacts.isAbroad | optSaPostcode == knownFacts.declarationPostcode | optSaPostcode == knownFacts.correspondencePostcode) {
-                    SuccessfulMatch
-                  }
+                  if (knownFacts.isAbroad && optSaPostcode.isEmpty |
+                    postcodeMatches(optSaPostcode, knownFacts.correspondencePostcode, knownFacts.declarationPostcode)) SuccessfulMatch
                   else DetailsMismatch
               }
             case None => Future.successful(DetailsNotFound)
@@ -53,5 +52,14 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
         } yield knownFactsMatchResult
     }
 
-}
+  def postcodeMatches(userPostcode: Option[String], optCorrespondencePostcode: Option[String], optDeclarationPostcode: Option[String]): Boolean = {
+    (optCorrespondencePostcode, optDeclarationPostcode) match {
+      case (Some(correspondencePostcode), _) =>
+        userPostcode.exists(saPostcode => saPostcode filterNot (_.isWhitespace) equalsIgnoreCase (correspondencePostcode filterNot (_.isWhitespace)))
+      case (_, Some(declarationPostcode)) =>
+        userPostcode.exists(saPostcode => saPostcode filterNot (_.isWhitespace) equalsIgnoreCase (declarationPostcode filterNot (_.isWhitespace)))
+      case _ => false
+    }
+  }
 
+}
