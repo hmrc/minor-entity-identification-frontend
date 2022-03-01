@@ -40,12 +40,9 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
         for {
           knownFactsMatchResult <- retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(saUtr).flatMap {
             case Some(knownFacts) =>
-              storageService.storeTrustsKnownFacts(journeyId, knownFacts).map {
-                _ =>
-                  if (knownFacts.isAbroad && optSaPostcode.isEmpty |
-                    postcodeMatches(optSaPostcode, knownFacts.correspondencePostcode, knownFacts.declarationPostcode)) SuccessfulMatch
-                  else DetailsMismatch
-              }
+              if (knownFacts.isAbroad && optSaPostcode.isEmpty |
+                postcodeMatches(optSaPostcode, knownFacts.correspondencePostcode, knownFacts.declarationPostcode)) Future.successful(SuccessfulMatch)
+              else Future.successful(DetailsMismatch)
             case None => Future.successful(DetailsNotFound)
           }
           _ <- storageService.storeIdentifiersMatch(journeyId, knownFactsMatchResult)
@@ -53,13 +50,18 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
     }
 
   def postcodeMatches(userPostcode: Option[String], optCorrespondencePostcode: Option[String], optDeclarationPostcode: Option[String]): Boolean = {
-    (optCorrespondencePostcode, optDeclarationPostcode) match {
-      case (Some(correspondencePostcode), _) =>
-        userPostcode.exists(saPostcode => saPostcode filterNot (_.isWhitespace) equalsIgnoreCase (correspondencePostcode filterNot (_.isWhitespace)))
-      case (_, Some(declarationPostcode)) =>
-        userPostcode.exists(saPostcode => saPostcode filterNot (_.isWhitespace) equalsIgnoreCase (declarationPostcode filterNot (_.isWhitespace)))
-      case _ => false
+    if (userPostcode.isDefined) {
+      (optCorrespondencePostcode, optDeclarationPostcode) match {
+        case (Some(correspondencePostcode), Some(declarationPostcode)) =>
+          (userPostcode.get.filterNot(_.isWhitespace) equalsIgnoreCase (correspondencePostcode filterNot (_.isWhitespace))) |
+            (userPostcode.get.filterNot(_.isWhitespace) equalsIgnoreCase (declarationPostcode filterNot (_.isWhitespace)))
+        case (Some(correspondencePostcode), _) =>
+          userPostcode.get.filterNot(_.isWhitespace) equalsIgnoreCase (correspondencePostcode filterNot (_.isWhitespace))
+        case (_, Some(declarationPostcode)) =>
+          userPostcode.get.filterNot(_.isWhitespace) equalsIgnoreCase (declarationPostcode filterNot (_.isWhitespace))
+      }
     }
+    else false
   }
 
 }

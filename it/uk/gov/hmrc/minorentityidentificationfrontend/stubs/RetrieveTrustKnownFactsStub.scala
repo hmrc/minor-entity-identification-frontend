@@ -22,13 +22,13 @@ import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
 trait RetrieveTrustKnownFactsStub extends WiremockMethods {
 
   def stubRetrieveTrustKnownFacts(sautr: String)(status: Int, body: JsObject = Json.obj()): Unit =
-    when(method = POST, uri=s"/trusts/$sautr/refresh").thenReturn(
+    when(method = GET, uri = s"/trusts/$sautr/refresh").thenReturn(
       status = status,
       body = body
     )
 
   def stubRetrieveTrustKnownFactsFromStub(sautr: String)(status: Int, body: JsObject = Json.obj()): Unit =
-    when(method = POST, uri=s"/identify-your-trust/test-only/trusts/$sautr/refresh").thenReturn(
+    when(method = GET, uri = s"/identify-your-trust/test-only/trusts/$sautr/refresh").thenReturn(
       status = status,
       body = body
     )

@@ -3,7 +3,7 @@
     "dfmcaReturnUserStatus": "Processed",
     "formBundleNo": "000001230962"
   },
-  "trustOrEstateDisplay": {
+  "getTrust": {
     "applicationType": "01",
     "matchData": {
       "utr": "1234567891"

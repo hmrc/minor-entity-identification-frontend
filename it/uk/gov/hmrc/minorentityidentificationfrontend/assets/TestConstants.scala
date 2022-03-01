@@ -77,7 +77,7 @@ object TestConstants {
   val testKnownFactsJson: JsObject = testKnownFactsJson(correspondencePostcode = "AA1 1AA",declarationPostcode = "AA00 0AA")
 
   def testKnownFactsJson(correspondencePostcode: String, declarationPostcode: String): JsObject = Json.obj(
-    "trustOrEstateDisplay" -> Json.obj(
+    "getTrust" -> Json.obj(
       "declaration" -> Json.obj(
         "name" -> Json.obj(
           "firstName" -> "Joe",
