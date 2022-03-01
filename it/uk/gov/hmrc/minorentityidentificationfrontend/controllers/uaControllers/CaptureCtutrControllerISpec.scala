@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT}
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Ctutr
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.uaViews.UaCaptureUtrViewTests
@@ -38,7 +39,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
-            testTrustsJourneyConfig(businessVerificationCheck = true)
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
           ))
           enable(EnableFullUAJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -76,7 +77,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             await(insertJourneyConfig(
               journeyId = testJourneyId,
               internalId = testInternalId,
-              testTrustsJourneyConfig(businessVerificationCheck = true)
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
             ))
             disable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -95,7 +96,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
-            testTrustsJourneyConfig(businessVerificationCheck = true)
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
           ))
           enable(EnableFullUAJourney)
           stubAuthFailure()
@@ -109,7 +110,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
-            testTrustsJourneyConfig(businessVerificationCheck = true)
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
           ))
           disable(EnableFullUAJourney)
           stubAuthFailure()
@@ -128,61 +129,63 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
 
       "the feature switch is enabled" when {
 
-        //        "the utr is correctly formatted" should {
-        //          "redirect to enter your postcode and remove CHRN (maybe we arrived to SautrController from from CYA page and CHRN could have been set during the previous journey)" in {
-        //            await(insertJourneyConfig(
-        //              journeyId = testJourneyId,
-        //              internalId = testInternalId,
-        //              testTrustsJourneyConfig(businessVerificationCheck = true)
-        //            ))
-        //            enable(EnableFullUAJourney)
-        //            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        //            stubStoreUtr(testJourneyId, Sautr(testUtr))(OK)
-        //            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
-        //
-        //            lazy val result = post(s"/unnicorporated-association/$testJourneyId/ct-utr")("utr" -> testUtr)
-        //
-        //            result must have(
-        //              httpStatus(SEE_OTHER),
-        //              redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
-        //            )
-        //
-        //            verifyRemoveCHRN(testJourneyId)
-        //
-        //          }
-        //        }
+        "the utr is correctly formatted" should {
+          "redirect to enter your postcode and remove CHRN " +
+            "(maybe we arrived to CtutrController from from CYA page and CHRN could have been set during the previous journey)" in {
+            await(insertJourneyConfig(
+              journeyId = testJourneyId,
+              internalId = testInternalId,
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+            ))
+            enable(EnableFullUAJourney)
+            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+            stubStoreUtr(testJourneyId, Ctutr("1234500000"))(OK)
+            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
 
-        //        "the utr is an sautr" should {
-        //          "redirect to check your answers and remove CHRN (maybe we arrived to SautrController from from CYA page and CHRN could have been set during the previous journey)" in {
-        //            val testSautr = "1234530000"
-        //
-        //            await(insertJourneyConfig(
-        //              journeyId = testJourneyId,
-        //              internalId = testInternalId,
-        //              testTrustsJourneyConfig(businessVerificationCheck = true)
-        //            ))
-        //            enable(EnableFullTrustJourney)
-        //            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        //            stubStoreUtr(testJourneyId, Sautr(testSautr))(OK)
-        //            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
-        //
-        //            lazy val result = post(s"/identify-your-trust/$testJourneyId/sa-utr")("utr" -> testSautr)
-        //
-        //            result must have(
-        //              httpStatus(SEE_OTHER),
-        //              redirectUri(routes.CaptureSaPostcodeController.show(testJourneyId).url)
-        //            )
-        //
-        //            verifyRemoveCHRN(testJourneyId)
-        //          }
-        //        }
+            lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1234500000")
+
+            result must have(
+              httpStatus(SEE_OTHER),
+              redirectUri(routes.CaptureOfficePostcodeController.show(testJourneyId).url)
+            )
+
+            verifyRemoveCHRN(testJourneyId)
+
+          }
+        }
+
+        "the utr is an ctutr" should {
+          "redirect to capture postcode and remove CHRN " +
+            "(maybe we arrived to CtutrController from from CYA page and CHRN could have been set during the previous journey)" in {
+            val testCtutr = "1234500000"
+
+            await(insertJourneyConfig(
+              journeyId = testJourneyId,
+              internalId = testInternalId,
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+            ))
+            enable(EnableFullUAJourney)
+            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+            stubStoreUtr(testJourneyId, Ctutr(testCtutr))(OK)
+            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
+
+            lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1234500000")
+
+            result must have(
+              httpStatus(SEE_OTHER),
+              redirectUri(routes.CaptureOfficePostcodeController.show(testJourneyId).url)
+            )
+
+            verifyRemoveCHRN(testJourneyId)
+          }
+        }
 
         "no utr is submitted" should {
           lazy val result = {
             await(insertJourneyConfig(
               journeyId = testJourneyId,
               internalId = testInternalId,
-              testTrustsJourneyConfig(businessVerificationCheck = true)
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
             ))
             enable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -201,7 +204,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             await(insertJourneyConfig(
               journeyId = testJourneyId,
               internalId = testInternalId,
-              testTrustsJourneyConfig(businessVerificationCheck = true)
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
             ))
             enable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -220,7 +223,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             await(insertJourneyConfig(
               journeyId = testJourneyId,
               internalId = testInternalId,
-              testTrustsJourneyConfig(businessVerificationCheck = true)
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
             ))
             enable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -246,7 +249,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
             await(journeyConfigRepository.insertJourneyConfig(
               journeyId = testJourneyId,
               authInternalId = testInternalId,
-              journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+              journeyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
             ))
 
             disable(EnableFullUAJourney)
@@ -269,7 +272,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
           authInternalId = testInternalId,
-          journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+          journeyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
         ))
 
         enable(EnableFullUAJourney)
@@ -285,7 +288,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
           authInternalId = testInternalId,
-          journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+          journeyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
         ))
 
         disable(EnableFullUAJourney)
@@ -302,28 +305,29 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
   }
 
   "GET /no-utr" should {
-    //    "redirect to enter your CHRN, remove UTR and remove SaPostcode (maybe we arrived to SautrController from CYA page and SaPostcode could have been set during the previous journey)" in {
-    //      await(insertJourneyConfig(
-    //        journeyId = testJourneyId,
-    //        internalId = testInternalId,
-    //        testTrustsJourneyConfig(businessVerificationCheck = true)
-    //      ))
-    //      enable(EnableFullUAJourney)
-    //      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-    //      stubRemoveUtr(testJourneyId)(status = NO_CONTENT)
-    //      stubRemoveSaPostcode(testJourneyId)(status = NO_CONTENT)
-    //
-    //      lazy val result = get(s"/identify-your-trust/$testJourneyId/no-utr")
-    //
-    //      result must have(
-    //        httpStatus(SEE_OTHER),
-    //        redirectUri(routes.CaptureCHRNController.show(testJourneyId).url)
-    //      )
-    //
-    //      verifyRemoveUtr(testJourneyId)
-    //      verifyRemoveSaPostcode(testJourneyId)
-    //
-    //    }
+    "redirect to enter your CHRN, remove UTR and remove UaPostcode " +
+      "(maybe we arrived to CtutrController from CYA page and UaPostcode could have been set during the previous journey)" in {
+      await(insertJourneyConfig(
+        journeyId = testJourneyId,
+        internalId = testInternalId,
+        testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+      ))
+      enable(EnableFullUAJourney)
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubRemoveUtr(testJourneyId)(status = NO_CONTENT)
+      stubRemoveSaPostcode(testJourneyId)(status = NO_CONTENT)
+
+      lazy val result = get(s"/identify-your-unincorporated-association/$testJourneyId/no-utr")
+
+      result must have(
+        httpStatus(SEE_OTHER),
+        redirectUri(routes.CaptureCHRNController.show(testJourneyId).url)
+      )
+
+      verifyRemoveUtr(testJourneyId)
+      verifyRemoveSaPostcode(testJourneyId)
+
+    }
 
     "redirect to Sign In page" when {
       "the user is UNAUTHORISED" in {
