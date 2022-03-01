@@ -154,32 +154,31 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           }
         }
 
-        // TODO - to be added when CYA is completed
-//        "the utr is an ctutr" should {
-//          "redirect to check your answers and remove CHRN " +
-//            "(maybe we arrived to CtutrController from from CYA page and CHRN could have been set during the previous journey)" in {
-//            val testCtutr = "1234500000"
-//
-//            await(insertJourneyConfig(
-//              journeyId = testJourneyId,
-//              internalId = testInternalId,
-//              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
-//            ))
-//            enable(EnableFullUAJourney)
-//            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-//            stubStoreUtr(testJourneyId, Ctutr(testCtutr))(OK)
-//            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
-//
-//            lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1234500000")
-//
-//            result must have(
-//              httpStatus(SEE_OTHER),
-//              redirectUri(routes.CaptureCHRNController.show(testJourneyId).url)
-//            )
-//
-//            verifyRemoveCHRN(testJourneyId)
-//          }
-//        }
+        "the utr is an ctutr" should {
+          "redirect to capture postcode and remove CHRN " +
+            "(maybe we arrived to CtutrController from from CYA page and CHRN could have been set during the previous journey)" in {
+            val testCtutr = "1234500000"
+
+            await(insertJourneyConfig(
+              journeyId = testJourneyId,
+              internalId = testInternalId,
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+            ))
+            enable(EnableFullUAJourney)
+            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+            stubStoreUtr(testJourneyId, Ctutr(testCtutr))(OK)
+            stubRemoveCHRN(testJourneyId)(status = NO_CONTENT)
+
+            lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")("utr" -> "1234500000")
+
+            result must have(
+              httpStatus(SEE_OTHER),
+              redirectUri(routes.CaptureOfficePostcodeController.show(testJourneyId).url)
+            )
+
+            verifyRemoveCHRN(testJourneyId)
+          }
+        }
 
         "no utr is submitted" should {
           lazy val result = {
