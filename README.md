@@ -100,10 +100,10 @@ A valid journeyId must be sent in the URI
 #### Response:
 Status:
 
-| Expected Response                       | Reason
-|-----------------------------------------|------------------------------
-| ```OK(200)```                           |  ```JourneyId exists```
-| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```
+| Expected Response                       | Reason                          |
+|-----------------------------------------|---------------------------------|
+| ```OK(200)```                           | ```JourneyId exists```          |
+| ```NOT_FOUND(404)```                    | ```JourneyId doesn't exist```   |
 
 Example response bodies:
 
@@ -129,6 +129,21 @@ Trust:
 ```
 {
     "identifiersMatch": false,
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+    }
+}
+```
+
+Trust with full flow enabled:
+```
+{
+    "sautr": "0000030000",
+    "saPostcode": "AA1 1AA",
+    "identifiersMatch": true,
     "businessVerification": {
       "verificationStatus":"UNCHALLENGED"
     },
