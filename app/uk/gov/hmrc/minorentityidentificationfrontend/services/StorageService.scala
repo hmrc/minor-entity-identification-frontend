@@ -97,7 +97,7 @@ class StorageService @Inject()(connector: StorageConnector) {
       }
 
       val utrSaPostcodeBlock: JsObject = optSaPostcode match {
-        case Some(saPostcode) => Json.obj("postcode" -> saPostcode)
+        case Some(saPostcode) => Json.obj("saPostcode" -> saPostcode)
         case None => Json.obj()
       }
 

@@ -78,7 +78,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
           "identifiersMatch" -> true,
           "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(BusinessVerificationStatus.format.writes),
           "registration" -> Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes),
-          "postcode" -> testSaPostcode,
+          "saPostcode" -> testSaPostcode,
           "chrn" -> testCHRN
         )
 

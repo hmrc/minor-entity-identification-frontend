@@ -35,11 +35,11 @@ object TrustCaptureUtrForm {
   val utrRegex: Regex = "[0-9]{10}".r
 
   val trustForm: Form[Utr] = Form(
-      UtrKey -> of(utrMapping(TrustUtrNotEnteredErrorKey, TrustUtrInvalidCharactersErrorKey))
-        .verifying(
-          UtrCaptureHelper.utrInvalidLength(TrustUtrInvalidLengthErrorKey) andThen
-            UtrCaptureHelper.utrInvalidCharacters(TrustUtrInvalidCharactersErrorKey)
-        )
-    )
+    UtrKey -> of(utrMapping(TrustUtrNotEnteredErrorKey, TrustUtrInvalidCharactersErrorKey, knowUtrType = true))
+      .verifying(
+        UtrCaptureHelper.utrInvalidLength(TrustUtrInvalidLengthErrorKey) andThen
+          UtrCaptureHelper.utrInvalidCharacters(TrustUtrInvalidCharactersErrorKey)
+      )
+  )
 
 }

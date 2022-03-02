@@ -205,6 +205,21 @@ Trust:
 }
 ```
 
+Trust with full flow enabled:
+```
+{
+    "sautr": "0000030000",
+    "saPostcode": "AA1 1AA",
+    "identifiersMatch": true,
+    "businessVerification": {
+      "verificationStatus":"UNCHALLENGED"
+    },
+    "registration": {
+        "registrationStatus":"REGISTRATION_NOT_CALLED",
+    }
+}
+```
+
 Unincorporated Association:
 
 ```

@@ -36,14 +36,17 @@ object UtrMapping {
     } else None
   }
 
-  def utrMapping(utrNotEnteredErrorMessage: String, invalidCharactersErrorMessage: String): Formatter[Utr] = new Formatter[Utr] {
+  def utrMapping(utrNotEnteredErrorMessage: String, invalidCharactersErrorMessage: String, knowUtrType: Boolean = false): Formatter[Utr] = new Formatter[Utr] {
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Utr] = {
       data.get(key) match {
         case Some(utr) if utr.nonEmpty =>
-          getUtrType(utr) match {
-            case Some(utr) => Right (utr)
-            case None => Left(Seq(FormError(key, invalidCharactersErrorMessage)))
+          if (knowUtrType) Right(Sautr(utr))
+          else {
+            getUtrType(utr) match {
+              case Some(utr) => Right (utr)
+              case None => Left(Seq(FormError(key, invalidCharactersErrorMessage)))
+            }
           }
         case _ =>
           Left(Seq(FormError(key, utrNotEnteredErrorMessage)))
