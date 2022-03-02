@@ -22,7 +22,6 @@ import uk.gov.hmrc.minorentityidentificationfrontend.connectors.StorageConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.{SuccessfullyRemoved, SuccessfullyStored}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.{format => bvFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.TrustKnownFacts.{format => knownFactsFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService._
 
@@ -79,9 +78,6 @@ class StorageService @Inject()(connector: StorageConnector) {
 
   def storeIdentifiersMatch(journeyId: String, identifiersMatch: KnownFactsMatchingResult)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[KnownFactsMatchingResult](journeyId, IdentifiersMatchKey, identifiersMatch)
-
-  def storeTrustsKnownFacts(journeyId: String, knownFacts: TrustKnownFacts)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
-    connector.storeDataField[TrustKnownFacts](journeyId, TrustKnownFactsKey, knownFacts)
 
   def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeAllData(journeyId)
@@ -160,9 +156,7 @@ object StorageService {
   val OfficePostcodeKey: String = "officePostcode"
   val RegistrationKey: String = "registration"
   val IdentifiersMatchKey: String = "identifiersMatch"
-  val TrustKnownFactsKey: String = "trustKnownFacts"
   val VerificationStatusKey = "businessVerification"
-
 
   implicit val utrStorageFormat: OFormat[Utr] = new OFormat[Utr] {
 

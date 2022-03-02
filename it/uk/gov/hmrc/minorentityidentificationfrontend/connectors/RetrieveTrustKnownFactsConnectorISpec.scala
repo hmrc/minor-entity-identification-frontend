@@ -51,7 +51,6 @@ class RetrieveTrustKnownFactsConnectorISpec extends ComponentSpecHelper with Ret
     "return None" when {
       "the Trust proxy endpoint returns 404" in {
         disable(TrustVerificationStub)
-
         stubRetrieveTrustKnownFacts(testUtr)(NOT_FOUND)
 
         val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr))

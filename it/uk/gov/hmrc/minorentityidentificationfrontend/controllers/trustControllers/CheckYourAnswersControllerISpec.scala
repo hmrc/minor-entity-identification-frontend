@@ -174,8 +174,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
         stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
-
-        stubStoreStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))(OK)
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))(OK)
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
@@ -186,8 +184,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))
-        verifyStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
-
       }
     }
     "the EnableFullTrustJourney is enabled and identifier match is DetailsMismatch (for example all postcodes are different)" should {
@@ -209,8 +205,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         val declarationPostcode = testSaPostcode + "Y"
 
         stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode, declarationPostcode))
-
-        stubStoreStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode, declarationPostcode))(OK)
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(DetailsMismatchKey))(OK)
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
@@ -221,8 +215,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(DetailsMismatchKey))
-        verifyStoreTrustsKnownFacts(testJourneyId, expBody = testTrustKnownFactsJson(correspondencePostcode, declarationPostcode))
-
       }
     }
     "the EnableFullTrustJourney is enabled and identifier match is UnMatchableWithoutRetry (No SaUtr but CHRN provided)" should {

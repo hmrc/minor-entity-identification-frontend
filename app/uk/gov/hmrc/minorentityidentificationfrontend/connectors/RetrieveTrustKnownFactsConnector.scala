@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RetrieveTrustKnownFactsConnector @Inject()(httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveTrustKnownFacts(sautr: String)(implicit hc: HeaderCarrier): Future[Option[TrustKnownFacts]] = {
-    httpClient.POSTEmpty(appConfig.retrieveTrustsKnownFactsUrl(sautr))(
+    httpClient.GET(appConfig.retrieveTrustsKnownFactsUrl(sautr))(
       KnownFactsHttpReads,
       hc,
       ec)
@@ -39,7 +39,7 @@ class RetrieveTrustKnownFactsConnector @Inject()(httpClient: HttpClient, appConf
 }
 
 object KnownFactsHttpParser {
-  private val TrustKey = "trustOrEstateDisplay"
+  private val TrustKey = "getTrust"
   private val CorrespondenceKey = "correspondence"
   private val AbroadIndicator = "abroadIndicator"
   private val DeclarationKey = "declaration"

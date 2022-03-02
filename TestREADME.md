@@ -221,7 +221,7 @@ Unincorporated Association:
 
 ### Using the Trusts Known Facts stub
 
-POST /identify-your-trust/test-only/trusts/:sautr/refresh
+GET /identify-your-trust/test-only/trusts/:sautr/refresh
 
 ___
 
