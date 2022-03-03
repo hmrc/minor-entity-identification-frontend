@@ -82,8 +82,10 @@ class CaptureOfficePostcodeControllerISpec extends ComponentSpecHelper
 
         lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/registered-office-postcode")("officePostcode" -> testOfficePostcode)
 
-        result.status mustBe NOT_IMPLEMENTED
-        //TODO: Update this to redirect to CYA page when ready
+        result must have(
+          httpStatus(SEE_OTHER),
+          redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
+        )
       }
 
       "no registered office postcode is submitted" should {

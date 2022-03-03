@@ -125,8 +125,10 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
             lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/chrn")("chrn" -> testCHRN)
 
-            result.status mustBe NOT_IMPLEMENTED
-          //TODO: Redirect to CYA
+            result must have(
+              httpStatus(SEE_OTHER),
+              redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
+            )
           }
         }
 
@@ -261,8 +263,12 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
 
           lazy val result = get(s"/identify-your-unincorporated-association/$testJourneyId/no-chrn")
 
-          result.status mustBe NOT_IMPLEMENTED
-          //TODO: redirect to CYA
+          result must have(
+            httpStatus(SEE_OTHER),
+            redirectUri(routes.CheckYourAnswersController.show(testJourneyId).url)
+          )
+
+          verifyRemoveCHRN(testJourneyId)
         }
 
         "return an internal server error when the back end raises an exception" in {

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.ws.WSResponse
+import play.api.test.Helpers.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
-import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, INTERNAL_SERVER_ERROR, await, defaultAwaitTimeout}
-import uk.gov.hmrc.minorentityidentificationfrontend.views.CaptureOverseasTaxIdentifiersTests
+import uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews.CaptureOverseasTaxIdentifiersTests
 
 
 class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper

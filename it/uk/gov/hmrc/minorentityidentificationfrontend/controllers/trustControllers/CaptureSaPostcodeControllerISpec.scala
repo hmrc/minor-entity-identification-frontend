@@ -22,8 +22,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
-import uk.gov.hmrc.minorentityidentificationfrontend.views.CaptureSaPostcodeViewTests
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.CaptureSaPostcodeViewTests
 
 class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
   with AuthStub

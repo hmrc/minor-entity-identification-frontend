@@ -24,7 +24,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, RetrieveTrustKnownFactsStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
-import uk.gov.hmrc.minorentityidentificationfrontend.views.{CheckYourAnswersCommonViewTests, TrustCheckYourAnswersSpecificViewTests}
+import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersCommonViewTests
+import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.TrustCheckYourAnswersSpecificViewTests
 
 class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   with AuthStub

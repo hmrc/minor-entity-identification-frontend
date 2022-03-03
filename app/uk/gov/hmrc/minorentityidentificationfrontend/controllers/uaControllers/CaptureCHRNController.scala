@@ -75,7 +75,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
                     ))
               },
               chrn => storageService.storeCHRN(journeyId, chrn).map {
-                _ => NotImplemented
+                _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
               }
             )
           } else throw new InternalServerException("UA journey is not enabled")
@@ -90,7 +90,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
       authorised() {
         if (isEnabled(EnableFullUAJourney)) {
           storageService.removeCHRN(journeyId).map {
-            _ => NotImplemented
+            _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
           }
         } else
           throw new InternalServerException("UA journey is not enabled")

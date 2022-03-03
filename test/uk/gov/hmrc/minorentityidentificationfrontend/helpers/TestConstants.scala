@@ -36,6 +36,7 @@ object TestConstants {
   val testCtutr: String = "1234500000"
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testSaPostcode = "AA1 1AA"
+  val testOfficePostcode = "AA2 2AA"
   val testCharityHMRCReferenceNumber: String = UUID.randomUUID().toString
 
   val testTrustJourneyConfig: JourneyConfig = testJourneyConfig(Trusts)

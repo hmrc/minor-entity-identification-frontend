@@ -93,7 +93,7 @@ class CaptureCtutrController @Inject()(val authConnector: AuthConnector,
         if (isEnabled(EnableFullUAJourney)) {
           for {
             _ <- storageService.removeUtr(journeyId)
-            _ <- storageService.removeSaPostcode(journeyId)
+            _ <- storageService.removeOfficePostcode(journeyId)
           } yield Redirect(routes.CaptureCHRNController.show(journeyId))
         } else throw new InternalServerException("Unincorporated association journey is not enabled")
       }

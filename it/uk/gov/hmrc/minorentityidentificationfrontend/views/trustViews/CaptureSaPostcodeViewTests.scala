@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views
-
+package uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureSaPostcode => messages}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureOverseasTaxIdentifiers => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
 
-
-trait CaptureOverseasTaxIdentifiersTests {
+trait CaptureSaPostcodeViewTests {
   this: ComponentSpecHelper =>
 
-  def testCaptureCaptureOverseasTaxIdentifiersView(result: => WSResponse): Unit = {
+  def testCaptureSaPostcodeView(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
 
@@ -55,21 +53,12 @@ trait CaptureOverseasTaxIdentifiersTests {
       doc.title mustBe messages.title
     }
 
-    "have the correct heading" in {
-      doc.getH1Elements.text mustBe messages.title
-    }
-
     "have the correct hint text" in {
       doc.getParagraphs.get(1).text mustBe messages.hint
     }
 
-    "have correct labels in the form" in {
-      doc.getLabelElement.first.text() mustBe messages.form_field_1
-      doc.getLabelElement.get(1).text() mustBe messages.form_field_2
-    }
-
-    "have a correct skip link" in {
-      doc.getElementById("no-overseas-tax-identifiers").text() mustBe messages.no_identifierLink
+    "have a correct link to skip self assessment postcode" in {
+      doc.getElementById("no-sa-postcode").text() mustBe messages.no_postcodeLink
     }
 
     "have a save and continue button" in {
@@ -81,45 +70,27 @@ trait CaptureOverseasTaxIdentifiersTests {
     }
   }
 
-  def testCaptureCaptureOverseasTaxIdentifiersErrorMessages(result: => WSResponse): Unit = {
+  def testCaptureSaPostcodeErrorMessageInvalidPostcode(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.get(0).text mustBe messages.Error.no_entry_tax_identifier + " " + messages.Error.no_entry_country
+      doc.getErrorSummaryBody.text mustBe messages.Error.invalid_sa_postcode
     }
-
-    "correctly display the field errors" in {
-      doc.getFieldErrorMessage.first.text() mustBe Base.Error.error + messages.Error.no_entry_tax_identifier
-      doc.getFieldErrorMessage.get(1).text mustBe Base.Error.error + messages.Error.no_entry_country
+    "correctly display the field error" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalid_sa_postcode
     }
   }
 
-  def testCaptureCaptureOverseasTaxIdentifiersErrorMessagesInvalidIdentifier(result: => WSResponse): Unit = {
+  def testCaptureSaPostcodeErrorMessageNoEntryPostcode(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.get(0).text mustBe messages.Error.invalid_tax_identifier
+      doc.getErrorSummaryBody.text mustBe messages.Error.no_entry_sa_postcode
     }
-
-    "correctly display the field errors" in {
-      doc.getFieldErrorMessage.get(0).text mustBe Base.Error.error + messages.Error.invalid_tax_identifier
-    }
-  }
-
-  def testCaptureCaptureOverseasTaxIdentifiersErrorMessagesTooLongIdentifier(result: => WSResponse): Unit = {
-    lazy val doc: Document = Jsoup.parse(result.body)
-
-    "correctly display the error summary" in {
-      doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.get(0).text mustBe messages.Error.invalid_length_tax_identifier
-    }
-
-    "correctly display the field errors" in {
-      doc.getFieldErrorMessage.get(0).text mustBe Base.Error.error + messages.Error.invalid_length_tax_identifier
+    "correctly display the field error" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.no_entry_sa_postcode
     }
   }
-
-
 }

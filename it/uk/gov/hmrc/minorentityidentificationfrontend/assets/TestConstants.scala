@@ -65,12 +65,19 @@ object TestConstants {
     testJourneyConfig(businessEntity = OverseasCompany, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
   val testUtr: String = "1234567890"
+  val testCtutr: String = "1234500000"
   val testUtrType: String = "sautr"
+  val testCtutrType: String = "ctutr"
 
   val testUtrJson: JsObject = Json.obj(
       "type" -> testUtrType,
       "value" -> testUtr
     )
+
+  val testCtutrJson: JsObject = Json.obj(
+    "type" -> testCtutrType,
+    "value" -> testCtutr
+  )
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testPostcode), Some(testSaPostcode), isAbroad = false)
 

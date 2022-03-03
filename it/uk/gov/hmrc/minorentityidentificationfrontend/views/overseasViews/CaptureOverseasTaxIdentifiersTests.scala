@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views
+package uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureOverseasTaxIdentifiers => messages}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureUtr => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
 
-trait CaptureUtrViewTests {
+trait CaptureOverseasTaxIdentifiersTests {
   this: ComponentSpecHelper =>
 
-  def testCaptureUtrView(result: => WSResponse): Unit = {
+  def testCaptureCaptureOverseasTaxIdentifiersView(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
+
 
     "have a sign out link in the header" in {
       doc.getSignOutText mustBe Header.signOut
@@ -56,15 +57,20 @@ trait CaptureUtrViewTests {
       doc.getH1Elements.text mustBe messages.title
     }
 
-    "have the correct first line" in {
-      doc.getParagraphs.get(1).text mustBe messages.line_1
+    "have the correct hint text" in {
+      doc.getParagraphs.get(1).text mustBe messages.hint
     }
 
-    "have the correct skip link" in {
-      doc.getElementById("no-utr").text() mustBe messages.no_utr_link
+    "have correct labels in the form" in {
+      doc.getLabelElement.first.text() mustBe messages.form_field_1
+      doc.getLabelElement.get(1).text() mustBe messages.form_field_2
     }
 
-    "have a continue and confirm button" in {
+    "have a correct skip link" in {
+      doc.getElementById("no-overseas-tax-identifiers").text() mustBe messages.no_identifierLink
+    }
+
+    "have a save and continue button" in {
       doc.getSubmitButton.first.text mustBe Base.saveAndContinue
     }
 
@@ -73,40 +79,45 @@ trait CaptureUtrViewTests {
     }
   }
 
-  def testCaptureUtrViewNoUtr(result: => WSResponse): Unit = {
+  def testCaptureCaptureOverseasTaxIdentifiersErrorMessages(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.error_not_entered
+      doc.getErrorSummaryBody.get(0).text mustBe messages.Error.no_entry_tax_identifier + " " + messages.Error.no_entry_country
     }
-    "correctly display the field error" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.error_not_entered
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.first.text() mustBe Base.Error.error + messages.Error.no_entry_tax_identifier
+      doc.getFieldErrorMessage.get(1).text mustBe Base.Error.error + messages.Error.no_entry_country
     }
   }
 
-  def testCaptureUtrViewInvalidUtr(result: => WSResponse): Unit = {
+  def testCaptureCaptureOverseasTaxIdentifiersErrorMessagesInvalidIdentifier(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.error_invalid_format
+      doc.getErrorSummaryBody.get(0).text mustBe messages.Error.invalid_tax_identifier
     }
-    "correctly display the field error" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.error_invalid_format
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.get(0).text mustBe Base.Error.error + messages.Error.invalid_tax_identifier
     }
   }
 
-  def testCaptureUtrViewInvalidUtrLength(result: => WSResponse): Unit = {
+  def testCaptureCaptureOverseasTaxIdentifiersErrorMessagesTooLongIdentifier(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.error_invalid_length
+      doc.getErrorSummaryBody.get(0).text mustBe messages.Error.invalid_length_tax_identifier
     }
-    "correctly display the field error" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.error_invalid_length
+
+    "correctly display the field errors" in {
+      doc.getFieldErrorMessage.get(0).text mustBe Base.Error.error + messages.Error.invalid_length_tax_identifier
     }
   }
+
 
 }

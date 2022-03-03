@@ -89,6 +89,7 @@ class StorageService @Inject()(connector: StorageConnector) {
       optSaPostcode <- retrieveSaPostcode(journeyId)
       optCharityHMRCReferenceNumber <- retrieveCHRN(journeyId)
       optIdentifiersMatch <- retrieveIdentifiersMatch(journeyId)
+      optOfficePostcode <- retrieveOfficePostcode(journeyId)
     } yield {
 
       val optCharityHMRCReferenceNumberBlock: JsObject = optCharityHMRCReferenceNumber match {
@@ -98,6 +99,11 @@ class StorageService @Inject()(connector: StorageConnector) {
 
       val utrSaPostcodeBlock: JsObject = optSaPostcode match {
         case Some(saPostcode) => Json.obj("saPostcode" -> saPostcode)
+        case None => Json.obj()
+      }
+
+      val registeredOfficePostcodeBlock: JsObject = optOfficePostcode match {
+        case Some(officePostcode) => Json.obj("ctPostcode" -> officePostcode)
         case None => Json.obj()
       }
 
@@ -126,7 +132,8 @@ class StorageService @Inject()(connector: StorageConnector) {
         overseasTaxIdentifiersBlock ++
         utrSaPostcodeBlock ++
         optCharityHMRCReferenceNumberBlock ++
-        identifiersMatchBlock
+        identifiersMatchBlock ++
+        registeredOfficePostcodeBlock
     }
 
   def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =

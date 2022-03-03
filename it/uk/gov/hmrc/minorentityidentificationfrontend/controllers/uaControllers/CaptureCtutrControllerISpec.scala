@@ -315,7 +315,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
       enable(EnableFullUAJourney)
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubRemoveUtr(testJourneyId)(status = NO_CONTENT)
-      stubRemoveSaPostcode(testJourneyId)(status = NO_CONTENT)
+      stubRemoveOfficePostcode(testJourneyId)(status = NO_CONTENT)
 
       lazy val result = get(s"/identify-your-unincorporated-association/$testJourneyId/no-utr")
 
@@ -325,7 +325,7 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
       )
 
       verifyRemoveUtr(testJourneyId)
-      verifyRemoveSaPostcode(testJourneyId)
+      verifyRemoveOfficePostcode(testJourneyId)
 
     }
 

@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views
+package uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureUtr => messages}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureSaPostcode => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
 
-trait CaptureSaPostcodeViewTests {
+trait CaptureUtrViewTests {
   this: ComponentSpecHelper =>
 
-  def testCaptureSaPostcodeView(result: => WSResponse): Unit = {
+  def testCaptureUtrView(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
     lazy val config = app.injector.instanceOf[AppConfig]
-
 
     "have a sign out link in the header" in {
       doc.getSignOutText mustBe Header.signOut
@@ -53,15 +52,19 @@ trait CaptureSaPostcodeViewTests {
       doc.title mustBe messages.title
     }
 
-    "have the correct hint text" in {
-      doc.getParagraphs.get(1).text mustBe messages.hint
+    "have the correct heading" in {
+      doc.getH1Elements.text mustBe messages.title
     }
 
-    "have a correct link to skip self assessment postcode" in {
-      doc.getElementById("no-sa-postcode").text() mustBe messages.no_postcodeLink
+    "have the correct first line" in {
+      doc.getParagraphs.get(1).text mustBe messages.line_1
     }
 
-    "have a save and continue button" in {
+    "have the correct skip link" in {
+      doc.getElementById("no-utr").text() mustBe messages.no_utr_link
+    }
+
+    "have a continue and confirm button" in {
       doc.getSubmitButton.first.text mustBe Base.saveAndContinue
     }
 
@@ -70,27 +73,40 @@ trait CaptureSaPostcodeViewTests {
     }
   }
 
-  def testCaptureSaPostcodeErrorMessageInvalidPostcode(result: => WSResponse): Unit = {
+  def testCaptureUtrViewNoUtr(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.invalid_sa_postcode
+      doc.getErrorSummaryBody.text mustBe messages.Error.error_not_entered
     }
     "correctly display the field error" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.invalid_sa_postcode
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.error_not_entered
     }
   }
 
-  def testCaptureSaPostcodeErrorMessageNoEntryPostcode(result: => WSResponse): Unit = {
+  def testCaptureUtrViewInvalidUtr(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
-      doc.getErrorSummaryBody.text mustBe messages.Error.no_entry_sa_postcode
+      doc.getErrorSummaryBody.text mustBe messages.Error.error_invalid_format
     }
     "correctly display the field error" in {
-      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.no_entry_sa_postcode
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.error_invalid_format
     }
   }
+
+  def testCaptureUtrViewInvalidUtrLength(result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "correctly display the error summary" in {
+      doc.getErrorSummaryTitle.text mustBe Base.Error.title
+      doc.getErrorSummaryBody.text mustBe messages.Error.error_invalid_length
+    }
+    "correctly display the field error" in {
+      doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.error_invalid_length
+    }
+  }
+
 }
