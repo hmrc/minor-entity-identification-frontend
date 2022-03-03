@@ -41,7 +41,8 @@ object BusinessVerificationStatus {
       val businessVerificationStatusString = businessVerificationStatus match {
         case BusinessVerificationPass => BusinessVerificationPassKey
         case BusinessVerificationFail => BusinessVerificationFailKey
-        case BusinessVerificationNotEnoughInformationToChallenge | BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationUnchallengedKey
+        case BusinessVerificationNotEnoughInformationToChallenge => BusinessVerificationNotEnoughInfoToChallengeKey
+        case BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationNotEnoughInfoToCallKey
       }
       Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusString)
     }
@@ -53,5 +54,14 @@ object BusinessVerificationStatus {
         case BusinessVerificationNotEnoughInfoToChallengeKey => BusinessVerificationNotEnoughInformationToChallenge
         case BusinessVerificationNotEnoughInfoToCallKey => BusinessVerificationNotEnoughInformationToCallBV
       }
+  }
+
+  def writeForJourneyContinuation(businessVerificationStatus: BusinessVerificationStatus): JsObject = {
+    val businessVerificationStatusString = businessVerificationStatus match {
+      case BusinessVerificationPass => BusinessVerificationPassKey
+      case BusinessVerificationFail => BusinessVerificationFailKey
+      case BusinessVerificationNotEnoughInformationToChallenge | BusinessVerificationNotEnoughInformationToCallBV => BusinessVerificationUnchallengedKey
+    }
+    Json.obj(BusinessVerificationStatusKey -> businessVerificationStatusString)
   }
 }

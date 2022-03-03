@@ -112,6 +112,7 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+      stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
       stubAudit()
 
       val result = post(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")()

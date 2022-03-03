@@ -37,12 +37,6 @@ trait StorageStub extends WiremockMethods {
     when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch", expBody)
       .thenReturn(status = status)
 
-  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, identifiersMatchJson: JsObject = Json.obj()): Unit =
-    when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch").thenReturn(
-      status = status,
-      body = identifiersMatchJson
-    )
-
   def stubRetrieveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
     when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/utr").thenReturn(
       status = status,
@@ -175,6 +169,14 @@ trait StorageStub extends WiremockMethods {
 
   def verifyRemoveUtr(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/utr")
+
+  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
 
   def stubStoreBusinessVerificationStatus(journeyId: String,
                                           businessVerificationStatus: BusinessVerificationStatus

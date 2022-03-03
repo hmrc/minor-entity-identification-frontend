@@ -115,7 +115,7 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         val result = await(TestJourneyService.validateTrustKnownFacts(journeyId = testJourneyId,
           optSaUtr = None,
           optSaPostcode = None,
-          optCHRN = Some(testCharityHMRCReferenceNumber))
+          optCHRN = Some(testCHRN))
         )
 
         result mustBe UnMatchableWithoutRetry

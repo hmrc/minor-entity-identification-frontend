@@ -23,16 +23,16 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.errorControllers.{routes => errorRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
-import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks.{MockStorageService, MockValidateTrustKnownFactsService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks.{MockAuditService, MockStorageService, MockValidateTrustKnownFactsService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubmissionServiceSpec extends AnyWordSpec with Matchers with MockValidateTrustKnownFactsService with MockStorageService {
+class SubmissionServiceSpec extends AnyWordSpec with Matchers with MockValidateTrustKnownFactsService with MockStorageService with MockAuditService {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  object TestSubmissionService extends SubmissionService(mockValidateTrustKnownFactsService, mockStorageService)
+  object TestSubmissionService extends SubmissionService(mockValidateTrustKnownFactsService, mockAuditService, mockStorageService)
 
   "submit" should {
     "return retry url" when {
@@ -42,12 +42,14 @@ class SubmissionServiceSpec extends AnyWordSpec with Matchers with MockValidateT
 
           mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
           mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
-          mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCharityHMRCReferenceNumber))
+          mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
           mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
             optSaUtr = Some(testSautr),
             optSaPostcode = Some(testSaPostcode),
-            optCHRN = Some(testCharityHMRCReferenceNumber)) returns Future.successful(knownFactsMatchFailure)
+            optCHRN = Some(testCHRN)) returns Future.successful(knownFactsMatchFailure)
+
+          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) returns Future.successful(())
 
           val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
 
@@ -66,12 +68,14 @@ class SubmissionServiceSpec extends AnyWordSpec with Matchers with MockValidateT
 
           mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
           mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
-          mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCharityHMRCReferenceNumber))
+          mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
           mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
             optSaUtr = Some(testSautr),
             optSaPostcode = Some(testSaPostcode),
-            optCHRN = Some(testCharityHMRCReferenceNumber)) returns Future.successful(knownFactsMatchResult)
+            optCHRN = Some(testCHRN)) returns Future.successful(knownFactsMatchResult)
+
+          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig)
 
           val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
 
@@ -94,6 +98,8 @@ class SubmissionServiceSpec extends AnyWordSpec with Matchers with MockValidateT
           optSaUtr = someValue,
           optSaPostcode = someValue,
           optCHRN = someValue) returns Future.successful(UnMatchableWithoutRetry)
+
+        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig)
 
         val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
 

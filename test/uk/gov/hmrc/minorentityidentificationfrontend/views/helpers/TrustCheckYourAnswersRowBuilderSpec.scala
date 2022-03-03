@@ -42,7 +42,7 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
 
   val testCharityHMRCReferenceNumberRow: SummaryListRow = SummaryListRow(
     key = Key(content = Text("HMRC reference number")),
-    value = Value(HtmlContent(testCharityHMRCReferenceNumber)),
+    value = Value(HtmlContent(testCHRN)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = trustControllers.routes.CaptureCHRNController.show(testJourneyId).url,
@@ -132,7 +132,7 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
           journeyId = testJourneyId,
           optUtr = None,
           optPostcode = None,
-          optCharityHMRCReferenceNumber = Some(testCharityHMRCReferenceNumber)
+          optCharityHMRCReferenceNumber = Some(testCHRN)
         )(messages)
 
         actualSummaryList mustBe Seq(
@@ -156,7 +156,7 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
               journeyId = testJourneyId,
               optUtr = Some(Sautr(testSautr)),
               optPostcode = optPostCode,
-              optCharityHMRCReferenceNumber = Some(testCharityHMRCReferenceNumber)
+              optCharityHMRCReferenceNumber = Some(testCHRN)
             )(messages)
           }
 
@@ -166,7 +166,7 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
       }
       "user has a postcode and they dont have SAUTR (with or without CharityHMRCReferenceNumber)" in {
 
-        List(None, Some(testCharityHMRCReferenceNumber)).map(optCharityHMRCReferenceNumber => {
+        List(None, Some(testCHRN)).map(optCharityHMRCReferenceNumber => {
 
           val theActualException: IllegalStateException = intercept[IllegalStateException] {
             rowBuilderUnderTest.buildSummaryListRows(

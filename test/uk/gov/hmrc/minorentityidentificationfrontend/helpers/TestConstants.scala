@@ -33,11 +33,13 @@ object TestConstants {
   val testRegime: String = "VATC"
 
   val testSautr: String = "1234599999"
+  val testSautr1: String = "1234599998"
   val testCtutr: String = "1234500000"
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testSaPostcode = "AA1 1AA"
   val testOfficePostcode = "AA2 2AA"
-  val testCharityHMRCReferenceNumber: String = UUID.randomUUID().toString
+  val testCHRN: String = UUID.randomUUID().toString
+  val testSafeId: String = UUID.randomUUID().toString
 
   val testTrustJourneyConfig: JourneyConfig = testJourneyConfig(Trusts)
 
@@ -77,12 +79,44 @@ object TestConstants {
     "RegisterApiStatus" ->  "not called",
     "identifiersMatch" -> false)
 
-  val testTrustsAuditEventJson: JsObject = Json.obj(
+  def testSaUtrAndPostcodeTrustsAuditEventJson(
+                                                saUtr: String,
+                                                saPostCode: String,
+                                                identifiersMatch: String,
+                                                bvStatus: String,
+                                                regStatus: String): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Trusts",
-    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" ->  "not called",
-    "identifiersMatch" -> false)
+    "SAUTR" -> saUtr,
+    "SApostcode" -> saPostCode,
+    "isMatch" -> identifiersMatch,
+    "VerificationStatus" -> bvStatus,
+    "RegisterApiStatus" -> regStatus
+  )
+
+  def testSaUtrOnlyTrustsAuditEventJson(
+                                         identifiersMatch: String,
+                                         bvStatus: String,
+                                         regStatus: String): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
+    "businessType" -> "Trusts",
+    "SAUTR" -> testSautr,
+    "isMatch" -> identifiersMatch,
+    "VerificationStatus" -> bvStatus,
+    "RegisterApiStatus" -> regStatus
+  )
+
+  def testCHRNOnlyTrustsAuditEventJson(
+                                        identifiersMatch: String,
+                                        bvStatus: String,
+                                        regStatus: String): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
+    "businessType" -> "Trusts",
+    "CHRN" -> testCHRN,
+    "isMatch" -> identifiersMatch,
+    "VerificationStatus" -> bvStatus,
+    "RegisterApiStatus" -> regStatus
+  )
 
   val testOverseasIdentifiersAuditEventJson: JsObject = Json.obj(
     "overseasTaxIdentifier" -> testOverseas.taxIdentifier,
