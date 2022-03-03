@@ -18,7 +18,6 @@ package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig, TrustKnownFacts}
 
 import java.util.UUID
@@ -42,6 +41,7 @@ object TestConstants {
     "taxIdentifier" -> testOverseasTaxIdentifiers.taxIdentifier,
     "country" -> testOverseasTaxIdentifiers.country
   )
+  val testSafeId: String = UUID.randomUUID().toString
 
   def testJourneyConfig(serviceName: Option[String] = None,
                         businessEntity: BusinessEntity,
@@ -193,12 +193,17 @@ object TestConstants {
     )
   )
 
+  val testIdentifiersMatchSuccessfulMatchJson: JsObject = Json.obj("identifiersMatch" -> "SuccessfulMatch")
+  val testIdentifiersMatchDetailsMismatchJson: JsObject = Json.obj("identifiersMatch" -> "DetailsMismatch")
+  val testIdentifiersMatchUnmatchableWithRetry: JsObject = Json.obj("identifiersMatch" -> "UnMatchableWithRetry")
+  val testIdentifiersMatchUnmatchableWithoutRetry: JsObject = Json.obj("identifiersMatch" -> "UnMatchableWithoutRetry")
+
   val testBusinessVerificationRedirectUrl = "/business-verification-start"
   val testBusinessVerificationJourneyId = "TestBusinessVerificationJourneyId"
-  val testBusinessVerificationPassJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey)
-  val testBusinessVerificationFailJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey)
-  val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToChallengeKey)
-  val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey)
+  val testBusinessVerificationPassJson: JsObject = Json.obj("verificationStatus" -> "PASS")
+  val testBusinessVerificationFailJson: JsObject = Json.obj("verificationStatus" -> "FAIL")
+  val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj("verificationStatus" -> "NOT_ENOUGH_INFORMATION_TO_CHALLENGE")
+  val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj("verificationStatus" -> "NOT_ENOUGH_INFORMATION_TO_CALL_BV")
 
   def testTrustKnownFactsJson(correspondencePostcode: String, declarationPostcode: String): JsValue = Json.obj(
     "correspondencePostcode" -> correspondencePostcode,
@@ -207,4 +212,9 @@ object TestConstants {
   )
 
   def testIdentifiersMatchJson(identifiersMatchValue:String): JsObject = Json.obj("identifiersMatch" -> identifiersMatchValue)
+  val testSuccessfulRegistrationJson: JsObject = Json.obj(
+    "registrationStatus" -> "REGISTERED",
+    "registeredBusinessPartnerId" -> testSafeId)
+
+  val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
 }

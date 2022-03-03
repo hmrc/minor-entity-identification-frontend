@@ -26,6 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, RetrieveTr
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersCommonViewTests
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.TrustCheckYourAnswersSpecificViewTests
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 
 class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   with AuthStub
@@ -64,7 +65,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           testCheckYourAnswersCommonView(result)
           testTrustWithUtrAndPostcodeSummaryListView(result, testJourneyId)
         }
-
       }
 
       "the applicant has a no utr and a no charity hmrc reference number" should {
@@ -132,6 +132,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
             )
           }
         }
+
       }
 
       "the user does not have an internal ID" should {
@@ -176,6 +177,11 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
         stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))(OK)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchSuccessfulMatchJson)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
+        stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
+        stubAudit()
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -185,6 +191,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))
+        verifyAudit()
       }
     }
     "the EnableFullTrustJourney is enabled and identifier match is DetailsMismatch (for example all postcodes are different)" should {
@@ -208,6 +215,13 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode, declarationPostcode))
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(DetailsMismatchKey))(OK)
 
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchDetailsMismatchJson)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
+        stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
+
+        stubAudit()
+
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
         result must have {
@@ -216,6 +230,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(DetailsMismatchKey))
+        verifyAudit()
       }
     }
     "the EnableFullTrustJourney is enabled and identifier match is UnMatchableWithoutRetry (No SaUtr but CHRN provided)" should {
@@ -235,6 +250,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
 
         stubStoreIdentifiersMatch(testJourneyId, testIdentifiersMatchJson(UnMatchableWithoutRetryKey))(OK)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchUnmatchableWithoutRetry)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
+        stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
+        stubAudit()
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -245,6 +264,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithoutRetryKey))
 
+        verifyAudit()
       }
     }
 
@@ -265,6 +285,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
 
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithRetryKey))(OK)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchUnmatchableWithRetry)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
+        stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
+        stubAudit()
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -275,6 +299,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithRetryKey))
 
+        verifyAudit()
       }
     }
 
@@ -303,9 +328,9 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
         result.status mustBe INTERNAL_SERVER_ERROR
-
       }
     }
+
     "the EnableFullTrustJourney is disabled" should {
       "throw an internal server exception" in {
         disable(EnableFullTrustJourney)

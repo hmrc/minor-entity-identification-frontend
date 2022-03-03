@@ -53,7 +53,7 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
 
   val testCharityHMRCReferenceNumberRow: SummaryListRow = SummaryListRow(
     key = Key(content = Text("HMRC reference number")),
-    value = Value(HtmlContent(testCharityHMRCReferenceNumber)),
+    value = Value(HtmlContent(testCHRN)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = uaControllers.routes.CaptureCHRNController.show(testJourneyId).url,
@@ -110,7 +110,7 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
           journeyId = testJourneyId,
           optUtr = None,
           optOfficePostcode = None,
-          optCHRN = Some(testCharityHMRCReferenceNumber)
+          optCHRN = Some(testCHRN)
         )(messages)
 
         actualSummaryList mustBe Seq(
@@ -147,7 +147,7 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
               journeyId = testJourneyId,
               optUtr = Some(Ctutr(testCtutr)),
               optOfficePostcode = optOfficePostCode,
-              optCHRN = Some(testCharityHMRCReferenceNumber)
+              optCHRN = Some(testCHRN)
             )(messages)
           }
 
@@ -156,7 +156,7 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
       }
       "user has a office postcode and they don't have CTUTR" in {
 
-        List(None, Some(testCharityHMRCReferenceNumber)).map(optCHRN => {
+        List(None, Some(testCHRN)).map(optCHRN => {
 
           val theActualException: IllegalStateException = intercept[IllegalStateException] {
             rowBuilderUnderTest.buildSummaryListRows(

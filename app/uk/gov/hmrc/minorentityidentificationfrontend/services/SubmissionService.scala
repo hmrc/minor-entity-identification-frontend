@@ -25,6 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmissionService @Inject()(validateTrustKnownFactsService: ValidateTrustKnownFactsService,
+                                  auditService: AuditService,
                                   storageService: StorageService) {
 
   def submit(journeyId: String, journeyConfig: JourneyConfig)
@@ -37,10 +38,14 @@ class SubmissionService @Inject()(validateTrustKnownFactsService: ValidateTrustK
     } yield {
       matchingResult match {
         case SuccessfulMatch |
-             UnMatchableWithoutRetry => journeyConfig.continueUrl(journeyId)
+             UnMatchableWithoutRetry =>
+          auditService.auditJourney(journeyId, journeyConfig)
+          journeyConfig.continueUrl(journeyId)
         case DetailsNotFound |
              DetailsMismatch |
-             UnMatchableWithRetry    => errorControllers.routes.CannotConfirmBusinessController.show(journeyId).url
+             UnMatchableWithRetry    =>
+          auditService.auditJourney(journeyId, journeyConfig)
+          errorControllers.routes.CannotConfirmBusinessController.show(journeyId).url
       }
     }
 

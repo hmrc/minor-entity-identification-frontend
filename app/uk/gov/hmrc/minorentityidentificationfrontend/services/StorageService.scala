@@ -21,6 +21,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.StorageConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.{SuccessfullyRemoved, SuccessfullyStored}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.{format => bvFormat}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.writeForJourneyContinuation
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService._
@@ -125,7 +126,7 @@ class StorageService @Inject()(connector: StorageConnector) {
         Json.obj("identifiersMatch" -> optIdentifiersMatch.contains(SuccessfulMatch))
 
       Json.obj(
-        "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(bvFormat.writes),
+        "businessVerification" -> Json.toJson(BusinessVerificationNotEnoughInformationToChallenge)(writeForJourneyContinuation),
         "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
       ) ++
         utrBlock ++
@@ -142,6 +143,9 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Overseas]] =
     connector.retrieveDataField[Overseas](journeyId, OverseasKey)
 
+  def retrieveBusinessVerificationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
+    connector.retrieveDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey)
+
   def retrieveRegistrationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[RegistrationStatus]] =
     connector.retrieveDataField[RegistrationStatus](journeyId, RegistrationKey)
 
@@ -149,10 +153,6 @@ class StorageService @Inject()(connector: StorageConnector) {
                                       businessVerification: BusinessVerificationStatus
                                      )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey, businessVerification)
-
-  def retrieveBusinessVerificationStatus(journeyId: String
-                                        )(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
-    connector.retrieveDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey)
 }
 
 object StorageService {
