@@ -28,13 +28,13 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
   val rowBuilderUnderTest: UaCheckYourAnswersRowBuilder = new UaCheckYourAnswersRowBuilder()
 
   val testCtutrNumberRow: SummaryListRow = SummaryListRow(
-    key = Key(content = Text("Unique taxpayers reference number")),
+    key = Key(content = Text("Unique Taxpayers Reference")),
     value = Value(HtmlContent(testCtutr)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = uaControllers.routes.CaptureCtutrController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Unique taxpayers reference number")
+        visuallyHiddenText = Some("Unique Taxpayers Reference")
       )
     )))
   )
@@ -76,20 +76,20 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
   )
 
   val testOfficePostcodeRow: SummaryListRow = SummaryListRow(
-    key = Key(content = Text("Association postcode")),
+    key = Key(content = Text("Postcode")),
     value = Value(HtmlContent(testOfficePostcode)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = uaControllers.routes.CaptureOfficePostcodeController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Association postcode")
+        visuallyHiddenText = Some("Postcode")
       )
     )))
   )
 
   "buildSummaryListRows" should {
     "build a summary list sequence" when {
-      "the user enter a CTUTR and postcode" in {
+      "the user enter a CTUTR and office postcode" in {
 
         val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
           journeyId = testJourneyId,

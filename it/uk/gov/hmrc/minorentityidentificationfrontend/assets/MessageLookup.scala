@@ -150,11 +150,11 @@ object MessageLookup {
     val heading = "Check your answers"
 
     val utr = "Unique taxpayers reference number"
-    val uaNoUtr = "Unique Taxpayers Reference"
+    val uaUtr = "Unique Taxpayers Reference"
     val noUtr = "The business does not have a UTR"
 
     val postcode = "Self Assessment postcode"
-    val uaPostcode = "Association postcode"
+    val uaPostcode = "Postcode"
 
     val charityHRMCReferenceNumber = "HMRC reference number"
     val charityHRMCReferenceNumberNotProvided = "The charity does not have a HMRC reference number"

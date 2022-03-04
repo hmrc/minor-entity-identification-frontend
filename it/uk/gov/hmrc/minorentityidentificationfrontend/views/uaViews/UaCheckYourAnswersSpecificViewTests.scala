@@ -43,10 +43,10 @@ trait UaCheckYourAnswersSpecificViewTests {
       "have a utr row" in {
         val utrRow = summaryListRows.head
 
-        utrRow.getSummaryListQuestion mustBe messages.utr
+        utrRow.getSummaryListQuestion mustBe messages.uaUtr
         utrRow.getSummaryListAnswer mustBe testCtutr
         utrRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCtutrController.show(testJourneyId).url
-        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
+        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaUtr}"
       }
 
       "have an registered office postcode row" in {
@@ -73,10 +73,10 @@ trait UaCheckYourAnswersSpecificViewTests {
       "have a Ctutr row saying utr not provided" in {
         val utrRow = summaryListRows.head
 
-        utrRow.getSummaryListQuestion mustBe messages.uaNoUtr
+        utrRow.getSummaryListQuestion mustBe messages.uaUtr
         utrRow.getSummaryListAnswer mustBe messages.noUtr
         utrRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCtutrController.show(testJourneyId).url
-        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaNoUtr}"
+        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaUtr}"
       }
 
       "have an charity HRMC reference number row saying charity HRMC reference number not provided" in {
