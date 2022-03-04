@@ -158,7 +158,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   }
 
   "POST /identify-your-unincorporated-association/check-your-answers-business" when {
-
     "redirect to the provided continueUrl" in {
       enable(EnableFullUAJourney)
       await(insertJourneyConfig(
@@ -168,12 +167,36 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       ))
 
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+      stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
 
       val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
 
       result must have {
         httpStatus(SEE_OTHER)
         redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
+      }
+    }
+
+    "redirect to Cannot Confirm Business error page" when {
+      "there is no Ctutr and chrn" in {
+        enable(EnableFullUAJourney)
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+
+        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
+        }
       }
     }
 

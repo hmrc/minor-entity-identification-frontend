@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews
+package uk.gov.hmrc.minorentityidentificationfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,7 +24,6 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSi
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-
 
 trait CannotConfirmBusinessViewTests {
   this: ComponentSpecHelper =>

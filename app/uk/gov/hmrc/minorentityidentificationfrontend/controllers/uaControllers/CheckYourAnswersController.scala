@@ -21,6 +21,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers.{routes => errorRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.UaCheckYourAnswersRowBuilder
@@ -38,13 +39,13 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page
                                           )(implicit appConfig: AppConfig, ec: ExecutionContext)
-extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
+  extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          if(isEnabled(EnableFullUAJourney)) {
+          if (isEnabled(EnableFullUAJourney)) {
             for {
               journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
               optUtr <- storageService.retrieveUtr(journeyId)
@@ -67,15 +68,20 @@ extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           if (isEnabled(EnableFullUAJourney)) {
-            journeyService.getJourneyConfig(journeyId, authInternalId).map {
-              journeyConfig => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+            journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
+              journeyConfig =>
+                for {
+                  optUtr <- storageService.retrieveUtr(journeyId)
+                  optChrn <- storageService.retrieveCHRN(journeyId)
+                } yield (optUtr, optChrn) match {
+                  case (None, None) => Redirect(errorRoutes.CannotConfirmBusinessController.show(journeyId).url)
+                  case _ => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
+                }
             }
           } else
             throw new InternalServerException("Unincorporated Associated journey is not enabled")
-        case None                 =>
+        case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
-
-
 }
