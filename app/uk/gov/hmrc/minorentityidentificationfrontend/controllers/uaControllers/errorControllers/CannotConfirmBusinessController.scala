@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.errorControllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => appRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => appRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CannotConfirmBusinessForm.cannotConfirmBusinessForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.errorViews.cannot_confirm_business
@@ -45,7 +45,7 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          if (isEnabled(EnableFullTrustJourney)) {
+          if (isEnabled(EnableFullUAJourney)) {
             journeyService.getJourneyConfig(journeyId, authInternalId).map {
               journeyConfig =>
                 Ok(view(
@@ -54,7 +54,7 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
                   form = cannotConfirmBusinessForm
                 ))
             }
-          } else throw new InternalServerException("Trust journey is not enabled")
+          } else throw new InternalServerException("UA journey is not enabled")
         case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
@@ -63,7 +63,7 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
     implicit request =>
       authorised.retrieve(internalId) {
         case Some(authInternalId) =>
-          if (isEnabled(EnableFullTrustJourney)) {
+          if (isEnabled(EnableFullUAJourney)) {
             cannotConfirmBusinessForm.bindFromRequest.fold(
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
@@ -83,12 +83,13 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
                 }
                 else {
                   storageService.removeAllData(journeyId).map {
-                    _ => Redirect(appRoutes.CaptureSautrController.show(journeyId))
+                    _ => Redirect(appRoutes.CaptureCtutrController.show(journeyId))
                   }
                 }
             )
-          } else throw new InternalServerException("Trust journey is not enabled")
+          } else throw new InternalServerException("UA journey is not enabled")
         case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
+
 }

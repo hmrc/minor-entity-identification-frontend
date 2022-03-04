@@ -17,3 +17,5 @@ GET         /:journeyId/no-chrn                            uk.gov.hmrc.minorenti
 GET         /:journeyId/check-your-answers-business        uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CheckYourAnswersController.show(journeyId)
 POST        /:journeyId/check-your-answers-business        uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.CheckYourAnswersController.submit(journeyId)
 
+GET         /:journeyId/cannot-confirm-business            uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers.CannotConfirmBusinessController.show(journeyId)
+POST        /:journeyId/cannot-confirm-business            uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers.CannotConfirmBusinessController.submit(journeyId)

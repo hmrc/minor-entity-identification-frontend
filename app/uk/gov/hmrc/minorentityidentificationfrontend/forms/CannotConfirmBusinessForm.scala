@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms
+package uk.gov.hmrc.minorentityidentificationfrontend.forms
 
 import play.api.data.Form
 import play.api.data.Forms.of
@@ -25,4 +25,5 @@ object CannotConfirmBusinessForm {
   val cannotConfirmBusinessForm: Form[Boolean] = Form(
     "yes_no" -> of(yesNoMapping("cannot-confirm-business.no_selection"))
   )
+
 }
