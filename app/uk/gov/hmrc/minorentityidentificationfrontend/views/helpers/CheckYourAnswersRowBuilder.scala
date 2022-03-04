@@ -37,11 +37,7 @@ object CheckYourAnswersRowBuilder {
   )
 
   def uaUtrSummaryRow(optUtr: Option[Utr], changeValuePageLink: Call, messages: Messages): Aliases.SummaryListRow = buildSummaryRow(
-    optUtr match {
-      case Some(_) => messages("check-your-answers.utr")
-      case None      => messages("check-your-answers.ua_utr")
-    },
-
+    messages("check-your-answers.ua_utr"),
     optUtr match {
       case Some(utr) => utr.value
       case None      => messages("check-your-answers.no_utr")
