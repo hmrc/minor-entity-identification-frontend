@@ -26,11 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{SuccessfulMatch, DetailsMismatch, DetailsNotFound, UnMatchableWithRetry, UnMatchableWithoutRetry}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationPass, BusinessVerificationFail}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationNotEnoughInformationToChallenge, BusinessVerificationNotEnoughInformationToCallBV}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Registered, RegistrationFailed, RegistrationNotCalled}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -228,7 +224,8 @@ class AuditServiceSpec
 
               "audit a successful registration successfully" in {
 
-                mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
+                mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns
+                  Future.successful(testJourneyConfig(Trusts, businessVerificationCheck = false))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
                 mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
@@ -253,7 +250,8 @@ class AuditServiceSpec
 
               "audit a failed registration correctly" in {
 
-                mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
+                mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns
+                  Future.successful(testJourneyConfig(Trusts, businessVerificationCheck = false))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
                 mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
@@ -274,11 +272,8 @@ class AuditServiceSpec
                 )
 
                 mockAuditConnector.sendExplicitAudit("TrustsRegistration", expectedAuditData) was called
-
               }
-
             }
-
           }
 
           "the user supplies a SA Utr only but the trust is located abroad" when {
