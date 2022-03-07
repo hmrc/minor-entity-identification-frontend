@@ -19,8 +19,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationFail, BusinessVerificationNotEnoughInformationToCallBV, BusinessVerificationNotEnoughInformationToChallenge, BusinessVerificationPass, BusinessVerificationStatus, Ctutr, DetailsMismatch, DetailsNotFound, JourneyConfig, KnownFactsMatchingResult, Registered, RegistrationFailed, RegistrationStatus, Sautr, SuccessfulMatch, UnMatchableWithRetry, UnMatchableWithoutRetry}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import javax.inject.{Inject, Singleton}
@@ -34,7 +34,7 @@ class AuditService @Inject()(appConfig: AppConfig,
 
   def auditJourney(journeyId: String, authInternalId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
-      journeyConfig =>auditByBusinessType(journeyId, journeyConfig)
+      journeyConfig => auditByBusinessType(journeyId, journeyConfig)
     }
 
   def auditJourney(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
@@ -48,7 +48,7 @@ class AuditService @Inject()(appConfig: AppConfig,
 
     journeyConfig.businessEntity match {
       case OverseasCompany => auditOverseasCompanyJourney(journeyId, callingService)
-      case Trusts => auditTrustsJourney(journeyId, callingService)
+      case Trusts => auditTrustsJourney(journeyId, callingService, journeyConfig.businessVerificationCheck)
       case UnincorporatedAssociation => auditUnincorporatedAssociationJourney(journeyId, callingService)
       case _ =>
         throw new InternalServerException(s"Unexpected business entity type encountered auditing minor entity journey for Journey ID $journeyId")
@@ -93,7 +93,7 @@ class AuditService @Inject()(appConfig: AppConfig,
     }
   }
 
-  private def auditTrustsJourney(journeyId: String, callingService: String)
+  private def auditTrustsJourney(journeyId: String, callingService: String, businessVerificationCheck: Boolean)
                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
 
     val retrieveSaUtr = storageService.retrieveUtr(journeyId)
@@ -131,7 +131,7 @@ class AuditService @Inject()(appConfig: AppConfig,
         "callingService" -> callingService,
         "businessType" -> "Trusts",
         "isMatch" -> defineAuditIdentifiersMatch(optIdentifiersMatch),
-        "VerificationStatus" -> defineAuditBusinessVerificationStatus(optBusinessVerificationStatus),
+        "VerificationStatus" -> defineAuditBusinessVerificationStatus(optBusinessVerificationStatus, businessVerificationCheck),
         "RegisterApiStatus" -> defineAuditRegistrationStatus(optRegistrationStatus)
       ) ++ optSaUtrBlock ++ optSaPostCodeBlock ++ optCHRNBlock
 
@@ -143,7 +143,7 @@ class AuditService @Inject()(appConfig: AppConfig,
   }
 
   private def auditUnincorporatedAssociationJourney(journeyId: String, callingService: String)
-                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+                                                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
 
     for {
       optRegistrationStatus <- storageService.retrieveRegistrationStatus(journeyId)
@@ -178,12 +178,16 @@ class AuditService @Inject()(appConfig: AppConfig,
       case _ => "not called"
     }
 
-  private def defineAuditBusinessVerificationStatus(optBusinessVerificationStatus: Option[BusinessVerificationStatus]): String =
-    optBusinessVerificationStatus match {
-      case Some(BusinessVerificationPass) => "success"
-      case Some(BusinessVerificationFail) => "fail"
-      case Some(BusinessVerificationNotEnoughInformationToCallBV) => "Not enough information to call BV"
-      case Some(BusinessVerificationNotEnoughInformationToChallenge) => "Not Enough Information to challenge"
-      case None => "not requested"
+  private def defineAuditBusinessVerificationStatus(optBusinessVerificationStatus: Option[BusinessVerificationStatus],
+                                                    businessVerificationCheck: Boolean): String = {
+    if (!businessVerificationCheck) "not requested"
+    else {
+      optBusinessVerificationStatus match {
+        case Some(BusinessVerificationPass) => "success"
+        case Some(BusinessVerificationFail) => "fail"
+        case Some(BusinessVerificationNotEnoughInformationToCallBV) | None => "Not enough information to call BV"
+        case Some(BusinessVerificationNotEnoughInformationToChallenge) => "Not Enough Information to challenge"
+      }
     }
+  }
 }

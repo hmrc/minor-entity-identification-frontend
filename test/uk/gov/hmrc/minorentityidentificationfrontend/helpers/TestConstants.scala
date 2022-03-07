@@ -43,7 +43,7 @@ object TestConstants {
 
   val testTrustJourneyConfig: JourneyConfig = testJourneyConfig(Trusts)
 
-  def testJourneyConfig(businessEntity: BusinessEntity): JourneyConfig = JourneyConfig(
+  def testJourneyConfig(businessEntity: BusinessEntity, businessVerificationCheck: Boolean = true): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
     pageConfig = PageConfig(
       optServiceName = None,
@@ -52,7 +52,7 @@ object TestConstants {
       accessibilityUrl = testAccessibilityUrl
     ),
     businessEntity = businessEntity,
-    businessVerificationCheck = true,
+    businessVerificationCheck = businessVerificationCheck,
     testRegime
   )
 
