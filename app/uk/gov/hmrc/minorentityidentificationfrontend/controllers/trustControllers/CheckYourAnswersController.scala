@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService, SubmissionService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService, TrustSubmissionService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TrustCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -35,7 +35,7 @@ import scala.concurrent.ExecutionContext
 class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            journeyService: JourneyService,
                                            storageService: StorageService,
-                                           submissionService: SubmissionService,
+                                           submissionService: TrustSubmissionService,
                                            rowBuilder: TrustCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page

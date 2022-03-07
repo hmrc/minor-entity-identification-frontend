@@ -125,5 +125,6 @@ object TestConstants {
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testSaPostcode), Some(testSaPostcode), isAbroad = false)
   val testTrustKnownFactsAbroadResponse: TrustKnownFacts = TrustKnownFacts(None, None, isAbroad = true)
+  val testBusinessVerificationRedirectUrl = "/business-verification-start"
 
 }

@@ -78,7 +78,7 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
                 if (continue) {
                   journeyService.getJourneyConfig(journeyId, authInternalId).map {
                     journeyConfig =>
-                      Redirect(journeyConfig.continueUrl(journeyId))
+                      Redirect(journeyConfig.fullContinueUrl(journeyId))
                   }
                 }
                 else {

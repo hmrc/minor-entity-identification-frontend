@@ -17,7 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.{BusinessVerificationJourneyCreated, BusinessVerificationJourneyCreationResponse, NotEnoughEvidence, UserLockedOut}
+import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.{BusinessVerificationJourneyCreated, NotEnoughEvidence, UserLockedOut}
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.{CreateBusinessVerificationJourneyConnector, RetrieveBusinessVerificationStatusConnector}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
@@ -34,18 +34,14 @@ class BusinessVerificationService @Inject()(createBusinessVerificationJourneyCon
                                         sautr: String,
                                         accessibilityUrl: String,
                                         regime: String
-                                       )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] =
+                                       )(implicit hc: HeaderCarrier): Future[Option[String]] =
     createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(journeyId, sautr, accessibilityUrl, regime).flatMap {
-      case success@Right(BusinessVerificationJourneyCreated(_)) =>
-        Future.successful(success)
+      case Right(BusinessVerificationJourneyCreated(journeyUrl)) =>
+        Future.successful(Some(journeyUrl))
       case Left(NotEnoughEvidence) =>
-        storageService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToChallenge).map {
-          _ => Left(NotEnoughEvidence)
-        }
+        storageService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToChallenge).map(_ => None)
       case Left(UserLockedOut) =>
-        storageService.storeBusinessVerificationStatus(journeyId, BusinessVerificationFail).map {
-          _ => Left(UserLockedOut)
-        }
+        storageService.storeBusinessVerificationStatus(journeyId, BusinessVerificationFail).map(_ => None)
       case _ =>
         throw new InternalServerException(s"createBusinessVerificationJourney service failed with invalid BV status")
     }

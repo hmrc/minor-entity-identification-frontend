@@ -16,37 +16,20 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockMethods
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.{WiremockHelper, WiremockMethods}
 
 
 trait BusinessVerificationStub extends WiremockMethods {
 
-  def stubCreateBusinessVerificationJourney(sautr: String,
-                                            journeyId: String,
-                                            accessibilityUrl: String,
-                                            regime: String
-                                           )(status: Int,
-                                             body: JsObject = Json.obj()): Unit = {
-
-    val postBody = Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
-      "origin" -> regime,
-      "identifiers" -> Json.arr(
-        Json.obj(
-          "saUtr" -> sautr
-        )
-      ),
-      "continueUrl" -> trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
-      "accessibilityStatementUrl" -> accessibilityUrl
-    )
-
-    when(method = POST, uri = "/business-verification/journey", postBody)
+  def stubCreateBusinessVerificationJourney(expBody: JsObject)(status: Int,
+                                                               body: JsObject = Json.obj()): Unit =
+    when(method = POST, uri = "/business-verification/journey", body = expBody)
       .thenReturn(
         status = status,
         body = body
       )
-  }
 
   def stubRetrieveBusinessVerificationResult(journeyId: String)
                                             (status: Int,
@@ -91,6 +74,12 @@ trait BusinessVerificationStub extends WiremockMethods {
         status = status,
         body = body
       )
+
+  def verifyCreateBusinessVerificationJourney(expBody: JsObject): Unit =
+    WiremockHelper.verifyPost(
+      uri = s"/business-verification/journey",
+      optBody = Some(Json.stringify(expBody))
+    )
 
 }
 

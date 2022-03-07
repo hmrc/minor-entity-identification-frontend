@@ -33,6 +33,10 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
+  def stubStoreStoreTrustsKnownFacts(journeyId: String, expBody: JsValue)(status: Int): Unit =
+    when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/trustKnownFacts", expBody)
+      .thenReturn(status = status)
+
   def stubStoreIdentifiersMatch(journeyId: String, expBody: JsValue)(status: Int): Unit =
     when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch", expBody)
       .thenReturn(status = status)
@@ -152,6 +156,12 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
+  def verifyStoreTrustsKnownFacts(journeyId: String, expBody: JsValue): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/minor-entity-identification/journey/$journeyId/trustKnownFacts",
+      optBody = Some(Json.stringify(expBody))
+    )
+
   def verifyStoreIdentifiersMatch(journeyId: String, expBody: JsValue): Unit =
     WiremockHelper.verifyPut(
       uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch",
@@ -188,6 +198,16 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
+  def stubStoreBusinessVerificationStatus(journeyId: String,
+                                          expBody: JsValue
+                                         )(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/businessVerification",
+      body = expBody
+    ).thenReturn(
+      status = status
+    )
+
   def stubRetrieveBusinessVerificationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/businessVerification"
@@ -200,6 +220,9 @@ trait StorageStub extends WiremockMethods {
     val jsonBody = Json.toJson(businessVerificationStatus)
     WiremockHelper.verifyPut(uri = s"/minor-entity-identification/journey/$journeyId/businessVerification", optBody = Some(jsonBody.toString()))
   }
+
+  def verifyStoreBusinessVerificationStatus(journeyId: String, expBody: JsObject): Unit =
+    WiremockHelper.verifyPut(uri = s"/minor-entity-identification/journey/$journeyId/businessVerification", optBody = Some(Json.stringify(expBody)))
 
   def stubRetrieveRegistrationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
     when(method = GET,
