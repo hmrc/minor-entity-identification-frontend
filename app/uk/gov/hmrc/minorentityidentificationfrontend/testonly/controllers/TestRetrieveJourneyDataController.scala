@@ -20,7 +20,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -29,14 +29,21 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class TestRetrieveJourneyDataController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                                   storageService: StorageService,
+                                                  journeyService: JourneyService,
                                                   val authConnector: AuthConnector
                                                  )(implicit ec: ExecutionContext) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
 
   def retrieveDetails(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
+    implicit req =>
       authorised().retrieve(internalId) {
-        case Some(_) => storageService.retrieveAllData(journeyId).map(journeyDataJson => Ok(journeyDataJson))
-        case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
+        case Some(authInternalId) =>
+          for {
+            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+            journeyDataJson <- storageService.retrieveAllData(journeyId, journeyConfig)
+          } yield
+            Ok(journeyDataJson)
+        case None =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
