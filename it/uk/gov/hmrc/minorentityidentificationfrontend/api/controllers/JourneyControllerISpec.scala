@@ -114,7 +114,6 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
 
         result.status mustBe OK
         result.json mustBe testDetailsJson
-
       }
     }
 

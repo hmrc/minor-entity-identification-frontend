@@ -89,7 +89,7 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
 
   "buildSummaryListRows" should {
     "build a summary list sequence" when {
-      "the user enter a CTUTR and office postcode" in {
+      "the user enter a CTUTR and postcode" in {
 
         val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
           journeyId = testJourneyId,

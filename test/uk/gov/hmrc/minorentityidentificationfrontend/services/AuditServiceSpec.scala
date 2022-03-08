@@ -94,7 +94,6 @@ class AuditServiceSpec
     "send an event for an Unincorporated Association" in {
       mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(UnincorporatedAssociation))
       mockStorageService.retrieveRegistrationStatus(testJourneyId) returns Future.successful(Some(RegistrationNotCalled))
-
       val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
       result.mustBe(())

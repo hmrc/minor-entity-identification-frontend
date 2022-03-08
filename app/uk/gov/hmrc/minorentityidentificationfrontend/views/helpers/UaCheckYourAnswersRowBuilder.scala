@@ -43,7 +43,7 @@ class UaCheckYourAnswersRowBuilder() {
       messages(checkYourAnswersMessageKey(keySuffix = "charity_hmrc_reference_number")),
       optCHRN match {
         case Some(charityHMRCReferenceNumber) => charityHMRCReferenceNumber
-        case None                             => messages(checkYourAnswersMessageKey(keySuffix = "no_charity_hmrc_reference_number"))
+        case None => messages(checkYourAnswersMessageKey(keySuffix = "no_charity_hmrc_reference_number"))
       },
       changeValuePageLink = uaControllers.routes.CaptureCHRNController.show(journeyId),
       messages = messages
@@ -59,10 +59,10 @@ class UaCheckYourAnswersRowBuilder() {
     )
 
     (optUtr, optOfficePostcode, optCHRN) match {
-      case (Some(_), Some(_), None)    => Seq(utrRow, officePostcodeRow())
-      case (None, None, _)       => Seq(utrRow, charityHMRCReferenceNumberRow())
+      case (Some(_), Some(_), None) => Seq(utrRow, officePostcodeRow())
+      case (None, None, _) => Seq(utrRow, charityHMRCReferenceNumberRow())
       case (Some(_), _, Some(_)) => throw new IllegalStateException("User cannot have CTUTR and charity HMRC reference number at the same time")
-      case (None, Some(_), _)    => throw new IllegalStateException("User cannot have registered office postcode when they don't have CTUTR")
+      case (None, Some(_), _) => throw new IllegalStateException("User cannot have registered office postcode when they don't have CTUTR")
     }
 
   }
@@ -70,5 +70,3 @@ class UaCheckYourAnswersRowBuilder() {
   private def checkYourAnswersMessageKey(keySuffix: String): String = s"check-your-answers.$keySuffix"
 
 }
-
-

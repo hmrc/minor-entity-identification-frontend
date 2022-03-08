@@ -67,6 +67,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           testCheckYourAnswersCommonView(result)
           testTrustWithUtrAndPostcodeSummaryListView(result, testJourneyId)
         }
+
       }
 
       "the applicant has a no utr and a no charity hmrc reference number" should {
@@ -137,7 +138,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
             )
           }
         }
-
       }
 
       "the user does not have an internal ID" should {
@@ -359,7 +359,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithoutRetryKey))
         verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
-
         verifyAudit()
       }
     }
@@ -396,7 +395,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(UnMatchableWithRetryKey))
         verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
-
         verifyAudit()
       }
     }
@@ -432,9 +430,9 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
         result.status mustBe INTERNAL_SERVER_ERROR
+
       }
     }
-
     "the EnableFullTrustJourney is disabled" should {
       "throw an internal server exception" in {
         disable(EnableFullTrustJourney)

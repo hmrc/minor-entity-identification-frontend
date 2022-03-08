@@ -94,5 +94,4 @@ trait TrustCheckYourAnswersSpecificViewTests {
   private def extractSummaryListRows(result: => WSResponse): List[Element] =
     Jsoup.parse(result.body).getSummaryListRows.iterator().asScala.toList
 
-
 }

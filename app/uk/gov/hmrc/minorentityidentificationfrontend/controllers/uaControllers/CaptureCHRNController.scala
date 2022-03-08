@@ -37,20 +37,21 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
                                       mcc: MessagesControllerComponents,
                                       view: capture_chrn_page)
                                      (implicit val config: AppConfig, executionContext: ExecutionContext)
-                                           extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
+  extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          if(isEnabled(EnableFullUAJourney)) {
+          if (isEnabled(EnableFullUAJourney)) {
             journeyService.getJourneyConfig(journeyId, authInternalId).map {
-              journeyConfig => Ok(view(
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = routes.CaptureCHRNController.submit(journeyId),
-                form = CaptureCHRNForm.form
-              ))
+              journeyConfig =>
+                Ok(view(
+                  journeyId = journeyId,
+                  pageConfig = journeyConfig.pageConfig,
+                  formAction = routes.CaptureCHRNController.submit(journeyId),
+                  form = CaptureCHRNForm.form
+                ))
             }
           } else throw new InternalServerException("UA journey is not enabled")
         case None =>
@@ -62,7 +63,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          if(isEnabled(EnableFullUAJourney)) {
+          if (isEnabled(EnableFullUAJourney)) {
             CaptureCHRNForm.form.bindFromRequest().fold(
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
@@ -73,7 +74,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
                       formAction = routes.CaptureCHRNController.submit(journeyId),
                       form = formWithErrors
                     ))
-              },
+                },
               chrn => storageService.storeCHRN(journeyId, chrn).map {
                 _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
               }

@@ -85,3 +85,4 @@ trait CannotConfirmBusinessViewTests {
     }
   }
 }
+

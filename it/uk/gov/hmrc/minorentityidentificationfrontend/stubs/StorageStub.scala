@@ -171,21 +171,19 @@ trait StorageStub extends WiremockMethods {
   def verifyRemoveCHRN(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/chrn")
 
-  def verifyRemoveSaPostcode(journeyId: String): Unit =
-    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/saPostcode")
-
   def verifyRemoveOfficePostcode(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/officePostcode")
+
+  def verifyRemoveSaPostcode(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/saPostcode")
 
   def verifyRemoveUtr(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/utr")
 
-  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
-    when(method = GET,
-      uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch"
-    ).thenReturn(
+  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, identifiersMatchJson: JsObject = Json.obj()): Unit =
+    when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch").thenReturn(
       status = status,
-      body = body
+      body = identifiersMatchJson
     )
 
   def stubStoreBusinessVerificationStatus(journeyId: String,

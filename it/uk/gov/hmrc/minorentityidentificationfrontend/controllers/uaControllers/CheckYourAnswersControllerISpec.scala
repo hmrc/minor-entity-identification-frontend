@@ -158,6 +158,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   }
 
   "POST /identify-your-unincorporated-association/check-your-answers-business" when {
+
     "redirect to the provided continueUrl" in {
       enable(EnableFullUAJourney)
       await(insertJourneyConfig(

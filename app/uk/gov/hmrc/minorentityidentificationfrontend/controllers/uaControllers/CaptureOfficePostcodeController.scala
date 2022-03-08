@@ -36,15 +36,15 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
                                                 journeyService: JourneyService,
                                                 storageService: StorageService,
                                                 val authConnector: AuthConnector
-                                           )(implicit val config: AppConfig, executionContext: ExecutionContext)
+                                               )(implicit val config: AppConfig, executionContext: ExecutionContext)
   extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
       authorised().retrieve(internalId) {
-          case Some(authInternalId) =>
-            if(isEnabled(EnableFullUAJourney)) {
-              journeyService.getJourneyConfig(journeyId, authInternalId).map {
+        case Some(authInternalId) =>
+          if (isEnabled(EnableFullUAJourney)) {
+            journeyService.getJourneyConfig(journeyId, authInternalId).map {
               journeyConfig =>
                 Ok(view(
                   journeyId = journeyId,
@@ -53,7 +53,7 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
                   form = CaptureOfficePostcodeForm.form
                 ))
             }
-        }  else throw new InternalServerException("Unincorporated association journey is not enabled")
+          } else throw new InternalServerException("Unincorporated association journey is not enabled")
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
@@ -63,7 +63,7 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          if(isEnabled(EnableFullUAJourney)) {
+          if (isEnabled(EnableFullUAJourney)) {
             CaptureOfficePostcodeForm.form.bindFromRequest().fold(
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
