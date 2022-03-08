@@ -82,7 +82,7 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeAllData(journeyId)
 
-  def retrieveAllData(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+  def retrieveAllData(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     for {
       optUtr <- retrieveUtr(journeyId)
       optOverseasTaxIdentifiers <- retrieveOverseasTaxIdentifiers(journeyId)
@@ -126,13 +126,16 @@ class StorageService @Inject()(connector: StorageConnector) {
       val identifiersMatchBlock: JsObject =
         Json.obj("identifiersMatch" -> optIdentifiersMatch.contains(SuccessfulMatch))
 
-      val businessVerificationStatusBlock: JsObject = {
-        val value = optBVStatus match {
-          case None => BusinessVerificationStatus.writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge)
-          case Some(bvStatus) => BusinessVerificationStatus.writeForJourneyContinuation(bvStatus)
+      val businessVerificationStatusBlock: JsObject =
+        if (journeyConfig.businessVerificationCheck) {
+          val value = optBVStatus match {
+            case None => BusinessVerificationStatus.writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge)
+            case Some(bvStatus) => BusinessVerificationStatus.writeForJourneyContinuation(bvStatus)
+          }
+          Json.obj("businessVerification" -> value)
         }
-        Json.obj("businessVerification" -> value)
-      }
+        else
+          JsObject.empty
 
       val registrationValue: JsValue = {
         optRegistrationStatus match {

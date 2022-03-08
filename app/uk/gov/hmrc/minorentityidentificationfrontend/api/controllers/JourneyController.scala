@@ -78,11 +78,11 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                     Created(Json.obj(journeyStartUrl -> pathToRedirect))
                   } else {
                     auditService.auditJourney(journeyId, authInternalId)
-                    Created(Json.obj(journeyStartUrl -> (req.body.continueUrl + s"?journeyId=$journeyId" )))
+                    Created(Json.obj(journeyStartUrl -> (req.body.continueUrl + s"?journeyId=$journeyId")))
                   }
                 case UnincorporatedAssociation =>
                   auditService.auditJourney(journeyId, authInternalId)
-                  val pathToRedirect = if(isEnabled(EnableFullUAJourney)) {
+                  val pathToRedirect = if (isEnabled(EnableFullUAJourney)) {
                     s"${appConfig.selfUrl}${uaControllerRoutes.CaptureCtutrController.show(journeyId).url}"
                   } else {
                     req.body.continueUrl + s"?journeyId=$journeyId"
@@ -100,8 +100,15 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
 
   def retrieveJourneyData(journeyId: String): Action[AnyContent] = Action.async {
     implicit req =>
-      authorised() {
-        storageService.retrieveAllData(journeyId).map(journeyDataJson => Ok(journeyDataJson))
+      authorised().retrieve(internalId) {
+        case Some(authInternalId) =>
+          for {
+            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+            journeyDataJson <- storageService.retrieveAllData(journeyId, journeyConfig)
+          } yield
+            Ok(journeyDataJson)
+        case None                 =>
+          throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 }
