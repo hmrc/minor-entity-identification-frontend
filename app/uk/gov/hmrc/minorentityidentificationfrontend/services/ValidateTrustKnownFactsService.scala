@@ -59,6 +59,7 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
           userPostcode.get.filterNot(_.isWhitespace) equalsIgnoreCase (correspondencePostcode filterNot (_.isWhitespace))
         case (_, Some(declarationPostcode)) =>
           userPostcode.get.filterNot(_.isWhitespace) equalsIgnoreCase (declarationPostcode filterNot (_.isWhitespace))
+        case _ => false
       }
     }
     else false

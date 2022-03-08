@@ -17,36 +17,26 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
 import org.scalatest.BeforeAndAfterEach
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, EnableFullTrustJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationPass
-import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, BusinessVerificationStub, StorageStub}
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.{ComponentSpecHelper, WiremockHelper}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationPass, Registered}
+import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.{AuditEnabledSpecHelper, WiremockHelper}
 
 import javax.inject.Singleton
 
 @Singleton
-class BusinessVerificationControllerISpec extends ComponentSpecHelper
+class BusinessVerificationControllerISpec extends AuditEnabledSpecHelper
   with FeatureSwitching
   with AuthStub
   with BusinessVerificationStub
   with StorageStub
+  with RegisterStub
   with BeforeAndAfterEach
   with WiremockHelper {
-
-
-  override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(config)
-    .build
-
-  override def beforeEach(): Unit = {
-    await(journeyConfigRepository.drop)
-    super.beforeEach()
-  }
 
   "GET /business-verification-result" when {
     s"the $BusinessVerificationStub feature switch is enabled" should {
@@ -60,10 +50,17 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           enable(EnableFullTrustJourney)
           enable(BusinessVerificationStub)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(OK)
-          stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
+          stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+          stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, testBusinessVerificationPassJson)
           stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
+          stubRegister(testSautr, testRegime)(OK, Registered(testSafeId))
+          stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
+          stubAudit()
+          stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchSuccessfulMatchJson)
+          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+          stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
 
           lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
 
@@ -73,30 +70,8 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           }
 
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
-        }
-
-        "the user does not have an sautr" in {
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
-          ))
-          enable(EnableFullTrustJourney)
-          enable(BusinessVerificationStub)
-          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-          stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
-          stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
-
-          lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
-          }
-
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
+          verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
+          verifyAudit()
         }
       }
 
@@ -110,6 +85,7 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        stubAudit()
 
         lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result")
 
@@ -128,10 +104,17 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           ))
           enable(EnableFullTrustJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(OK)
-          stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
+          stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+          stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, testBusinessVerificationPassJson)
           stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
+          stubRegister(testSautr, testRegime)(OK, Registered(testSafeId))
+          stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
+          stubAudit()
+          stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchSuccessfulMatchJson)
+          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+          stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
 
           lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
 
@@ -141,30 +124,8 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           }
 
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
-        }
-
-        "the user does not have a sautr" in {
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            testTrustsJourneyConfig(businessVerificationCheck = true)
-          ))
-          enable(EnableFullTrustJourney)
-          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-          stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, Json.obj("verificationStatus" -> "PASS"))
-          stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
-
-          lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
-
-          result must have {
-            httpStatus(SEE_OTHER)
-            redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
-          }
-
-          verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
-
+          verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
+          verifyAudit()
         }
       }
 
@@ -177,10 +138,12 @@ class BusinessVerificationControllerISpec extends ComponentSpecHelper
           internalId = testInternalId,
           testTrustsJourneyConfig(businessVerificationCheck = true)
         ))
+        stubAudit()
 
         lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result")
 
         result.status mustBe INTERNAL_SERVER_ERROR
+
       }
     }
   }

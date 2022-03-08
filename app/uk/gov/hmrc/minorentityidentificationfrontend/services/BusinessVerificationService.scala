@@ -32,10 +32,9 @@ class BusinessVerificationService @Inject()(createBusinessVerificationJourneyCon
 
   def createBusinessVerificationJourney(journeyId: String,
                                         sautr: String,
-                                        accessibilityUrl: String,
-                                        regime: String
+                                        journeyConfig: JourneyConfig
                                        )(implicit hc: HeaderCarrier): Future[Option[String]] =
-    createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(journeyId, sautr, accessibilityUrl, regime).flatMap {
+    createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(journeyId, sautr, journeyConfig).flatMap {
       case Right(BusinessVerificationJourneyCreated(journeyUrl)) =>
         Future.successful(Some(journeyUrl))
       case Left(NotEnoughEvidence) =>

@@ -29,9 +29,9 @@ object TestConstants {
   val testInternalId: String = UUID.randomUUID().toString
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
   val testSautr: String = "1234567890"
-  val testSaPostcode: String =  "AA00 0AA"
+  val testSaPostcode: String = "AA00 0AA"
   val testPostcode: String = "AA1 1AA"
-  val testOfficePostcode: String =  "AA22 2AA"
+  val testOfficePostcode: String = "AA22 2AA"
   val testCHRN: String = "AB99999"
   val testContinueUrl: String = "/test"
   val testDeskProServiceId: String = "vrs"
@@ -71,9 +71,9 @@ object TestConstants {
   val testCtutrType: String = "ctutr"
 
   val testUtrJson: JsObject = Json.obj(
-      "type" -> testUtrType,
-      "value" -> testUtr
-    )
+    "type" -> testUtrType,
+    "value" -> testUtr
+  )
 
   val testCtutrJson: JsObject = Json.obj(
     "type" -> testCtutrType,
@@ -82,7 +82,7 @@ object TestConstants {
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testPostcode), Some(testSaPostcode), isAbroad = false)
 
-  val testKnownFactsJson: JsObject = testKnownFactsJson(correspondencePostcode = "AA1 1AA",declarationPostcode = "AA00 0AA")
+  val testKnownFactsJson: JsObject = testKnownFactsJson(correspondencePostcode = "AA1 1AA", declarationPostcode = "AA00 0AA")
 
   def testKnownFactsJson(correspondencePostcode: String, declarationPostcode: String): JsObject = Json.obj(
     "getTrust" -> Json.obj(
@@ -219,16 +219,15 @@ object TestConstants {
 
   def testCreateBusinessVerificationJourneyJson(sautr: String,
                                                 journeyId: String,
-                                                accessibilityUrl: String,
-                                                regime: String): JsObject =
+                                                journeyConfig: JourneyConfig): JsObject =
     Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
-      "origin" -> regime,
+      "origin" -> journeyConfig.regime,
       "identifiers" -> Json.arr(
         Json.obj(
           "saUtr" -> sautr
         )
       ),
       "continueUrl" -> trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
-      "accessibilityStatementUrl" -> accessibilityUrl
+      "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl
     )
 }

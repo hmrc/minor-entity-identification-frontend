@@ -21,6 +21,7 @@ import org.mockito.Mockito.when
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.services.BusinessVerificationService
 
 import scala.concurrent.Future
@@ -32,14 +33,12 @@ trait MockBusinessVerificationService extends IdiomaticMockito with BeforeAndAft
 
   def createBusinessVerificationJourney(journeyId: String,
                                         sautr: String,
-                                        accessibilityUrl: String,
-                                        regime: String)
+                                        journeyConfig: JourneyConfig)
                                        (response: Future[Option[String]]): Unit =
     when(mockBusinessVerificationService.createBusinessVerificationJourney(
       ArgumentMatchers.eq(journeyId),
       ArgumentMatchers.eq(sautr),
-      ArgumentMatchers.eq(accessibilityUrl),
-      ArgumentMatchers.eq(regime),
+      ArgumentMatchers.eq(journeyConfig)
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 

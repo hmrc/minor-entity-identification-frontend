@@ -24,9 +24,9 @@ import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, BusinessVerificationStub, RetrieveTrustKnownFactsStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersCommonViewTests
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.TrustCheckYourAnswersSpecificViewTests
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
 
 class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   with AuthStub
@@ -54,6 +54,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
           stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+          stubAudit()
 
           get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
         }
@@ -81,6 +82,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveUtr(testJourneyId)(NOT_FOUND)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
           stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
+          stubAudit()
 
           get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
         }
@@ -108,6 +110,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRetrieveUtr(testJourneyId)(NOT_FOUND)
           stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+          stubAudit()
 
           get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
         }
@@ -122,6 +125,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         "redirect to sign in page" in {
           enable(EnableFullTrustJourney)
           stubAuthFailure()
+          stubAudit()
 
           lazy val result: WSResponse = get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
 
@@ -140,6 +144,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         "return an INTERNAL_SERVER_ERROR status" in {
           enable(EnableFullTrustJourney)
           stubAuth(OK, successfulAuthResponse(internalId = None))
+          stubAudit()
 
           lazy val result: WSResponse = get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
 
@@ -152,6 +157,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         "throw an internal server exception" in {
           disable(EnableFullTrustJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubAudit()
 
           val result = get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
 
@@ -179,7 +185,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
         stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))(OK)
-        stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
+        stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(CREATED, Json.obj("redirectUri" -> testBusinessVerificationRedirectUrl))
+        stubAudit()
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -189,7 +196,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))
-        verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))
+        verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
 
       }
     }
@@ -213,7 +220,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
         stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))(OK)
-        stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(NOT_FOUND)
+        stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(NOT_FOUND)
         stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))(OK)
 
         stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchSuccessfulMatchJson)
@@ -230,7 +237,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))
         verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))
-        verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))
+        verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
 
         verifyAudit()
       }
@@ -255,9 +262,12 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
         stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
         stubStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))(OK)
-        stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(FORBIDDEN)
+        stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(FORBIDDEN)
         stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))(OK)
         stubAudit()
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchSuccessfulMatchJson)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationFailJson)
+        stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -267,7 +277,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
 
         verifyStoreIdentifiersMatch(testJourneyId, expBody = testIdentifiersMatchJson(SuccessfulMatchKey))
-        verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))
+        verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
         verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))
         verifyAudit()
       }
@@ -399,6 +409,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       "redirect to sign in page" in {
         enable(EnableFullTrustJourney)
         stubAuthFailure()
+        stubAudit()
 
         lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -416,6 +427,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       "the user does not have an internal ID" in {
         enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(internalId = None))
+        stubAudit()
 
         lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
@@ -427,6 +439,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       "throw an internal server exception" in {
         disable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubAudit()
 
         val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 

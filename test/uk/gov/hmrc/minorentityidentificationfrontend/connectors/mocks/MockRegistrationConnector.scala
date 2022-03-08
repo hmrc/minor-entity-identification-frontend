@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.models
+package uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks
 
-import org.scalatest.matchers.should.Matchers._
-import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testTrustJourneyConfig}
+import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
+import org.scalatest.Suite
+import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RegistrationConnector
 
-class JourneyConfigSpec extends org.scalatest.flatspec.AnyFlatSpec {
+trait MockRegistrationConnector extends IdiomaticMockito with ResetMocksAfterEachTest {
+  self: Suite =>
 
-  "continueUrl" should "append the journeyId query parameter to the continue url" in {
-    testTrustJourneyConfig().fullContinueUrl(testJourneyId) should be(testTrustJourneyConfig().continueUrl + s"?journeyId=$testJourneyId")
-  }
+  val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
 }

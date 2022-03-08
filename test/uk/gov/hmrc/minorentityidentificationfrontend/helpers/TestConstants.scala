@@ -41,7 +41,7 @@ object TestConstants {
   val testCHRN: String = UUID.randomUUID().toString
   val testSafeId: String = UUID.randomUUID().toString
 
-  val testTrustJourneyConfig: JourneyConfig = testJourneyConfig(Trusts)
+  def testTrustJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig = testJourneyConfig(Trusts, businessVerificationCheck)
 
   def testJourneyConfig(businessEntity: BusinessEntity, businessVerificationCheck: Boolean = true): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,

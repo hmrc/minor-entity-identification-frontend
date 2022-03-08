@@ -27,7 +27,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class TrustSubmissionService @Inject()(validateTrustKnownFactsService: ValidateTrustKnownFactsService,
                                        storageService: StorageService,
                                        auditService: AuditService,
-                                       businessVerificationService: BusinessVerificationService) {
+                                       businessVerificationService: BusinessVerificationService,
+                                       registrationOrchestrationService: RegistrationOrchestrationService) {
 
   def submit(journeyId: String, journeyConfig: JourneyConfig)
             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
@@ -36,40 +37,44 @@ class TrustSubmissionService @Inject()(validateTrustKnownFactsService: ValidateT
       optSaPostcode <- storageService.retrieveSaPostcode(journeyId)
       optCHRN <- storageService.retrieveCHRN(journeyId)
       matchingResult <- validateTrustKnownFactsService.validateTrustKnownFacts(journeyId, optSaUtr.map(_.value), optSaPostcode, optCHRN)
-      nextJourneyUrl <- handleBusinessVerificationCheck(journeyId, matchingResult, optSaUtr.map(_.value), journeyConfig)
-      _ <- auditService.auditJourney(journeyId, journeyConfig)
-    } yield nextJourneyUrl
+      redirectUrl <- handleBusinessVerificationCheck(journeyId, matchingResult, optSaUtr.map(_.value), journeyConfig)
+    } yield redirectUrl
 
   private def handleBusinessVerificationCheck(journeyId: String,
                                               matchingResult: KnownFactsMatchingResult,
                                               optSaUtr: Option[String],
                                               journeyConfig: JourneyConfig)
                                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = matchingResult match {
-    case SuccessfulMatch                          =>
+    case SuccessfulMatch =>
       if (journeyConfig.businessVerificationCheck)
         businessVerificationService
-          .createBusinessVerificationJourney(journeyId, optSaUtr.getOrElse(throwASaUtrNotDefinedException), journeyConfig.pageConfig.accessibilityUrl, journeyConfig.regime)
+          .createBusinessVerificationJourney(journeyId, optSaUtr.getOrElse(throwASaUtrNotDefinedException), journeyConfig)
           .flatMap({
             case Some(businessVerificationUrl) => Future.successful(businessVerificationUrl)
-            case None                          => Future.successful(journeyConfig.fullContinueUrl(journeyId))
+            case None =>
+              auditService.auditJourney(journeyId, journeyConfig)
+              Future.successful(journeyConfig.fullContinueUrl(journeyId))
           })
-      else
-        Future.successful(journeyConfig.fullContinueUrl(journeyId))
+      else {
+        registrationOrchestrationService.register(journeyId, optSaUtr, journeyConfig).map { _ =>
+          auditService.auditJourney(journeyId, journeyConfig)
+          journeyConfig.fullContinueUrl(journeyId)
+        }
+      }
     case aMatchingFailure: KnownFactsMatchFailure =>
       for {
         _ <- if (journeyConfig.businessVerificationCheck)
           storageService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToCallBV)
         else
           Future.successful(())
-        journeyNextUrl <- Future.successful(calculateJourneyNextUrl(aMatchingFailure, journeyConfig, journeyId))
-      } yield journeyNextUrl
-  }
-
-  private def calculateJourneyNextUrl(aMatchingFailure: KnownFactsMatchFailure, journeyConfig: JourneyConfig, journeyId: String): String = aMatchingFailure match {
-    case UnMatchableWithoutRetry => journeyConfig.fullContinueUrl(journeyId)
-    case DetailsNotFound |
-         DetailsMismatch |
-         UnMatchableWithRetry    => errorControllers.routes.CannotConfirmBusinessController.show(journeyId).url
+      } yield aMatchingFailure match {
+        case UnMatchableWithoutRetry =>
+          auditService.auditJourney(journeyId, journeyConfig)
+          journeyConfig.fullContinueUrl(journeyId)
+        case DetailsNotFound | DetailsMismatch | UnMatchableWithRetry =>
+          auditService.auditJourney(journeyId, journeyConfig)
+          errorControllers.routes.CannotConfirmBusinessController.show(journeyId).url
+      }
   }
 
   private def throwASaUtrNotDefinedException: Nothing =
