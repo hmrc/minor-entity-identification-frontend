@@ -150,7 +150,7 @@ class AuditServiceSpec
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
                 mockStorageService.retrieveRegistrationStatus(testJourneyId) returns Future.successful(Some(RegistrationFailed))
 
-                val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testTrustJourneyConfig))
+                val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()))
 
                 result.mustBe(())
 

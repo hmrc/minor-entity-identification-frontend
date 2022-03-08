@@ -37,9 +37,9 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         "the journey creation has been successful" in {
           enable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl, testRegime)(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourneyFromStub(testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(true)))(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig(true)))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -50,9 +50,9 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
           enable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
 
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl, testRegime)(NOT_FOUND, Json.obj())
+          stubCreateBusinessVerificationJourneyFromStub(testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(true)))(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig(true)))
 
           result mustBe Left(NotEnoughEvidence)
         }
@@ -60,9 +60,9 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           enable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourneyFromStub(testSautr, testJourneyId, testAccessibilityUrl, testRegime)(FORBIDDEN, Json.obj())
+          stubCreateBusinessVerificationJourneyFromStub(testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(true)))(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig(true)))
 
           result mustBe Left(UserLockedOut)
         }
@@ -73,9 +73,9 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         "the journey creation has been successful" in {
           disable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(CREATED, Json.obj("redirectUri" -> testContinueUrl))
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(true)))(CREATED, Json.obj("redirectUri" -> testContinueUrl))
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig(true)))
 
           result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrl))
         }
@@ -85,18 +85,18 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
         "the journey creation has been unsuccessful because BV cannot find the record" in {
           disable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(NOT_FOUND, Json.obj())
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(true)))(NOT_FOUND, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig(true)))
 
           result mustBe Left(NotEnoughEvidence)
         }
         "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
           disable(BusinessVerificationStub)
           enable(EnableFullTrustJourney)
-          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testAccessibilityUrl, testRegime))(FORBIDDEN, Json.obj())
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(true)))(FORBIDDEN, Json.obj())
 
-          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testAccessibilityUrl, testRegime))
+          val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig(true)))
 
           result mustBe Left(UserLockedOut)
         }

@@ -16,15 +16,9 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.when
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService
-
-import scala.concurrent.Future
 
 trait MockStorageService extends IdiomaticMockito with BeforeAndAfterEach {
   self: Suite =>
@@ -36,10 +30,4 @@ trait MockStorageService extends IdiomaticMockito with BeforeAndAfterEach {
     reset(mockStorageService)
   }
 
-  def mockRetrieveUtr(journeyId: String)
-                     (response: Future[Option[Utr]]): Unit =
-    when(mockStorageService.retrieveUtr(
-      ArgumentMatchers.eq(journeyId)
-    )(ArgumentMatchers.any[HeaderCarrier])
-    ).thenReturn(response)
 }

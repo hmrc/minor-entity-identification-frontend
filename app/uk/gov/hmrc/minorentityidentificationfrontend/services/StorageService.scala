@@ -91,6 +91,7 @@ class StorageService @Inject()(connector: StorageConnector) {
       optIdentifiersMatch <- retrieveIdentifiersMatch(journeyId)
       optOfficePostcode <- retrieveOfficePostcode(journeyId)
       optBVStatus <- retrieveBusinessVerificationStatus(journeyId)
+      optRegistrationStatus <- retrieveRegistrationStatus(journeyId)
     } yield {
 
       val optCharityHMRCReferenceNumberBlock: JsObject = optCharityHMRCReferenceNumber match {
@@ -127,13 +128,20 @@ class StorageService @Inject()(connector: StorageConnector) {
 
       val businessVerificationStatusBlock: JsObject = {
         val value = optBVStatus match {
-          case None           => BusinessVerificationStatus.writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge)
+          case None => BusinessVerificationStatus.writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge)
           case Some(bvStatus) => BusinessVerificationStatus.writeForJourneyContinuation(bvStatus)
         }
         Json.obj("businessVerification" -> value)
       }
 
-      Json.obj("registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)) ++
+      val registrationValue: JsValue = {
+        optRegistrationStatus match {
+          case Some(regStatus) => Json.toJson(regStatus)(regFormat.writes)
+          case _ => Json.toJson(RegistrationNotCalled)(regFormat.writes)
+        }
+      }
+
+      Json.obj("registration" -> registrationValue) ++
         utrBlock ++
         overseasTaxIdentifiersBlock ++
         utrSaPostcodeBlock ++

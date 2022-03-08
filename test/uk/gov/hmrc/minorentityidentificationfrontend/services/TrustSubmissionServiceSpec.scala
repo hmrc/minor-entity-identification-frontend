@@ -24,7 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustController
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.SuccessfullyStored
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
-import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks.{MockAuditService, MockBusinessVerificationService, MockStorageService, MockValidateTrustKnownFactsService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,14 +35,16 @@ class TrustSubmissionServiceSpec
     with MockValidateTrustKnownFactsService
     with MockStorageService
     with MockBusinessVerificationService
-    with MockAuditService {
+    with MockAuditService
+    with MockRegistrationOrchestrationService {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   object TestSubmissionService extends TrustSubmissionService(mockValidateTrustKnownFactsService,
     mockStorageService,
     mockAuditService,
-    mockBusinessVerificationService)
+    mockBusinessVerificationService,
+    mockRegistrationOrchestrationService)
 
   "given businessVerificationCheck is true, submit" should {
     "create a BusinessVerificationJourney and return the businessVerificationUrl" when {
@@ -58,17 +60,11 @@ class TrustSubmissionServiceSpec
 
         mockBusinessVerificationService.createBusinessVerificationJourney(testJourneyId,
           testSautr,
-          testAccessibilityUrl,
-          testRegime) returns Future.successful(Some(testBusinessVerificationRedirectUrl))
+          testTrustJourneyConfig()) returns Future.successful(Some(testBusinessVerificationRedirectUrl))
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) returns Future.successful(())
-
-        val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
+        val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig()))
 
         result mustBe testBusinessVerificationRedirectUrl
-
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) was called
-
       }
     }
     "create a BusinessVerificationJourney and return the full journey continue url" when {
@@ -84,20 +80,16 @@ class TrustSubmissionServiceSpec
 
         mockBusinessVerificationService.createBusinessVerificationJourney(testJourneyId,
           testSautr,
-          testAccessibilityUrl,
-          testRegime) returns Future.successful(None)
+          testTrustJourneyConfig()) returns Future.successful(None)
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) returns Future.successful(())
+        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
 
-        val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
+        val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig()))
 
-        result mustBe testTrustJourneyConfig.fullContinueUrl(testJourneyId)
+        result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) was called
-
+        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
       }
-    }
-    "not create a BusinessVerificationJourney and return the full journey continue url" when {
       "TrustKnownFacts is UnMatchableWithoutRetry" in {
 
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
@@ -111,13 +103,13 @@ class TrustSubmissionServiceSpec
 
         mockStorageService.storeBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV) returns Future.successful(SuccessfullyStored)
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) returns Future.successful(())
+        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
 
-        val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
+        val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig()))
 
-        result mustBe testTrustJourneyConfig.fullContinueUrl(testJourneyId)
+        result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) was called
+        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
         mockBusinessVerificationService wasNever called
       }
     }
@@ -137,13 +129,13 @@ class TrustSubmissionServiceSpec
 
           mockStorageService.storeBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV) returns Future.successful(SuccessfullyStored)
 
-          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) returns Future.successful(())
+          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
 
-          val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
+          val result = await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig()))
 
           result mustBe errorRoutes.CannotConfirmBusinessController.show(testJourneyId).url
 
-          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig) was called
+          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
           mockBusinessVerificationService wasNever called
 
           reset(mockStorageService, mockBusinessVerificationService, mockAuditService)
@@ -163,7 +155,7 @@ class TrustSubmissionServiceSpec
           optCHRN = Some(testCHRN)) returns Future.successful(SuccessfulMatch)
 
         val theActualException: IllegalStateException = intercept[IllegalStateException] {
-          await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig))
+          await(TestSubmissionService.submit(testJourneyId, testTrustJourneyConfig()))
         }
 
         theActualException.getMessage mustBe "Error: SA UTR is not defined"
@@ -172,7 +164,7 @@ class TrustSubmissionServiceSpec
   }
 
   "given businessVerificationCheck is false, submit" should {
-    val trustJourneyConfigWithoutBVCheck = testTrustJourneyConfig.copy(businessVerificationCheck = false)
+    val trustJourneyConfigWithoutBVCheck = testTrustJourneyConfig().copy(businessVerificationCheck = false)
     "not create a BusinessVerificationJourney, not store BusinessVerificationStatus and return the full journey continue url" when {
       "TrustKnownFacts is SuccessfulMatch" in {
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
@@ -184,27 +176,26 @@ class TrustSubmissionServiceSpec
           optSaPostcode = Some(testSaPostcode),
           optCHRN = Some(testCHRN)) returns Future.successful(SuccessfulMatch)
 
+        mockRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), trustJourneyConfigWithoutBVCheck) returns Future.successful(Registered(testSafeId))
+
         mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) returns Future.successful(())
 
         val result = await(TestSubmissionService.submit(testJourneyId, trustJourneyConfigWithoutBVCheck))
 
-        result mustBe testTrustJourneyConfig.fullContinueUrl(testJourneyId)
-
+        result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
         mockStorageService.retrieveUtr(testJourneyId) was called
         mockStorageService.retrieveSaPostcode(testJourneyId) was called
         mockStorageService.retrieveCHRN(testJourneyId) was called
 
+        mockRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), trustJourneyConfigWithoutBVCheck) was called
+
         mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) was called
 
         mockBusinessVerificationService wasNever called
         mockStorageService wasNever calledAgain
-
       }
-    }
-    "not create a BusinessVerificationJourney, not store BusinessVerificationStatus and return the full journey continue url" when {
       "TrustKnownFacts is UnMatchableWithoutRetry" in {
-
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
         mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
         mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
@@ -218,7 +209,7 @@ class TrustSubmissionServiceSpec
 
         val result = await(TestSubmissionService.submit(testJourneyId, trustJourneyConfigWithoutBVCheck))
 
-        result mustBe testTrustJourneyConfig.fullContinueUrl(testJourneyId)
+        result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
         mockStorageService.retrieveUtr(testJourneyId) was called
         mockStorageService.retrieveSaPostcode(testJourneyId) was called
@@ -227,12 +218,10 @@ class TrustSubmissionServiceSpec
         mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) was called
         mockStorageService wasNever calledAgain
         mockBusinessVerificationService wasNever called
-
       }
     }
     "not create a BusinessVerificationJourney, not store BusinessVerificationStatus and return Cannot ConfirmBusiness Controller url" when {
       "TrustKnownFacts is one of DetailsNotFound, DetailsMismatch, UnMatchableWithRetry" in {
-
         List(DetailsNotFound, DetailsMismatch, UnMatchableWithRetry).foreach(knownFactsMatchFailure => {
 
           mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))

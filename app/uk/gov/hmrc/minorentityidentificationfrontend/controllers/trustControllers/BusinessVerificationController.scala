@@ -20,7 +20,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{BusinessVerificationService, JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -31,7 +31,8 @@ class BusinessVerificationController @Inject()(mcc: MessagesControllerComponents
                                                val authConnector: AuthConnector,
                                                businessVerificationService: BusinessVerificationService,
                                                journeyService: JourneyService,
-                                               storageService: StorageService
+                                               storageService: StorageService,
+                                               registrationOrchestrationService: RegistrationOrchestrationService
                                               )(implicit val executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
   def retrieveBusinessVerificationResult(journeyId: String): Action[AnyContent] = Action.async {
@@ -44,6 +45,8 @@ class BusinessVerificationController @Inject()(mcc: MessagesControllerComponents
                 journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
                 verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
                 _ <- storageService.storeBusinessVerificationStatus(journeyId, verificationStatus)
+                optSautr <- storageService.retrieveUtr(journeyId)
+                _ <- registrationOrchestrationService.register(journeyId, optSautr.map(_.value), journeyConfig)
               } yield {
                 SeeOther(journeyConfig.continueUrl + s"?journeyId=$journeyId")
               }

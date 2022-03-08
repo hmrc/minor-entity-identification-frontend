@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.{JsObject, JsValue, Json}
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{WiremockHelper, WiremockMethods}
-
 
 trait BusinessVerificationStub extends WiremockMethods {
 
@@ -40,26 +38,9 @@ trait BusinessVerificationStub extends WiremockMethods {
         body = body
       )
 
-  def stubCreateBusinessVerificationJourneyFromStub(sautr: String,
-                                                    journeyId: String,
-                                                    accessibilityUrl: String,
-                                                    regime: String
-                                                   )(status: Int,
-                                                     body: JsObject = Json.obj()): Unit = {
-
-    val postBody = Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
-      "origin" -> regime,
-      "identifiers" -> Json.arr(
-        Json.obj(
-          "saUtr" -> sautr
-        )
-      ),
-      "continueUrl" -> trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
-      "accessibilityStatementUrl" -> accessibilityUrl
-
-    )
-
-    when(method = POST, uri = "/identify-your-trust/test-only/business-verification/journey", postBody)
+  def stubCreateBusinessVerificationJourneyFromStub(expBody: JsObject)(status: Int,
+                                                                       body: JsObject = Json.obj()): Unit = {
+    when(method = POST, uri = "/identify-your-trust/test-only/business-verification/journey", expBody)
       .thenReturn(
         status = status,
         body = body
@@ -82,4 +63,3 @@ trait BusinessVerificationStub extends WiremockMethods {
     )
 
 }
-
