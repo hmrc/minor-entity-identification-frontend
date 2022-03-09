@@ -78,7 +78,7 @@ class CaptureOfficePostcodeControllerISpec extends ComponentSpecHelper
         ))
         enable(EnableFullUAJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubStoreOfficePostcode(testJourneyId, testOfficePostcode)(status = OK)
+        stubStorePostcode(testJourneyId, testOfficePostcode)(status = OK)
 
         lazy val result = post(s"/identify-your-unincorporated-association/$testJourneyId/registered-office-postcode")("officePostcode" -> testOfficePostcode)
 

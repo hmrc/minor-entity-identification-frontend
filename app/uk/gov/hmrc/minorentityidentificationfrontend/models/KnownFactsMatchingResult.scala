@@ -41,7 +41,7 @@ object KnownFactsMatchingResult {
   val DetailsNotFoundKey = "DetailsNotFound"
 
   implicit val format: Format[KnownFactsMatchingResult] = new Format[KnownFactsMatchingResult] {
-    override def writes(knownFactsMatchingResult: KnownFactsMatchingResult): JsObject = {
+    override def writes(knownFactsMatchingResult: KnownFactsMatchingResult): JsValue = {
       val knownFactsMatchingResultString = knownFactsMatchingResult match {
         case SuccessfulMatch => SuccessfulMatchKey
         case UnMatchableWithoutRetry => UnMatchableWithoutRetryKey
@@ -50,11 +50,11 @@ object KnownFactsMatchingResult {
         case DetailsNotFound => DetailsNotFoundKey
       }
 
-      Json.obj(KnownFactsMatchingResultKey -> knownFactsMatchingResultString)
+      JsString(knownFactsMatchingResultString)
     }
 
     override def reads(json: JsValue): JsResult[KnownFactsMatchingResult] =
-      (json \ KnownFactsMatchingResultKey).validate[String].collect(JsonValidationError("Invalid business validation state")) {
+      (json).validate[String].collect(JsonValidationError("Invalid Known Facts Matching Result")) {
         case SuccessfulMatchKey => SuccessfulMatch
         case UnMatchableWithRetryKey => UnMatchableWithRetry
         case UnMatchableWithoutRetryKey => UnMatchableWithoutRetry

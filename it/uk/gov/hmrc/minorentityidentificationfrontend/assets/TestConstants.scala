@@ -19,6 +19,9 @@ package uk.gov.hmrc.minorentityidentificationfrontend.assets
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{SuccessfulMatchKey, UnMatchableWithoutRetryKey}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{RegisteredKey, RegistrationNotCalledKey, registeredBusinessPartnerIdKey, registrationStatusKey}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig, TrustKnownFacts}
 
 import java.util.UUID
@@ -29,6 +32,7 @@ object TestConstants {
   val testInternalId: String = UUID.randomUUID().toString
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
   val testSautr: String = "1234567890"
+  val testCtutr: String = "1000000001"
   val testSaPostcode: String = "AA00 0AA"
   val testPostcode: String = "AA1 1AA"
   val testOfficePostcode: String = "AA22 2AA"
@@ -65,19 +69,54 @@ object TestConstants {
   def testOverseasCompanyJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(businessEntity = OverseasCompany, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
-  val testUtr: String = "1234567890"
-  val testCtutr: String = "1234500000"
-  val testUtrType: String = "sautr"
-  val testCtutrType: String = "ctutr"
-
-  val testUtrJson: JsObject = Json.obj(
-    "type" -> testUtrType,
-    "value" -> testUtr
+  val testSautrJson: JsObject = Json.obj(
+    "type" -> "sautr",
+    "value" -> testSautr
   )
 
   val testCtutrJson: JsObject = Json.obj(
-    "type" -> testCtutrType,
+    "type" -> "ctutr",
     "value" -> testCtutr
+  )
+
+  val testTrustJourneyDataJson: JsObject = Json.obj(
+    "utr" -> testSautrJson,
+    "chrn" -> testCHRN,
+    "postcode" -> testSaPostcode,
+    "identifiersMatch" -> SuccessfulMatchKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey),
+    "registration" -> Json.obj(
+      registrationStatusKey -> RegisteredKey,
+      registeredBusinessPartnerIdKey -> testSafeId)
+  )
+
+  val testLegacyJourneyDataJson: JsObject = Json.obj(
+    "identifiersMatch" -> UnMatchableWithoutRetryKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
+    "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
+  )
+
+  val testUAJourneyDataJson: JsObject = Json.obj(
+    "utr" -> testCtutrJson,
+    "chrn" -> testCHRN,
+    "postcode" -> testSaPostcode,
+    "identifiersMatch" -> SuccessfulMatchKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey),
+    "registration" -> Json.obj(
+      registrationStatusKey -> RegisteredKey,
+      registeredBusinessPartnerIdKey -> testSafeId)
+  )
+
+  def testOverseasJourneyDataJson(utrBlock: JsObject): JsObject = Json.obj(
+    "utr" -> utrBlock,
+    "identifiersMatch" -> UnMatchableWithoutRetryKey,
+    "businessVerification" -> Json.obj(
+      "verificationStatus" -> "UNCHALLENGED"
+    ),
+    "registration" -> Json.obj(
+      "registrationStatus" -> "REGISTRATION_NOT_CALLED"
+    ),
+    "overseas" -> testOverseasTaxIdentifiersJson
   )
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testPostcode), Some(testSaPostcode), isAbroad = false)
@@ -211,8 +250,6 @@ object TestConstants {
     "registeredBusinessPartnerId" -> testSafeId)
 
   val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-
-  def testIdentifiersMatchJson(identifiersMatchValue: String): JsObject = Json.obj("identifiersMatch" -> identifiersMatchValue)
 
   def testVerificationStatusJson(verificationStatusValue: String): JsObject =
     Json.obj("verificationStatus" -> verificationStatusValue)

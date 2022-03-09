@@ -78,7 +78,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
         ))
         enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubStoreSaPostcode(testJourneyId, testSaPostcode)(status = OK)
+        stubStorePostcode(testJourneyId, testSaPostcode)(status = OK)
 
         lazy val result = post(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")("saPostcode" -> testSaPostcode)
 
@@ -135,7 +135,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
         ))
         enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRemoveSaPostcode(testJourneyId)(NO_CONTENT)
+        stubRemovePostcode(testJourneyId)(NO_CONTENT)
 
         val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
 
@@ -154,7 +154,7 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
         ))
         enable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRemoveSaPostcode(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")
+        stubRemovePostcode(testJourneyId)(INTERNAL_SERVER_ERROR, "Failed to remove field")
 
         val result = get(s"/identify-your-trust/$testJourneyId/no-self-assessment-postcode")
 

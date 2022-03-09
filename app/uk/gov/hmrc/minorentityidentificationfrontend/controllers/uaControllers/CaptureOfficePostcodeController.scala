@@ -76,7 +76,7 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
                     ))
                 },
               postcode =>
-                storageService.storeOfficePostcode(journeyId, postcode).map {
+                storageService.storePostcode(journeyId, postcode).map {
                   _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
                 }
             )

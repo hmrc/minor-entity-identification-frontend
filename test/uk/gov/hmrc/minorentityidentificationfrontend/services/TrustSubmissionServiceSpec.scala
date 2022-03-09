@@ -50,7 +50,7 @@ class TrustSubmissionServiceSpec
     "create a BusinessVerificationJourney and return the businessVerificationUrl" when {
       "TrustKnownFacts is SuccessfulMatch and BV creates a businessVerificationUrl" in {
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
         mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
         mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -70,7 +70,7 @@ class TrustSubmissionServiceSpec
     "create a BusinessVerificationJourney and return the full journey continue url" when {
       "TrustKnownFacts is SuccessfulMatch but BV somehow fails" in {
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
         mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
         mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -93,7 +93,7 @@ class TrustSubmissionServiceSpec
       "TrustKnownFacts is UnMatchableWithoutRetry" in {
 
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
         mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
         mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -119,7 +119,7 @@ class TrustSubmissionServiceSpec
         List(DetailsNotFound, DetailsMismatch, UnMatchableWithRetry).foreach(knownFactsMatchFailure => {
 
           mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-          mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+          mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
           mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
           mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -146,7 +146,7 @@ class TrustSubmissionServiceSpec
     "throw an exception" when {
       "SuccessfulMatch but SaUtr is not defined" in {
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(None)
-        mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
         mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
         mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -168,7 +168,7 @@ class TrustSubmissionServiceSpec
     "not create a BusinessVerificationJourney, not store BusinessVerificationStatus and return the full journey continue url" when {
       "TrustKnownFacts is SuccessfulMatch" in {
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
         mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
         mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -185,7 +185,7 @@ class TrustSubmissionServiceSpec
         result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
         mockStorageService.retrieveUtr(testJourneyId) was called
-        mockStorageService.retrieveSaPostcode(testJourneyId) was called
+        mockStorageService.retrievePostcode(testJourneyId) was called
         mockStorageService.retrieveCHRN(testJourneyId) was called
 
         mockRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), trustJourneyConfigWithoutBVCheck) was called
@@ -197,7 +197,7 @@ class TrustSubmissionServiceSpec
       }
       "TrustKnownFacts is UnMatchableWithoutRetry" in {
         mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
         mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
         mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -212,7 +212,7 @@ class TrustSubmissionServiceSpec
         result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
         mockStorageService.retrieveUtr(testJourneyId) was called
-        mockStorageService.retrieveSaPostcode(testJourneyId) was called
+        mockStorageService.retrievePostcode(testJourneyId) was called
         mockStorageService.retrieveCHRN(testJourneyId) was called
 
         mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) was called
@@ -225,7 +225,7 @@ class TrustSubmissionServiceSpec
         List(DetailsNotFound, DetailsMismatch, UnMatchableWithRetry).foreach(knownFactsMatchFailure => {
 
           mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-          mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+          mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
           mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
 
           mockValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
@@ -240,7 +240,7 @@ class TrustSubmissionServiceSpec
           result mustBe errorRoutes.CannotConfirmBusinessController.show(testJourneyId).url
 
           mockStorageService.retrieveUtr(testJourneyId) was called
-          mockStorageService.retrieveSaPostcode(testJourneyId) was called
+          mockStorageService.retrievePostcode(testJourneyId) was called
           mockStorageService.retrieveCHRN(testJourneyId) was called
 
           mockStorageService wasNever calledAgain

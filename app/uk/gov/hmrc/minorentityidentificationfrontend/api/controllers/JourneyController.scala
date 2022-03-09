@@ -100,12 +100,10 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
     implicit req =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            journeyDataJson <- storageService.retrieveAllData(journeyId, journeyConfig)
-          } yield
-            Ok(journeyDataJson)
-        case None                 =>
+          journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
+            journeyConfig =>  storageService.retrieveAllData(journeyId, journeyConfig).map(journeyDataJson => Ok(journeyDataJson))
+          }
+        case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }

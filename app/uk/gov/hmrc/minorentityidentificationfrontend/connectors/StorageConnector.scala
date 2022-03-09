@@ -19,7 +19,10 @@ package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 import play.api.libs.json.{JsObject, Reads, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReadsInstances}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.RetrieveTrustDetailsHttpParser.RetrieveTrustDetailsHttpReads
+import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.RetrieveUADetailsHttpParser.RetrieveUADetailsHttpReads
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.{SuccessfullyRemoved, SuccessfullyStored}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{OverseasCompanyDetails, TrustDetails, UADetails}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,6 +40,15 @@ class StorageConnector @Inject()(http: HttpClient,
 
   def retrieveAllDataFields(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[JsObject]] =
     http.GET[Option[JsObject]](s"${appConfig.minorEntityIdentificationUrl(journeyId)}")
+
+  def retrieveOverseasDetails(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[OverseasCompanyDetails]] =
+    http.GET[Option[OverseasCompanyDetails]](appConfig.minorEntityIdentificationUrl(journeyId))
+
+  def retrieveTrustsDetails(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[TrustDetails]] =
+    http.GET[Option[TrustDetails]](appConfig.minorEntityIdentificationUrl(journeyId))(RetrieveTrustDetailsHttpReads, hc, ec)
+
+  def retrieveUADetails(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[UADetails]] =
+    http.GET[Option[UADetails]](appConfig.minorEntityIdentificationUrl(journeyId))(RetrieveUADetailsHttpReads, hc, ec)
 
   def storeDataField[DataType](journeyId: String,
                                dataKey: String,

@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, CheckYourAnswers => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testSaPostcode, testUtr}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testSaPostcode, testSautr}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -44,7 +44,7 @@ trait TrustCheckYourAnswersSpecificViewTests {
         val utrRow = summaryListRows.head
 
         utrRow.getSummaryListQuestion mustBe messages.utr
-        utrRow.getSummaryListAnswer mustBe testUtr
+        utrRow.getSummaryListAnswer mustBe testSautr
         utrRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSautrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }

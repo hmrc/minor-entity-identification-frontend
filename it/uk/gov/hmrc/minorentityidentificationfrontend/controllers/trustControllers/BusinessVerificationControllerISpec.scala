@@ -21,6 +21,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.SuccessfulMatchKey
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationPass, Registered}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
@@ -50,7 +51,7 @@ class BusinessVerificationControllerISpec extends AuditEnabledSpecHelper
           enable(EnableFullTrustJourney)
           enable(BusinessVerificationStub)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+          stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
           stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, testBusinessVerificationPassJson)
           stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
@@ -58,9 +59,9 @@ class BusinessVerificationControllerISpec extends AuditEnabledSpecHelper
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchSuccessfulMatchJson)
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, SuccessfulMatchKey)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-          stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+          stubRetrievePostcode(testJourneyId)(OK, testSaPostcode)
 
           lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
 
@@ -104,7 +105,7 @@ class BusinessVerificationControllerISpec extends AuditEnabledSpecHelper
           ))
           enable(EnableFullTrustJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+          stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
           stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, testBusinessVerificationPassJson)
           stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
@@ -112,9 +113,9 @@ class BusinessVerificationControllerISpec extends AuditEnabledSpecHelper
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchSuccessfulMatchJson)
+          stubRetrieveIdentifiersMatch(testJourneyId)(OK, SuccessfulMatchKey)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-          stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
+          stubRetrievePostcode(testJourneyId)(OK, testSaPostcode)
 
           lazy val result = get(s"/identify-your-trust/$testJourneyId/business-verification-result" + s"?journeyId=$testBusinessVerificationJourneyId")
 

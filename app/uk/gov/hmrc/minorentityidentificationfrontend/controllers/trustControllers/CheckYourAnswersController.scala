@@ -50,7 +50,7 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
             for {
               journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
               optUtr <- storageService.retrieveUtr(journeyId)
-              optSaPostcode <- storageService.retrieveSaPostcode(journeyId)
+              optSaPostcode <- storageService.retrievePostcode(journeyId)
               optCharityHRMCReferenceNumber <- storageService.retrieveCHRN(journeyId)
               summaryRows = rowBuilder.buildSummaryListRows(journeyId, optUtr, optSaPostcode, optCharityHRMCReferenceNumber)
             } yield Ok(view(

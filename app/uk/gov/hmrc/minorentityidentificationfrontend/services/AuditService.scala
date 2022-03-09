@@ -97,7 +97,7 @@ class AuditService @Inject()(appConfig: AppConfig,
                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
 
     val retrieveSaUtr = storageService.retrieveUtr(journeyId)
-    val retrieveSaPostCode = storageService.retrieveSaPostcode(journeyId)
+    val retrieveSaPostCode = storageService.retrievePostcode(journeyId)
     val retrieveCHRN = storageService.retrieveCHRN(journeyId)
     val retrieveIdentifiersMatch = storageService.retrieveIdentifiersMatch(journeyId)
     val retrieveBusinessVerificationStatus = storageService.retrieveBusinessVerificationStatus(journeyId)
