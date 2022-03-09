@@ -196,7 +196,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         result must have {
           httpStatus(SEE_OTHER)
-          redirectUri(errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
+          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
         }
       }
     }
