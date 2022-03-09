@@ -83,13 +83,13 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveTrustsDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     connector.retrieveTrustsDetails(journeyId).map {
       case Some(trustDetails) => TrustDetails.writesForJourneyEnd(trustDetails, journeyConfig.businessVerificationCheck)
-      case None => throw new InternalServerException("No Overseas Company data stored for journeyId: " + journeyId)
+      case None => throw new InternalServerException("No Trusts journey data stored for journeyId: " + journeyId)
     }
 
   def retrieveUADetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     connector.retrieveUADetails(journeyId).map {
       case Some(uaDetails) => UADetails.writesForJourneyEnd(uaDetails, journeyConfig.businessVerificationCheck)
-      case None => throw new InternalServerException("No Overseas Company data stored for journeyId: " + journeyId)
+      case None => throw new InternalServerException("No UA journey data stored for journeyId: " + journeyId)
     }
 
   def retrieveAllData(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] = {

@@ -21,8 +21,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustController
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{SuccessfulMatchKey, UnMatchableWithoutRetryKey}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{RegisteredKey, RegistrationNotCalledKey, registeredBusinessPartnerIdKey, registrationStatusKey}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, Overseas, PageConfig, TrustKnownFacts}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus._
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import java.util.UUID
 

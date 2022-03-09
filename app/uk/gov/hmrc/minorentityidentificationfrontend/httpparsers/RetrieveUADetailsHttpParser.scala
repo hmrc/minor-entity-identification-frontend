@@ -30,12 +30,12 @@ object RetrieveUADetailsHttpParser {
           response.json.validate[UADetails](reads) match {
             case JsSuccess(uaDetails, _) => Some(uaDetails)
             case JsError(errors) =>
-              throw new InternalServerException(s"`Failed to read Trust Details with the following error/s: $errors")
+              throw new InternalServerException(s"`Failed to read UA Details with the following error/s: $errors")
           }
         case NOT_FOUND =>
           None
         case status =>
-          throw new InternalServerException(s"Unexpected status from Trust Details retrieval. Status returned - $status")
+          throw new InternalServerException(s"Unexpected status from UA Details retrieval. Status returned - $status")
       }
     }
   }
