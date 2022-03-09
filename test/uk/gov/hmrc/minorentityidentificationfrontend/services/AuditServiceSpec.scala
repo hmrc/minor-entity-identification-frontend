@@ -114,7 +114,7 @@ class AuditServiceSpec
               "audit a successful registration correctly" in {
                 mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-                mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+                mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(SuccessfulMatch))
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
@@ -139,7 +139,7 @@ class AuditServiceSpec
 
                 mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-                mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+                mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(SuccessfulMatch))
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
@@ -168,7 +168,7 @@ class AuditServiceSpec
 
                 mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-                mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+                mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(SuccessfulMatch))
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationFail))
@@ -196,7 +196,7 @@ class AuditServiceSpec
 
                 mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-                mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+                mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(SuccessfulMatch))
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId).returns(Future.successful(
@@ -226,7 +226,7 @@ class AuditServiceSpec
                 mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns
                   Future.successful(testJourneyConfig(Trusts, businessVerificationCheck = false))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-                mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+                mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(SuccessfulMatch))
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(None)
@@ -252,7 +252,7 @@ class AuditServiceSpec
                 mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns
                   Future.successful(testJourneyConfig(Trusts, businessVerificationCheck = false))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-                mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+                mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(SuccessfulMatch))
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(None)
@@ -283,7 +283,7 @@ class AuditServiceSpec
 
                 mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
                 mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-                mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(None)
+                mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
                 mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(SuccessfulMatch))
                 mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
@@ -313,7 +313,7 @@ class AuditServiceSpec
 
               mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
               mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-              mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+              mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
               mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
               mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(DetailsMismatch))
               mockStorageService.retrieveBusinessVerificationStatus(testJourneyId).returns(
@@ -343,7 +343,7 @@ class AuditServiceSpec
 
               mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
               mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr1)))
-              mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+              mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
               mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
               mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(DetailsNotFound))
               mockStorageService.retrieveBusinessVerificationStatus(testJourneyId).returns(
@@ -376,7 +376,7 @@ class AuditServiceSpec
 
               mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
               mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(None)
-              mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(None)
+              mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(None)
               mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
               mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(UnMatchableWithoutRetry))
               mockStorageService.retrieveBusinessVerificationStatus(testJourneyId).returns(
@@ -404,7 +404,7 @@ class AuditServiceSpec
 
               mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
               mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(None)
-              mockStorageService.retrieveSaPostcode(testJourneyId) returns Future.successful(None)
+              mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(None)
               mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
               mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(UnMatchableWithRetry))
               mockStorageService.retrieveBusinessVerificationStatus(testJourneyId).returns(

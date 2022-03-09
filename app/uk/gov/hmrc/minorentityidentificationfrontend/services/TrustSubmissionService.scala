@@ -34,7 +34,7 @@ class TrustSubmissionService @Inject()(validateTrustKnownFactsService: ValidateT
             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
     for {
       optSaUtr <- storageService.retrieveUtr(journeyId)
-      optSaPostcode <- storageService.retrieveSaPostcode(journeyId)
+      optSaPostcode <- storageService.retrievePostcode(journeyId)
       optCHRN <- storageService.retrieveCHRN(journeyId)
       matchingResult <- validateTrustKnownFactsService.validateTrustKnownFacts(journeyId, optSaUtr.map(_.value), optSaPostcode, optCHRN)
       redirectUrl <- handleBusinessVerificationCheck(journeyId, matchingResult, optSaUtr.map(_.value), journeyConfig)

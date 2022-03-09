@@ -71,9 +71,9 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
           testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubStoreUtr(testJourneyId, Sautr(testUtr))(OK)
+        stubStoreUtr(testJourneyId, Sautr(testSautr))(OK)
 
-        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")("utr" -> testUtr)
+        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")("utr" -> testSautr)
 
         result must have(
           httpStatus(SEE_OTHER),

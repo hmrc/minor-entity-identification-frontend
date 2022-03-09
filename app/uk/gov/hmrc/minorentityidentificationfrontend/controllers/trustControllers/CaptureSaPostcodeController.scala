@@ -76,7 +76,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
                     ))
                 },
               postcode =>
-                storageService.storeSaPostcode(journeyId, postcode).map {
+                storageService.storePostcode(journeyId, postcode).map {
                   _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
                 }
             )
@@ -90,7 +90,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
     implicit request =>
       if(isEnabled(EnableFullTrustJourney)) {
         authorised() {
-          storageService.removeSaPostcode(journeyId).map {
+          storageService.removePostcode(journeyId).map {
             _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
           }
         }

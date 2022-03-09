@@ -19,8 +19,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testOverseasTaxIdentifiers, testSautr}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, CheckYourAnswers => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testOverseasTaxIdentifiers, testUtr}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -44,7 +44,7 @@ trait OverseasCheckYourAnswersSpecificViewTests {
         val utrRow = summaryListRows.head
 
         utrRow.getSummaryListQuestion mustBe messages.utr
-        utrRow.getSummaryListAnswer mustBe testUtr
+        utrRow.getSummaryListAnswer mustBe testSautr
         utrRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureUtrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }

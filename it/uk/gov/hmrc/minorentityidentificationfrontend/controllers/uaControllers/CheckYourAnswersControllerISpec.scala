@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 
-import play.api.http.Status.OK
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
@@ -48,7 +47,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
-          stubRetrieveOfficePostcode(testJourneyId)(OK, testOfficePostcode)
+          stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
 
           get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
@@ -77,7 +76,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRetrieveUtr(testJourneyId)(NOT_FOUND)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-          stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
+          stubRetrievePostcode(testJourneyId)(NOT_FOUND)
 
           get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
         }
@@ -104,7 +103,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-          stubRetrieveOfficePostcode(testJourneyId)(OK, testOfficePostcode)
+          stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
 
           get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
         }
@@ -168,7 +167,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       ))
 
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
+      stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
       stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
 
       val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()

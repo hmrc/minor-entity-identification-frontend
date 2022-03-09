@@ -16,20 +16,18 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
-import play.api.libs.json.{JsObject, Json, __}
-import play.api.libs.ws.WSResponse
+import play.api.libs.json.{JsObject, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.stubAudit
 
-class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with AuthStub with StorageStub with FeatureSwitching {
+class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub with AuthStub with StorageStub with FeatureSwitching {
 
   lazy val repo: JourneyConfigRepository = app.injector.instanceOf[JourneyConfigRepository]
 
@@ -41,11 +39,12 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "accessibilityUrl" -> testAccessibilityUrl,
       "businessVerificationCheck" -> true,
       "regime" -> testRegime
-      )
+    )
 
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+      stubAudit()
 
       lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
 
@@ -57,88 +56,79 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
     "redirect to Sign In page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
+        stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-                        "?continue_url=%2Fminor-entity-identification%2Fapi%2Foverseas-company-journey" +
-                        "&origin=minor-entity-identification-frontend"
-                      )
+            "?continue_url=%2Fminor-entity-identification%2Fapi%2Foverseas-company-journey" +
+            "&origin=minor-entity-identification-frontend"
           )
+        )
       }
     }
 
     "return an error" when {
       "we have no internalId after auth" in {
         stubAuth(OK, body = JsObject.empty)
+        stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
 
         result.status mustBe INTERNAL_SERVER_ERROR
-
       }
     }
 
   }
 
-  "GET /api/journey/:journeyId" should {
-    "return sautr, business registration status, registration status, postcode, chrn and identifiersMatch true" when {
-      "they exist in the database and KnownFactsMatchingResult is SuccessfulMatch" in {
-
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
+  "GET /api/journey/:journeyId" when {
+    "the business entity is a trust" should {
+      "return the correct json" when {
+        "the user is on the new journey flow" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
           ))
 
-        val testDetailsJson = Json.obj(
-          "sautr" -> "1234567890",
-          "identifiersMatch" -> true,
-          "businessVerification" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-          "registration" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
-          "saPostcode" -> testSaPostcode,
-          "chrn" -> testCHRN
+          val testDetailsJson = Json.obj(
+            "sautr" -> "1234567890",
+            "identifiersMatch" -> true,
+            "businessVerification" -> Json.obj("verificationStatus" -> "PASS"),
+            "registration" -> Json.obj("registrationStatus" -> "REGISTERED",
+              "registeredBusinessPartnerId" -> testSafeId),
+            "saPostcode" -> testSaPostcode,
+            "chrn" -> testCHRN
           )
 
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
-        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-        stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
-        stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson)
+          stubAudit()
 
-        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
-        result.status mustBe OK
-        result.json mustBe testDetailsJson
+          result.status mustBe OK
+          result.json mustBe testDetailsJson
+        }
       }
-    }
-
-    "return the business verification status, registration status and identifiersMatch false (no sautr, no postcode, no chrn)" when {
-      "the utr, SAPostcode, CHRN and identifiersMatch do not exist in the database" in {
-
+      "the user is on the legacy journey" in {
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
-          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
-          ))
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
 
         val testDetailsJson = Json.obj(
           "identifiersMatch" -> false,
           "businessVerification" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
           "registration" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-          )
+        )
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveSaPostcode(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(status = NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testLegacyJourneyDataJson)
+        stubAudit()
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
@@ -146,219 +136,122 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
         result.json mustBe testDetailsJson
       }
     }
-
-    "map verificationStatus in the right way for all journey types:" when {
-
-      def extractActualBusinessVerificationStatus(response: WSResponse): String = response.json.as[String]((__ \ "businessVerification" \ "verificationStatus").read)
-
-      "journey config BVCheck is true and BV is BusinessVerificationPass in the DB it returns PASS" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
-          ))
-
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
-        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-        stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
-
-        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, body = testBusinessVerificationPassJson)
-
-        lazy val result: WSResponse = get(s"/minor-entity-identification/api/journey/$testJourneyId")
-
-        result.status mustBe OK
-
-        extractActualBusinessVerificationStatus(response = result) mustBe "PASS"
-
-      }
-
-      "journey config BVCheck is true and BV is BusinessVerificationFail in the DB it returns FAIL" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
-          ))
-
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
-        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-        stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
-
-        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationFailJson)
-
-        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
-
-        result.status mustBe OK
-
-        extractActualBusinessVerificationStatus(response = result) mustBe "FAIL"
-
-      }
-
-      "journey config BVCheck is true and BV is BusinessVerificationNotEnoughInformationToCallBV in the DB it returns UNCHALLENGED" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
-          ))
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
-        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-        stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
-
-        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToChallengeJson)
-
-        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
-
-        result.status mustBe OK
-
-        extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
-
-      }
-
-      "journey config BVCheck is true and BV is BusinessVerificationNotEnoughInformationToChallenge in the DB it returns UNCHALLENGED" in {
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
-          ))
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(OK, testUtrJson)
-        stubRetrieveSaPostcode(testJourneyId)(OK, testSaPostcode)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-        stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(KnownFactsMatchingResult.SuccessfulMatchKey))
-
-        stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
-
-        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
-
-        result.status mustBe OK
-
-        extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
-
-      }
-
-      "journey config BVCheck is true and BV is not present in the DB it returns UNCHALLENGED (for all entity: OverseasCompany, UnincorporatedAssociation and Trust)" in {
-
-        List(
-          () => testOverseasCompanyJourneyConfig(businessVerificationCheck = true),
-          () => testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true),
-          () => testTrustsJourneyConfig(businessVerificationCheck = true)
-          ).foreach(businessEntityLoader => {
-
+    "the business entity is an Unincorporated Entity" should {
+      "return the correct json" when {
+        "the user is on the new journey flow" in {
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
-            businessEntityLoader()
-            ))
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          val testDetailsJson = Json.obj(
+            "ctutr" -> "1000000001",
+            "identifiersMatch" -> true,
+            "businessVerification" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+            "registration" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+            "ctPostcode" -> testSaPostcode,
+            "chrn" -> testCHRN
+          )
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          // we just want some data ... this test is related only to a specific piece of json
-          stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-          stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
-          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-          stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-          stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
-
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+          stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson)
+          stubAudit()
 
           lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
           result.status mustBe OK
-
-          extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
-
-          await(journeyConfigRepository.drop)
-
-        })
+          result.json mustBe testDetailsJson
+        }
       }
+      "the user is on the legacy journey" in {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testTrustsJourneyConfig(businessVerificationCheck = true)
+        ))
 
-      "journey config BVCheck is false it returns not businessVerification json at all (for all entities: OverseasCompany, UnincorporatedAssociation and Trust)" in {
-        List(
-          () => testOverseasCompanyJourneyConfig(businessVerificationCheck = false),
-          () => testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = false),
-          () => testTrustsJourneyConfig(businessVerificationCheck = false)
-          ).foreach(businessEntityLoader => {
+        val testDetailsJson = Json.obj(
+          "identifiersMatch" -> false,
+          "businessVerification" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+          "registration" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
+        )
 
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            businessEntityLoader()
-            ))
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveEntityDetails(testJourneyId)(OK, testLegacyJourneyDataJson)
+        stubAudit()
 
-          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          // we just want some data ... this test is related only to a specific piece of json
-          stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-          stubRetrieveSaPostcode(testJourneyId)(NOT_FOUND)
-          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-          stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-          stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+        lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
-          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
-
-          result.status mustBe OK
-
-          result.json.toString() mustNot include("businessVerification")
-          result.json.toString() mustNot include("verificationStatus")
-
-          await(journeyConfigRepository.drop)
-        })
+        result.status mustBe OK
+        result.json mustBe testDetailsJson
       }
     }
-
-    "return identifiersMatch false" when {
-      "identifiersMatch is different from SuccessfulMatch in the DB" in {
-
-        List(UnMatchableWithoutRetryKey, UnMatchableWithRetryKey, DetailsMismatchKey, DetailsNotFoundKey).foreach(aNonSuccessfulMatch => {
-
+    "the business entity is an Overseas Company" should {
+      "return the correct json" when {
+        "the user has a ctutr" in {
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
             testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
-            ))
+          ))
+
+          val testDetailsJson = Json.obj(
+            "ctutr" -> testCtutr,
+            "identifiersMatch" -> false,
+            "businessVerification" -> Json.obj(
+              "verificationStatus" -> "UNCHALLENGED"
+            ),
+            "registration" -> Json.obj(
+              "registrationStatus" -> "REGISTRATION_NOT_CALLED"
+            ),
+            "overseas" -> testOverseasTaxIdentifiersJson
+          )
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-
-          // we just want some data ... this test is related only to a specific piece of json
-          stubRetrieveUtr(testJourneyId)(status = NOT_FOUND)
-          stubRetrieveSaPostcode(testJourneyId)(status = NOT_FOUND)
-          stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
-          stubRetrieveOverseasTaxIdentifiers(testJourneyId)(status = NOT_FOUND)
-          stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-          stubRetrieveOfficePostcode(testJourneyId)(NOT_FOUND)
-
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, testIdentifiersMatchJson(aNonSuccessfulMatch))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyDataJson(testCtutrJson))
+          stubAudit()
 
           lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
           result.status mustBe OK
+          result.json mustBe testDetailsJson
+        }
+        "the user has a sautr" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
+          ))
 
-          result.json.as[Boolean]((__ \ "identifiersMatch").read[Boolean]) mustBe false
+          val testDetailsJson = Json.obj(
+            "sautr" -> testSautr,
+            "identifiersMatch" -> false,
+            "businessVerification" -> Json.obj(
+              "verificationStatus" -> "UNCHALLENGED"
+            ),
+            "registration" -> Json.obj(
+              "registrationStatus" -> "REGISTRATION_NOT_CALLED"
+            ),
+            "overseas" -> testOverseasTaxIdentifiersJson
+          )
 
-          await(journeyConfigRepository.drop)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyDataJson(testSautrJson))
+          stubAudit()
 
-        })
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
+          result.status mustBe OK
+          result.json mustBe testDetailsJson
+        }
       }
     }
 
     "redirect to Sign In Page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
+        stubAudit()
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
@@ -374,11 +267,11 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
     "return an error" when {
       "we have no internalId after auth" in {
         stubAuth(OK, body = JsObject.empty)
+        stubAudit()
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
 
         result.status mustBe INTERNAL_SERVER_ERROR
-
       }
     }
   }
@@ -399,6 +292,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
       stubRetrieveUtr(testJourneyId)(NOT_FOUND)
       stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+      stubAudit()
 
       lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
@@ -413,6 +307,10 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       disable(EnableFullTrustJourney)
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+      stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
+      stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+      stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+      stubAudit()
 
       lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
@@ -426,6 +324,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
     "redirect to Sign In page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
+        stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
@@ -443,6 +342,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "the user does not have an internal ID" in {
         stubAuth(OK, successfulAuthResponse(None))
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
@@ -459,12 +359,16 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "accessibilityUrl" -> testAccessibilityUrl,
       "businessVerificationCheck" -> true,
       "regime" -> testRegime
-      )
+    )
     "return a created journey" in {
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       stubRetrieveUtr(testJourneyId)(NOT_FOUND)
       stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
       stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+      stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
+      stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+      stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+      stubAudit()
 
       lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
 
@@ -473,22 +377,22 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       result.status mustBe CREATED
 
       await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
-
     }
 
     "redirect to Sign In page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
+        stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-                        "?continue_url=%2Fminor-entity-identification%2Fapi%2Funincorporated-association-journey" +
-                        "&origin=minor-entity-identification-frontend"
-                      )
+            "?continue_url=%2Fminor-entity-identification%2Fapi%2Funincorporated-association-journey" +
+            "&origin=minor-entity-identification-frontend"
           )
+        )
       }
     }
 
@@ -496,6 +400,7 @@ class JourneyControllerISpec extends ComponentSpecHelper with JourneyStub with A
       "the user does not have an internal ID" in {
         stubAuth(OK, successfulAuthResponse(None))
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
 

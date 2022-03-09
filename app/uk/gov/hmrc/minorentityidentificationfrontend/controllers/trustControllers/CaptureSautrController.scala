@@ -93,7 +93,7 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
         if(isEnabled(EnableFullTrustJourney)) {
           for {
             _ <- storageService.removeUtr(journeyId)
-            _ <- storageService.removeSaPostcode(journeyId)
+            _ <- storageService.removePostcode(journeyId)
           } yield
             Redirect(routes.CaptureCHRNController.show(journeyId))
         } else throw new InternalServerException("Trust journey is not enabled")

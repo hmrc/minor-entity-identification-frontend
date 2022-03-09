@@ -19,7 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testKnownFactsJson, testTrustKnownFactsResponse, testUtr}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testKnownFactsJson, testSautr, testTrustKnownFactsResponse}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.RetrieveTrustKnownFactsStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
@@ -34,16 +34,16 @@ class RetrieveTrustKnownFactsConnectorISpec extends ComponentSpecHelper with Ret
     "return Trust Known Facts" when {
       "the TrustVerificationStub feature switch is off" in {
         disable(TrustVerificationStub)
-        stubRetrieveTrustKnownFacts(testUtr)(OK, testKnownFactsJson)
-        val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr))
+        stubRetrieveTrustKnownFacts(testSautr)(OK, testKnownFactsJson)
+        val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr))
 
         result mustBe Some(testTrustKnownFactsResponse)
       }
       "the TrustVerificationStub feature switch is on" in {
         enable(TrustVerificationStub)
-        stubRetrieveTrustKnownFactsFromStub(testUtr)(OK, testKnownFactsJson)
+        stubRetrieveTrustKnownFactsFromStub(testSautr)(OK, testKnownFactsJson)
 
-        val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr))
+        val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr))
 
         result mustBe Some(testTrustKnownFactsResponse)
       }
@@ -51,18 +51,18 @@ class RetrieveTrustKnownFactsConnectorISpec extends ComponentSpecHelper with Ret
     "return None" when {
       "the Trust proxy endpoint returns 404" in {
         disable(TrustVerificationStub)
-        stubRetrieveTrustKnownFacts(testUtr)(NOT_FOUND)
+        stubRetrieveTrustKnownFacts(testSautr)(NOT_FOUND)
 
-        val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr))
+        val result = await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr))
 
         result mustBe None
       }
     }
     "throw an Internal Server Exception" in {
       disable(TrustVerificationStub)
-      stubRetrieveTrustKnownFacts(testUtr)(BAD_REQUEST)
+      stubRetrieveTrustKnownFacts(testSautr)(BAD_REQUEST)
 
-      intercept[InternalServerException](await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testUtr)))
+      intercept[InternalServerException](await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr)))
     }
   }
 }

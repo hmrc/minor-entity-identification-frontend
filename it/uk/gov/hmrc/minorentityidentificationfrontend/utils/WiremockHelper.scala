@@ -18,7 +18,6 @@ package uk.gov.hmrc.minorentityidentificationfrontend.utils
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, delete, equalTo, get, getRequestedFor, patch, post, postRequestedFor, put, putRequestedFor, stubFor, urlEqualTo, urlMatching, verify}
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -88,8 +87,8 @@ object WiremockHelper extends Eventually with IntegrationPatience {
     )
 
   def stubAudit(): Unit = {
-    stubPost("/write/audit", 200, "{}")
-    stubPost("/write/audit/merged", 200, "{}")
+    stubPost("/write/audit", 204, "{}")
+    stubPost("/write/audit/merged", 204, "{}")
   }
 
   def verifyPut(uri: String, optBody: Option[String] = None): Unit = {
@@ -105,7 +104,6 @@ object WiremockHelper extends Eventually with IntegrationPatience {
     verifyPost("/write/audit")
     verifyPost("/write/audit/merged")
   }
-
 
 }
 

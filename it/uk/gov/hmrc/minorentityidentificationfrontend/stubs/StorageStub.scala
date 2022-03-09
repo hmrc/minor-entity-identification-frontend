@@ -37,8 +37,8 @@ trait StorageStub extends WiremockMethods {
     when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/trustKnownFacts", expBody)
       .thenReturn(status = status)
 
-  def stubStoreIdentifiersMatch(journeyId: String, expBody: JsValue)(status: Int): Unit =
-    when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch", expBody)
+  def stubStoreIdentifiersMatch(journeyId: String, identifiersMatch: String)(status: Int): Unit =
+    when(method = PUT, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch", body = JsString(identifiersMatch))
       .thenReturn(status = status)
 
   def stubRetrieveUtr(journeyId: String)(status: Int, body: JsObject = Json.obj()): Unit =
@@ -76,33 +76,17 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
-  def stubStoreSaPostcode(journeyId: String, saPostcode: String)(status: Int): Unit =
+  def stubStorePostcode(journeyId: String, saPostcode: String)(status: Int): Unit =
     when(method = PUT,
-      uri = s"/minor-entity-identification/journey/$journeyId/saPostcode",
+      uri = s"/minor-entity-identification/journey/$journeyId/postcode",
       body = JsString(saPostcode)
     ).thenReturn(
       status = status
     )
 
-  def stubRemoveSaPostcode(journeyId: String)(status: Int, body: String = ""): Unit =
+  def stubRemovePostcode(journeyId: String)(status: Int, body: String = ""): Unit =
     when(method = DELETE,
-      uri = s"/minor-entity-identification/journey/$journeyId/saPostcode"
-    ).thenReturn(
-      status = status,
-      body = body
-    )
-
-  def stubStoreOfficePostcode(journeyId: String, officePostcode: String)(status: Int): Unit =
-    when(method = PUT,
-      uri = s"/minor-entity-identification/journey/$journeyId/officePostcode",
-      body = JsString(officePostcode)
-    ).thenReturn(
-      status = status
-    )
-
-  def stubRemoveOfficePostcode(journeyId: String)(status: Int, body: String = ""): Unit =
-    when(method = DELETE,
-      uri = s"/minor-entity-identification/journey/$journeyId/officePostcode"
+      uri = s"/minor-entity-identification/journey/$journeyId/postcode"
     ).thenReturn(
       status = status,
       body = body
@@ -116,20 +100,12 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
-  def stubRetrieveSaPostcode(journeyId: String)(status: Int, saPostcode: String = ""): Unit =
+  def stubRetrievePostcode(journeyId: String)(status: Int, postcode: String = ""): Unit =
     when(method = GET,
-      uri = s"/minor-entity-identification/journey/$journeyId/saPostcode"
+      uri = s"/minor-entity-identification/journey/$journeyId/postcode"
     ).thenReturn(
       status = status,
-      body = JsString(saPostcode)
-    )
-
-  def stubRetrieveOfficePostcode(journeyId: String)(status: Int, officePostcode: String = ""): Unit =
-    when(method = GET,
-      uri = s"/minor-entity-identification/journey/$journeyId/officePostcode"
-    ).thenReturn(
-      status = status,
-      body = JsString(officePostcode)
+      body = JsString(postcode)
     )
 
   def stubRemoveCHRN(journeyId: String)(status: Int, body: String = ""): Unit =
@@ -171,19 +147,18 @@ trait StorageStub extends WiremockMethods {
   def verifyRemoveCHRN(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/chrn")
 
-  def verifyRemoveOfficePostcode(journeyId: String): Unit =
-    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/officePostcode")
-
-  def verifyRemoveSaPostcode(journeyId: String): Unit =
-    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/saPostcode")
-
   def verifyRemoveUtr(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/utr")
 
-  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, identifiersMatchJson: JsObject = Json.obj()): Unit =
-    when(method = GET, uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch").thenReturn(
+  def verifyRemovePostcode(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/postcode")
+
+  def stubRetrieveIdentifiersMatch(journeyId: String)(status: Int, identifiersMatch: String = ""): Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/identifiersMatch"
+    ).thenReturn(
       status = status,
-      body = identifiersMatchJson
+      body = JsString(identifiersMatch)
     )
 
   def stubStoreBusinessVerificationStatus(journeyId: String,
@@ -243,5 +218,8 @@ trait StorageStub extends WiremockMethods {
       status = status,
       body = body
     )
+
+  def stubRetrieveEntityDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
+    when(method = GET, uri =  s"/minor-entity-identification/journey/$journeyId").thenReturn(status = status, body = body)
 
 }

@@ -34,16 +34,13 @@ class TestRetrieveJourneyDataController @Inject()(messagesControllerComponents: 
                                                  )(implicit ec: ExecutionContext) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
 
   def retrieveDetails(journeyId: String): Action[AnyContent] = Action.async {
-    implicit req =>
+    implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            journeyDataJson <- storageService.retrieveAllData(journeyId, journeyConfig)
-          } yield
-            Ok(journeyDataJson)
-        case None =>
-          throw new InternalServerException("Internal ID could not be retrieved from Auth")
+          journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
+            journeyConfig => storageService.retrieveAllData(journeyId, journeyConfig).map(journeyDataJson => Ok(journeyDataJson))
+          }
+        case None => throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 

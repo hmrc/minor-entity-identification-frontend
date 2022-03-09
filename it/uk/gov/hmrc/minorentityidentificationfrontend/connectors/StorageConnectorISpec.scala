@@ -36,8 +36,8 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
 
   s"storeDataField($testJourneyId, $utrKey)" should {
     "return SuccessfullyStored" in {
-      stubStoreUtr(testJourneyId, Sautr(testUtr))(status = OK)
-      val result = await(storageConnector.storeDataField[Utr](testJourneyId, utrKey, Sautr(testUtr)))
+      stubStoreUtr(testJourneyId, Sautr(testSautr))(status = OK)
+      val result = await(storageConnector.storeDataField[Utr](testJourneyId, utrKey, Sautr(testSautr)))
 
       result mustBe SuccessfullyStored
     }
@@ -48,12 +48,12 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
       "there is utr stored against the journeyId" in {
         stubRetrieveUtr(testJourneyId)(
           status = OK,
-          body = testUtrJson
+          body = testSautrJson
         )
 
         val result = await(storageConnector.retrieveDataField[JsObject](testJourneyId, utrKey))
 
-        result mustBe Some(testUtrJson)
+        result mustBe Some(testSautrJson)
       }
     }
 
