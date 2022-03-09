@@ -97,7 +97,8 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
             "sautr" -> "1234567890",
             "identifiersMatch" -> true,
             "businessVerification" -> Json.obj("verificationStatus" -> "PASS"),
-            "registration" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+            "registration" -> Json.obj("registrationStatus" -> "REGISTERED",
+              "registeredBusinessPartnerId" -> testSafeId),
             "saPostcode" -> testSaPostcode,
             "chrn" -> testCHRN
           )
