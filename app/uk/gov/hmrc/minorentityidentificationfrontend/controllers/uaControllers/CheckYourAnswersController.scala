@@ -74,7 +74,7 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                   optUtr <- storageService.retrieveUtr(journeyId)
                   optChrn <- storageService.retrieveCHRN(journeyId)
                 } yield (optUtr, optChrn) match {
-                  case (None, None) => Redirect(errorRoutes.CannotConfirmBusinessController.show(journeyId).url)
+                  case (None, None) => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
                   case _ => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
                 }
             }
