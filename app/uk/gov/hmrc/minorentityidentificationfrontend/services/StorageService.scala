@@ -160,9 +160,6 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Overseas]] =
     connector.retrieveDataField[Overseas](journeyId, OverseasKey)
 
-  def retrieveBusinessVerificationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
-    connector.retrieveDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey)
-
   def retrieveRegistrationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[RegistrationStatus]] =
     connector.retrieveDataField[RegistrationStatus](journeyId, RegistrationKey)
 
@@ -170,6 +167,10 @@ class StorageService @Inject()(connector: StorageConnector) {
                                       businessVerification: BusinessVerificationStatus
                                      )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey, businessVerification)
+
+  def retrieveBusinessVerificationStatus(journeyId: String
+                                        )(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
+    connector.retrieveDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey)
 }
 
 object StorageService {

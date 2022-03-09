@@ -326,7 +326,6 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
 
       verifyRemoveUtr(testJourneyId)
       verifyRemoveOfficePostcode(testJourneyId)
-
     }
 
     "redirect to Sign In page" when {

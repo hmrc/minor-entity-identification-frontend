@@ -84,6 +84,8 @@ class AppConfig @Inject()(config: Configuration,
     baseUrl + s"/trusts/$sautr/refresh"
   }
 
+  lazy val validateUnincorporatedAssociationDetailsUrl: String = s"$backendUrl/minor-entity-identification/validate-details"
+
   lazy val countries: Map[String, Country] = {
     environment.resourceAsStream("/countries.json") match {
       case Some(countriesStream) =>

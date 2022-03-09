@@ -72,9 +72,8 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
             for {
               journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
               nextUrl <- submissionService.submit(journeyId, journeyConfig)
-            } yield {
+            } yield
               Redirect(nextUrl)
-            }
           } else
             throw new InternalServerException("Trust journey is not enabled")
         case None                 =>
