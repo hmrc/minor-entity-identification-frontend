@@ -30,10 +30,11 @@ import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services._
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.UrlHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class JourneyController @Inject()(val authConnector: AuthConnector,
@@ -41,7 +42,8 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
                                   storageService: StorageService,
                                   controllerComponents: ControllerComponents,
                                   appConfig: AppConfig,
-                                  auditService: AuditService
+                                  auditService: AuditService,
+                                  urlHelper: UrlHelper
                                  )(implicit ec: ExecutionContext)
   extends BackendController(controllerComponents) with AuthorisedFunctions with FeatureSwitching {
 
@@ -66,31 +68,33 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
     implicit req =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          journeyService.createJourney(req.body, authInternalId).map(
-            journeyId => {
-              businessEntity match {
-                case OverseasCompany => Created(Json.obj(
-                  journeyStartUrl -> s"${appConfig.selfUrl}${overseasControllerRoutes.CaptureUtrController.show(journeyId).url}"
-                ))
-                case Trusts =>
-                  if (isEnabled(EnableFullTrustJourney)) {
-                    val pathToRedirect = s"${appConfig.selfUrl}${trustControllerRoutes.CaptureSautrController.show(journeyId).url}"
-                    Created(Json.obj(journeyStartUrl -> pathToRedirect))
-                  } else {
-                    auditService.auditJourney(journeyId, authInternalId)
-                    Created(Json.obj(journeyStartUrl -> (req.body.continueUrl + s"?journeyId=$journeyId")))
-                  }
-                case UnincorporatedAssociation =>
-                  if (isEnabled(EnableFullUAJourney)) {
-                    val pathToRedirect = s"${appConfig.selfUrl}${uaControllerRoutes.CaptureCtutrController.show(journeyId).url}"
-                    Created(Json.obj(journeyStartUrl -> pathToRedirect))
-                  } else {
-                    auditService.auditJourney(journeyId, authInternalId)
-                    Created(Json.obj(journeyStartUrl -> (req.body.continueUrl + s"?journeyId=$journeyId")))
-                  }
+          if (urlHelper.areRelativeOrAcceptedUrls(List(req.body.continueUrl, req.body.pageConfig.signOutUrl, req.body.pageConfig.accessibilityUrl))) {
+            journeyService.createJourney(req.body, authInternalId).map(
+              journeyId => {
+                businessEntity match {
+                  case OverseasCompany => Created(Json.obj(
+                    journeyStartUrl -> s"${appConfig.selfUrl}${overseasControllerRoutes.CaptureUtrController.show(journeyId).url}"
+                  ))
+                  case Trusts =>
+                    if (isEnabled(EnableFullTrustJourney)) {
+                      val pathToRedirect = s"${appConfig.selfUrl}${trustControllerRoutes.CaptureSautrController.show(journeyId).url}"
+                      Created(Json.obj(journeyStartUrl -> pathToRedirect))
+                    } else {
+                      auditService.auditJourney(journeyId, authInternalId)
+                      Created(Json.obj(journeyStartUrl -> (req.body.continueUrl + s"?journeyId=$journeyId")))
+                    }
+                  case UnincorporatedAssociation =>
+                    if (isEnabled(EnableFullUAJourney)) {
+                      val pathToRedirect = s"${appConfig.selfUrl}${uaControllerRoutes.CaptureCtutrController.show(journeyId).url}"
+                      Created(Json.obj(journeyStartUrl -> pathToRedirect))
+                    } else {
+                      auditService.auditJourney(journeyId, authInternalId)
+                      Created(Json.obj(journeyStartUrl -> (req.body.continueUrl + s"?journeyId=$journeyId")))
+                    }
+                }
               }
-            }
-          )
+            )
+          } else Future.successful(BadRequest(Json.toJson("JourneyConfig contained non-relative urls")))
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }

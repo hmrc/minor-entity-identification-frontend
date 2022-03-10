@@ -6,14 +6,18 @@
 
 1. [Setting up an Overseas Company Journey](TestREADME.md#get-identify-your-overseas-businesstest-onlycreate-overseas-company-journey)
 2. [Setting up a Trust Journey](TestREADME.md#get-identify-your-trusttest-onlycreate-trusts-journey)
-3. [Retrieving Journey Data](TestREADME.md#get-minor-entity-identificationtest-onlyretrieve-journeyjourneyid-or-minor-entity-identificationtest-onlyretrieve-journey)
-4. [Using the Trust Known Facts Stub](TestREADME.md#using-the-trusts-known-facts-stub)
+3. [Setting up a Unincorporated Association Journey](TestREADME.md#get-identify-your-unincorporated-associationtest-onlycreate-unincorporated-association-journey)
+4. [Retrieving Journey Data](TestREADME.md#retrieve-journey-data)
+5. [Using the Trust Known Facts Stub](TestREADME.md#using-the-trusts-known-facts-stub)
 
 ### GET /identify-your-overseas-business/test-only/create-overseas-company-journey
 
 ---
 This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an
 Overseas Company.
+
+All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out
+to Business Verification (rather than stub it) all non-relative urls will cause the handover to Business Verification to fail.
 
 1. Continue URL (Required)
 
@@ -56,6 +60,9 @@ Overseas Company.
 This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for a
 Trust.
 
+All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out
+to Business Verification (rather than stub it) all non-relative urls will cause the handover to Business Verification to fail.
+
 1. Continue URL (Required)
 
     - Where to redirect the user after the journey has been completed
@@ -96,6 +103,9 @@ Trust.
 ---
 This is a test entry point which simulates a service by triggering the initial POST call to set up a journey for an
 Unincorporated Association.
+
+All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out
+to Business Verification (rather than stub it) all non-relative urls will cause the handover to Business Verification to fail.
 
 1. Continue URL (Required)
 
