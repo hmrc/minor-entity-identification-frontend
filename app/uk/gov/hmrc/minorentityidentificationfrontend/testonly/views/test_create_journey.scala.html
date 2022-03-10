@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.p
 
 @this(layout: govuk_template,
     govukFieldset: GovukFieldset,
@@ -27,7 +28,8 @@
     govukInput: GovukInput,
     formWithCSRF: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukCheckboxes: GovukCheckboxes
+    govukCheckboxes: GovukCheckboxes,
+    p: p
 )
 
 @(pageConfig: PageConfig, form: Form[JourneyConfig], formAction: Call)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
@@ -52,10 +54,13 @@
 @html = {
     @formWithCSRF(action = formAction) {
 
+        @p(Html("All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out to Business Verification (rather than stub it) all non-relative urls will fail."))
+
         @govukInput(
             Input(
                 label = Label(content=Text("Continue URL"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
-                classes = "govuk-input--width-20"
+                hint = Some(Hint(content = Text("Must be non-relative for staging, qa and production"))),
+                classes = "govuk-input--width-35"
             ).withFormField(form("continueUrl"))
         )
 
@@ -68,19 +73,18 @@
 
         @govukInput(
             Input(
-            label = Label(content=Text("DeskPro Service Identifier"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
-            classes = "govuk-input--width-20"
+                label = Label(content=Text("DeskPro Service Identifier"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
             ).withFormField(form("deskProServiceId"))
         )
 
         @govukInput(
             Input(
                 label = Label(content=Text("Sign Out Url"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
-                classes = "govuk-input--width-20"
+                hint = Some(Hint(content = Text("Must be non-relative for staging, qa and production"))),
+                classes = "govuk-input--width-35"
             ).withFormField(form("signOutUrl"))
         )
-
-
 
         @govukCheckboxes(Checkboxes(
             fieldset = Some(Fieldset(
@@ -111,15 +115,15 @@
         @govukInput(
             Input(
                 label = Label(content=Text("Accessibility Statement Url"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
-                classes = "govuk-input--width-20"
+                hint = Some(Hint(content = Text("Must be non-relative for staging, qa and production"))),
+                classes = "govuk-input--width-35"
             ).withFormField(form("accessibilityUrl"))
         )
 
         @govukButton(Button(
             attributes = Map("id" -> "save-and-continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(Messages("Submit"))
+            content = Text("Submit")
         ))
-
     }
 }

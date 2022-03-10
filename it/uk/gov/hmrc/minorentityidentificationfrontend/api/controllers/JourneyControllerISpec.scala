@@ -17,11 +17,12 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
 import play.api.libs.json.{JsObject, Json}
-import play.api.test.Helpers._
+import play.api.test.Helpers.{NOT_FOUND, _}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaControllerRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
@@ -31,28 +32,70 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
   lazy val repo: JourneyConfigRepository = app.injector.instanceOf[JourneyConfigRepository]
 
+  val testJourneyConfigJson: JsObject = Json.obj(
+    "continueUrl" -> testContinueUrl,
+    "deskProServiceId" -> testDeskProServiceId,
+    "signOutUrl" -> testSignOutUrl,
+    "accessibilityUrl" -> testAccessibilityUrl,
+    "businessVerificationCheck" -> true,
+    "regime" -> testRegime
+  )
+
   "POST /api/overseas-company-journey" should {
-    val testJourneyConfigJson: JsObject = Json.obj(
-      "continueUrl" -> testContinueUrl,
-      "deskProServiceId" -> testDeskProServiceId,
-      "signOutUrl" -> testSignOutUrl,
-      "accessibilityUrl" -> testAccessibilityUrl,
-      "businessVerificationCheck" -> true,
-      "regime" -> testRegime
-    )
+    "return a created journey" when {
+      "all the URLs provided are relative" in {
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
 
-    "return a created journey" in {
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-      stubAudit()
+        lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
 
-      lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
+        (result.json \ "journeyStartUrl").as[String] must include(overseasControllerRoutes.CaptureUtrController.show(testJourneyId).url)
 
-      (result.json \ "journeyStartUrl").as[String] must include(overseasControllerRoutes.CaptureUtrController.show(testJourneyId).url)
+        result.status mustBe CREATED
 
-      result.status mustBe CREATED
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testOverseasCompanyJourneyConfig(businessVerificationCheck = true))
+      }
+      "a URL provided in non-relative but in allowed hosts list" in {
+        val testJourneyConfigJson: JsObject = Json.obj(
+          "continueUrl" -> testContinueUrl,
+          "deskProServiceId" -> testDeskProServiceId,
+          "signOutUrl" -> testSignOutUrl,
+          "accessibilityUrl" -> testLocalAccessibilityUrl,
+          "businessVerificationCheck" -> true,
+          "regime" -> testRegime
+        )
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
+
+        (result.json \ "journeyStartUrl").as[String] must include(overseasControllerRoutes.CaptureUtrController.show(testJourneyId).url)
+
+        result.status mustBe CREATED
+      }
     }
 
+    "return Bad Request" when {
+      "one URL provided for the journey config is not relative" in {
+        val testJourneyConfigJson: JsObject = Json.obj(
+          "continueUrl" -> testContinueUrl,
+          "deskProServiceId" -> testDeskProServiceId,
+          "signOutUrl" -> testSignOutUrl,
+          "accessibilityUrl" -> testStagingAccessibilityUrl,
+          "businessVerificationCheck" -> true,
+          "regime" -> testRegime
+        )
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson)
+
+        result.status mustBe BAD_REQUEST
+      }
+    }
     "redirect to Sign In page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
@@ -80,7 +123,6 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
         result.status mustBe INTERNAL_SERVER_ERROR
       }
     }
-
   }
 
   "GET /api/journey/:journeyId" when {
@@ -286,39 +328,83 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
       "regime" -> testRegime
     )
 
-    "return a created journey with the trust journey FS enabled" in {
-      enable(EnableFullTrustJourney)
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-      stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-      stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
-      stubAudit()
+    "return a created journey" when {
+      "trust journey FS enabled" in {
+        enable(EnableFullTrustJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+        stubAudit()
 
-      lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
+        lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
-      (result.json \ "journeyStartUrl").as[String] must include(trustControllerRoutes.CaptureSautrController.show(testJourneyId).url)
+        (result.json \ "journeyStartUrl").as[String] must include(trustControllerRoutes.CaptureSautrController.show(testJourneyId).url)
 
-      result.status mustBe CREATED
+        result.status mustBe CREATED
 
-      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig(businessVerificationCheck = true))
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig(businessVerificationCheck = true))
+      }
+      "the trust journey FS disabled" in {
+        disable(EnableFullTrustJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
+        stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+
+        lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
+
+        (result.json \ "journeyStartUrl").as[String] must include(testContinueUrl + s"?journeyId=$testJourneyId")
+
+        result.status mustBe CREATED
+
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig(businessVerificationCheck = true))
+      }
+      "a URL provided is non-relative but in allowed hosts list" in {
+        enable(EnableFullTrustJourney)
+        val testJourneyConfigJson: JsObject = Json.obj(
+          "continueUrl" -> testContinueUrl,
+          "deskProServiceId" -> testDeskProServiceId,
+          "signOutUrl" -> testSignOutUrl,
+          "accessibilityUrl" -> testLocalAccessibilityUrl,
+          "businessVerificationCheck" -> true,
+          "regime" -> testRegime
+        )
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
+
+        (result.json \ "journeyStartUrl").as[String] must include(trustControllerRoutes.CaptureSautrController.show(testJourneyId).url)
+
+        result.status mustBe CREATED
+      }
     }
 
-    "return a created journey with the trust journey FS disabled" in {
-      disable(EnableFullTrustJourney)
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-      stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
-      stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-      stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
-      stubAudit()
+    "return Bad Request" when {
+      "one URL provided for the journey config is not relative" in {
+        val testJourneyConfigJson: JsObject = Json.obj(
+          "continueUrl" -> testContinueUrl,
+          "deskProServiceId" -> testDeskProServiceId,
+          "signOutUrl" -> testSignOutUrl,
+          "accessibilityUrl" -> testStagingAccessibilityUrl,
+          "businessVerificationCheck" -> true,
+          "regime" -> testRegime
+        )
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
 
-      lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
+        lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
-      (result.json \ "journeyStartUrl").as[String] must include(testContinueUrl + s"?journeyId=$testJourneyId")
-
-      result.status mustBe CREATED
-
-      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testTrustsJourneyConfig(businessVerificationCheck = true))
+        result.status mustBe BAD_REQUEST
+      }
     }
 
     "redirect to Sign In page" when {
@@ -360,23 +446,83 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
       "businessVerificationCheck" -> true,
       "regime" -> testRegime
     )
-    "return a created journey" in {
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-      stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
-      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-      stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
-      stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-      stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
-      stubAudit()
+    "return a created journey" when {
+      "the UA journey FS is enabled" when {
+        "the urls provided are all relative" in {
+          enable(EnableFullUAJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+          stubAudit()
 
-      lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
+          lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
 
-      (result.json \ "journeyStartUrl").as[String] must include(testContinueUrl + s"?journeyId=$testJourneyId")
+          (result.json \ "journeyStartUrl").as[String] must include(uaControllerRoutes.CaptureCtutrController.show(testJourneyId).url)
 
-      result.status mustBe CREATED
+          result.status mustBe CREATED
 
-      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
+          await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
+        }
+        "a URL provided is non-relative but in allowed hosts list" in {
+          enable(EnableFullUAJourney)
+          val testJourneyConfigJson: JsObject = Json.obj(
+            "continueUrl" -> testContinueUrl,
+            "deskProServiceId" -> testDeskProServiceId,
+            "signOutUrl" -> testSignOutUrl,
+            "accessibilityUrl" -> testLocalAccessibilityUrl,
+            "businessVerificationCheck" -> true,
+            "regime" -> testRegime
+          )
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+          stubAudit()
+
+          lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
+
+          (result.json \ "journeyStartUrl").as[String] must include(uaControllerRoutes.CaptureCtutrController.show(testJourneyId).url)
+
+          result.status mustBe CREATED
+        }
+      }
+      "the UA journey FS is disabled" in {
+        disable(EnableFullUAJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
+        stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
+        stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
+
+        (result.json \ "journeyStartUrl").as[String] must include(testContinueUrl + s"?journeyId=$testJourneyId")
+
+        result.status mustBe CREATED
+
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
+      }
+    }
+
+    "return Bad Request" when {
+      "one URL provided for the journey config is not relative" in {
+        val testJourneyConfigJson: JsObject = Json.obj(
+          "continueUrl" -> testContinueUrl,
+          "deskProServiceId" -> testDeskProServiceId,
+          "signOutUrl" -> testSignOutUrl,
+          "accessibilityUrl" -> testStagingAccessibilityUrl,
+          "businessVerificationCheck" -> true,
+          "regime" -> testRegime
+        )
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
+
+        result.status mustBe BAD_REQUEST
+      }
     }
 
     "redirect to Sign In page" when {
@@ -408,4 +554,5 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
       }
     }
   }
+
 }

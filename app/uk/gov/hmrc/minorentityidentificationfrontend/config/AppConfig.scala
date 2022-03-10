@@ -25,11 +25,14 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
 
 import javax.inject.{Inject, Singleton}
+import scala.collection.JavaConverters.asScalaBufferConverter
 
 @Singleton
 class AppConfig @Inject()(config: Configuration,
                           servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+
+  lazy val allowedHosts: Set[String] = config.underlying.getStringList("microservice.hosts.allowList").asScala.toSet
 
   lazy val timeToLiveSeconds: Long = servicesConfig.getInt("mongodb.timeToLiveSeconds").toLong
 
