@@ -17,18 +17,40 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, RegistrationStatus}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{WiremockHelper, WiremockMethods}
 
 trait RegisterStub extends WiremockMethods {
 
-  def stubRegister(sautr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
+  def stubRegister(utr: String, journeyConfig: JourneyConfig)(status: Int, body: RegistrationStatus): Unit = {
+    journeyConfig.businessEntity match {
+      case Trusts => stubRegisterTrust(utr, journeyConfig.regime)(status, body)
+      case UnincorporatedAssociation => stubRegisterUA(utr, journeyConfig.regime)(status, body)
+      case OverseasCompany => throw new IllegalArgumentException("Overseas Company is not supported for registration")
+    }
+  }
+
+  def stubRegisterTrust(sautr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
     val jsonBody = Json.obj(
         "sautr" -> sautr.toUpperCase,
         "regime" -> regime
       )
 
     when(method = POST, uri = "/minor-entity-identification/register-trust", jsonBody)
+      .thenReturn(
+        status = status,
+        body = Json.obj("registration" -> body)
+      )
+  }
+
+  def stubRegisterUA(ctutr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
+    val jsonBody = Json.obj(
+      "ctutr" -> ctutr.toUpperCase,
+      "regime" -> regime
+    )
+
+    when(method = POST, uri = "/minor-entity-identification/register-ua", jsonBody)
       .thenReturn(
         status = status,
         body = Json.obj("registration" -> body)

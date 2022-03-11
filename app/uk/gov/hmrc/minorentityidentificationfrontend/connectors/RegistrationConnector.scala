@@ -31,20 +31,31 @@ class RegistrationConnector @Inject()(httpClient: HttpClient,
                                       appConfig: AppConfig
                                      )(implicit ec: ExecutionContext) {
 
-  def register(sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
-
-    val jsonBody = Json.obj(
-      "sautr" -> sautr.toUpperCase,
-      "regime" -> regime
-    )
-
-    httpClient.POST[JsObject, RegistrationStatus](appConfig.registerUrl, jsonBody)(
+  private def register(jsonBody: JsObject, postUrl: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
+    httpClient.POST[JsObject, RegistrationStatus](postUrl, jsonBody)(
       implicitly[Writes[JsObject]],
       RegistrationHttpReads,
       hc,
       ec
     )
   }
+
+  def registerTrust(sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
+    register(
+      jsonBody = Json.obj(
+        "sautr" -> sautr.toUpperCase,
+        "regime" -> regime
+      ),
+      postUrl = appConfig.registerTrustUrl)
+
+
+  def registerUA(ctutr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
+    register(
+      jsonBody = Json.obj(
+        "ctutr" -> ctutr.toUpperCase,
+        "regime" -> regime
+      ),
+      postUrl = appConfig.registerUAUrl)
 }
 
 object RegistrationHttpParser {
@@ -62,4 +73,5 @@ object RegistrationHttpParser {
       }
     }
   }
+
 }

@@ -35,11 +35,11 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec with Matchers wit
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  "register" should {
+  "register trust" should {
     "return Registered" when {
       "the user has successfully passed BV check" in {
         mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
-        mockRegistrationConnector.register(testSautr, testRegime) returns Future.successful(Registered(testSafeId))
+        mockRegistrationConnector.registerTrust(testSautr, testRegime) returns Future.successful(Registered(testSafeId))
         mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
 
         mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
@@ -52,7 +52,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec with Matchers wit
       }
       "the Business Verification Check is disabled" in {
         mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(None)
-        mockRegistrationConnector.register(testSautr, testRegime) returns Future.successful(Registered(testSafeId))
+        mockRegistrationConnector.registerTrust(testSautr, testRegime) returns Future.successful(Registered(testSafeId))
         mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
 
         mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig(false)) returns Future.successful(())
@@ -67,7 +67,7 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec with Matchers wit
     "return RegistrationNotCalled" when {
       "the user did not pass BV checks" in {
         mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationFail))
-        mockRegistrationConnector.register(testSautr, testRegime) returns Future.successful(RegistrationNotCalled)
+        mockRegistrationConnector.registerTrust(testSautr, testRegime) returns Future.successful(RegistrationNotCalled)
         mockStorageService.storeRegistrationStatus(testJourneyId,RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
 
         mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
@@ -78,6 +78,61 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec with Matchers wit
 
         mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
       }
+    }
+  }
+
+  "register Unincorporated association" should {
+    "return Registered" when {
+      "the user has successfully passed BV check" in {
+        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
+        mockRegistrationConnector.registerUA(testCtutr, testRegime) returns Future.successful(Registered(testSafeId))
+        mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
+
+        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) returns Future.successful(())
+
+        val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testCtutr), testUAJourneyConfig()))
+
+        result mustBe Registered(testSafeId)
+
+        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) was called
+      }
+      "the Business Verification Check is disabled" in {
+        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(None)
+        mockRegistrationConnector.registerUA(testCtutr, testRegime) returns Future.successful(Registered(testSafeId))
+        mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
+
+        mockAuditService.auditJourney(journeyId = testJourneyId, journeyConfig = testUAJourneyConfig(false)) returns Future.successful(())
+
+        val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testCtutr), testUAJourneyConfig(false)))
+
+        result mustBe Registered(testSafeId)
+
+        mockAuditService.auditJourney(journeyId = testJourneyId, journeyConfig = testUAJourneyConfig(false)) was called
+      }
+    }
+    "return RegistrationNotCalled" when {
+      "the user did not pass BV checks" in {
+        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationFail))
+        mockRegistrationConnector.registerUA(testCtutr, testRegime) returns Future.successful(RegistrationNotCalled)
+        mockStorageService.storeRegistrationStatus(testJourneyId,RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+
+        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) returns Future.successful(())
+
+        val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testCtutr), testUAJourneyConfig()))
+
+        result mustBe RegistrationNotCalled
+
+        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) was called
+      }
+    }
+  }
+
+  "register overseas company" should {
+    "throw an exception for registration" in {
+      val actualException = intercept[IllegalArgumentException] {
+        await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testCtutr), testOverseasJourneyConfig()))
+      }
+      actualException.getMessage mustBe "Overseas Company is not supported for registration."
     }
   }
 

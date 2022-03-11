@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
+import play.api.http.Status.UNAUTHORIZED
+import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testRegime, testSafeId, testSautr}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Registered, RegistrationFailed}
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Registered, RegistrationFailed, RegistrationNotCalled}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.RegisterStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
@@ -29,13 +31,15 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  "register" should {
+  private val jsonBody = Json.obj("registration" -> testRegistrationNotCalledJson)
+
+  "register trust" should {
     "return Registered" when {
       "the registration has been successful" when {
         "the user has a sautr" in {
-          stubRegister(testSautr, testRegime)(OK, Registered(testSafeId))
+          stubRegisterTrust(testSautr, testRegime)(OK, Registered(testSafeId))
 
-          val result = await(registrationConnector.register(testSautr, testRegime))
+          val result = await(registrationConnector.registerTrust(testSautr, testRegime))
 
           result mustBe Registered(testSafeId)
         }
@@ -44,11 +48,58 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
     "return RegistrationFailed" when {
       "the registration has not been successful" in {
-        stubRegister(testSautr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
+        stubRegisterTrust(testSautr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
 
-        val result = await(registrationConnector.register(testSautr, testRegime))
+        val result = await(registrationConnector.registerTrust(testSautr, testRegime))
 
         result mustBe RegistrationFailed
+      }
+    }
+
+    "throws InternalServerException" when {
+      "the registration http status is different from Ok and INTERNAL_SERVER_ERROR" in {
+        stubRegisterTrust(testSautr, testRegime)(UNAUTHORIZED, RegistrationNotCalled)
+
+        val actualException: InternalServerException = intercept[InternalServerException] {
+          await(registrationConnector.registerTrust(testSautr, testRegime))
+        }
+        actualException.getMessage mustBe s"Unexpected response from Register API - status = 401, body = $jsonBody"
+      }
+    }
+  }
+
+  "register Unincorporated association" should {
+    "return Registered" when {
+      "the registration has been successful" when {
+        "the user has a ctutr" in {
+          stubRegisterUA(testCtutr, testRegime)(OK, Registered(testSafeId))
+
+          val result = await(registrationConnector.registerUA(testCtutr, testRegime))
+
+          result mustBe Registered(testSafeId)
+        }
+      }
+    }
+
+    "return RegistrationFailed" when {
+      "the registration has not been successful" in {
+        stubRegisterUA(testCtutr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
+
+        val result = await(registrationConnector.registerUA(testCtutr, testRegime))
+
+        result mustBe RegistrationFailed
+      }
+    }
+
+    "throws InternalServerException" when {
+      "the registration http status is different from Ok and INTERNAL_SERVER_ERROR" in {
+        stubRegisterUA(testCtutr, testRegime)(UNAUTHORIZED, RegistrationNotCalled)
+
+        val actualException: InternalServerException = intercept[InternalServerException] {
+          await(registrationConnector.registerUA(testCtutr, testRegime))
+        }
+
+        actualException.getMessage mustBe s"Unexpected response from Register API - status = 401, body = $jsonBody"
       }
     }
   }
