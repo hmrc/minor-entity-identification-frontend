@@ -34,7 +34,7 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] =
     optSaUtr match {
       case None =>
-        val identifiersMatchFailure: KnownFactsMatchFailure = if (optCHRN.isEmpty) UnMatchableWithRetry else UnMatchableWithoutRetry
+        val identifiersMatchFailure: KnownFactsMatchFailure =  UnMatchable
         storageService.storeIdentifiersMatch(journeyId, identifiersMatchFailure).map(_ => identifiersMatchFailure)
       case Some(saUtr) =>
         for {

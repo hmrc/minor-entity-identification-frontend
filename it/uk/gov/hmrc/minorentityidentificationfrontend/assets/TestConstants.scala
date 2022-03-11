@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{SuccessfulMatchKey, UnMatchableWithoutRetryKey}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{SuccessfulMatchKey, UnMatchableKey}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
@@ -93,7 +93,7 @@ object TestConstants {
   )
 
   val testLegacyJourneyDataJson: JsObject = Json.obj(
-    "identifiersMatch" -> UnMatchableWithoutRetryKey,
+    "identifiersMatch" -> UnMatchableKey,
     "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
     "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
   )
@@ -111,7 +111,7 @@ object TestConstants {
 
   def testOverseasJourneyDataJson(utrBlock: JsObject): JsObject = Json.obj(
     "utr" -> utrBlock,
-    "identifiersMatch" -> UnMatchableWithoutRetryKey,
+    "identifiersMatch" -> UnMatchableKey,
     "businessVerification" -> Json.obj(
       "verificationStatus" -> "UNCHALLENGED"
     ),
@@ -237,8 +237,7 @@ object TestConstants {
 
   val testIdentifiersMatchSuccessfulMatchJson: JsObject = Json.obj("identifiersMatch" -> "SuccessfulMatch")
   val testIdentifiersMatchDetailsMismatchJson: JsObject = Json.obj("identifiersMatch" -> "DetailsMismatch")
-  val testIdentifiersMatchUnmatchableWithRetry: JsObject = Json.obj("identifiersMatch" -> "UnMatchableWithRetry")
-  val testIdentifiersMatchUnmatchableWithoutRetry: JsObject = Json.obj("identifiersMatch" -> "UnMatchableWithoutRetry")
+  val testIdentifiersMatchUnmatchable: JsObject = Json.obj("identifiersMatch" -> "UnMatchable")
 
   val testBusinessVerificationRedirectUrl = "/business-verification-start"
   val testBusinessVerificationJourneyId = "TestBusinessVerificationJourneyId"

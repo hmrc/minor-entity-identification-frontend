@@ -108,9 +108,9 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound) was called
       }
     }
-    "return UnMatchableWithoutRetry" when {
+    "return UnMatchable" when {
       "the user provides no Sautr but provides CHRN" in {
-        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) returns Future.successful(SuccessfullyStored)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable) returns Future.successful(SuccessfullyStored)
 
         val result = await(TestValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
           optSaUtr = None,
@@ -118,15 +118,13 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
           optCHRN = Some(testCHRN))
         )
 
-        result mustBe UnMatchableWithoutRetry
+        result mustBe UnMatchable
 
-        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithoutRetry) was called
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable) was called
       }
-    }
 
-    "return UnMatchableWithRetry" when {
       "the user provides no Sautr and no CHRN" in {
-        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) returns Future.successful(SuccessfullyStored)
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable) returns Future.successful(SuccessfullyStored)
 
         val result = await(TestValidateTrustKnownFactsService.validateTrustKnownFacts(journeyId = testJourneyId,
           optSaUtr = None,
@@ -134,11 +132,11 @@ class ValidateTrustKnownFactsServiceSpec extends AnyWordSpec with Matchers with 
           optCHRN = None)
         )
 
-        result mustBe UnMatchableWithRetry
+        result mustBe UnMatchable
 
-        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchableWithRetry) was called
+        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable) was called
       }
     }
-  }
 
+  }
 }

@@ -290,7 +290,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       }
     }
 
-    "the EnableFullTrustJourney is enabled and identifier match is UnMatchableWithoutRetry (No SaUtr but CHRN provided)" should {
+    "the EnableFullTrustJourney is enabled and identifier match is UnMatchable (No SaUtr but CHRN provided)" should {
       "redirect to the provided continueUrl without contacting TrustKnownFacts api and BV" in {
         enable(EnableFullTrustJourney)
 
@@ -305,8 +305,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
         stubRetrievePostcode(testJourneyId)(NOT_FOUND)
         stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
-        stubStoreIdentifiersMatch(testJourneyId, UnMatchableWithoutRetryKey)(OK)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, UnMatchableWithoutRetryKey)
+        stubStoreIdentifiersMatch(testJourneyId, UnMatchableKey)(OK)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, UnMatchableKey)
         stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))(OK)
         stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
         stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
@@ -319,14 +319,13 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
         }
 
-        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableWithoutRetryKey))
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
         verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
         verifyAudit()
       }
     }
-
-    "the EnableFullTrustJourney is enabled and identifier match is UnMatchableWithRetry (No SaUtr and No CHRN provided)" should {
-      "redirect to the Cannot Confirm Business error page without contacting TrustKnownFacts api and BV" in {
+    "the EnableFullTrustJourney is enabled and identifier match is UnMatchable (No SaUtr and No CHRN provided)" should {
+      "redirect to the provided continueUrl without contacting TrustKnownFacts api and BV" in {
         enable(EnableFullTrustJourney)
 
         await(insertJourneyConfig(
@@ -340,8 +339,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
         stubRetrievePostcode(testJourneyId)(NOT_FOUND)
         stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-        stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = UnMatchableWithRetryKey)(OK)
-        stubRetrieveIdentifiersMatch(testJourneyId)(OK, UnMatchableWithRetryKey)
+        stubStoreIdentifiersMatch(testJourneyId, identifiersMatch = UnMatchableKey)(OK)
+        stubRetrieveIdentifiersMatch(testJourneyId)(OK, UnMatchableKey)
         stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))(OK)
         stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationNotEnoughInfoToCallJson)
         stubRetrieveRegistrationStatus(testJourneyId)(OK, testRegistrationNotCalledJson)
@@ -351,15 +350,14 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         result must have {
           httpStatus(SEE_OTHER)
-          redirectUri(expectedValue = errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
+          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
         }
 
-        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableWithRetryKey))
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
         verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
         verifyAudit()
       }
     }
-
   }
 
   "POST /identify-your-trust/check-your-answers-business" when {

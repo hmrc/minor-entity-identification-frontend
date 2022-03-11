@@ -378,7 +378,7 @@ class AuditServiceSpec
               mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(None)
               mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(None)
               mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(Some(testCHRN))
-              mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(UnMatchableWithoutRetry))
+              mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(UnMatchable))
               mockStorageService.retrieveBusinessVerificationStatus(testJourneyId).returns(
                 Future.successful(Some(BusinessVerificationNotEnoughInformationToCallBV)))
               mockStorageService.retrieveRegistrationStatus(testJourneyId) returns Future.successful(Some(RegistrationNotCalled))
@@ -406,7 +406,7 @@ class AuditServiceSpec
               mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(None)
               mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(None)
               mockStorageService.retrieveCHRN(testJourneyId) returns Future.successful(None)
-              mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(UnMatchableWithRetry))
+              mockStorageService.retrieveIdentifiersMatch(testJourneyId) returns Future.successful(Some(UnMatchable))
               mockStorageService.retrieveBusinessVerificationStatus(testJourneyId).returns(
                 Future.successful(Some(BusinessVerificationNotEnoughInformationToCallBV)))
               mockStorageService.retrieveRegistrationStatus(testJourneyId) returns Future.successful(Some(RegistrationNotCalled))
