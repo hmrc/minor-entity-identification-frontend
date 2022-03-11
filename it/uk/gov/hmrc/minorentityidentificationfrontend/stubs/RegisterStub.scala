@@ -24,12 +24,11 @@ trait RegisterStub extends WiremockMethods {
 
   def stubRegister(sautr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
     val jsonBody = Json.obj(
-      "trust" -> Json.obj(
         "sautr" -> sautr.toUpperCase,
         "regime" -> regime
-      ))
+      )
 
-    when(method = POST, uri = "/minor-entity-identification/register", jsonBody)
+    when(method = POST, uri = "/minor-entity-identification/register-trust", jsonBody)
       .thenReturn(
         status = status,
         body = Json.obj("registration" -> body)
@@ -38,12 +37,11 @@ trait RegisterStub extends WiremockMethods {
 
   def verifyRegister(sautr: String, regime: String): Unit = {
     val jsonBody = Json.obj(
-      "trust" -> Json.obj(
         "sautr" -> sautr.toUpperCase,
         "regime" -> regime
-      ))
+      )
 
-    WiremockHelper.verifyPost(uri = "/minor-entity-identification/register", optBody = Some(jsonBody.toString()))
+    WiremockHelper.verifyPost(uri = "/minor-entity-identification/register-trust", optBody = Some(jsonBody.toString()))
   }
 
 }
