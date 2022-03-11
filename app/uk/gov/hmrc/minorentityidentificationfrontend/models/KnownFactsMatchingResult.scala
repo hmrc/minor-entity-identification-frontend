@@ -24,9 +24,8 @@ case object SuccessfulMatch extends KnownFactsMatchingResult
 
 sealed trait KnownFactsMatchFailure extends KnownFactsMatchingResult
 
-case object UnMatchableWithRetry extends KnownFactsMatchFailure
 
-case object UnMatchableWithoutRetry extends KnownFactsMatchFailure
+case object UnMatchable extends KnownFactsMatchFailure
 
 case object DetailsMismatch extends KnownFactsMatchFailure
 
@@ -35,8 +34,7 @@ case object DetailsNotFound extends KnownFactsMatchFailure
 object KnownFactsMatchingResult {
   val KnownFactsMatchingResultKey = "identifiersMatch"
   val SuccessfulMatchKey = "SuccessfulMatch"
-  val UnMatchableWithoutRetryKey = "UnMatchableWithoutRetry"
-  val UnMatchableWithRetryKey = "UnMatchableWithRetry"
+  val UnMatchableKey = "UnMatchable"
   val DetailsMismatchKey = "DetailsMismatch"
   val DetailsNotFoundKey = "DetailsNotFound"
 
@@ -44,8 +42,7 @@ object KnownFactsMatchingResult {
     override def writes(knownFactsMatchingResult: KnownFactsMatchingResult): JsValue = {
       val knownFactsMatchingResultString = knownFactsMatchingResult match {
         case SuccessfulMatch => SuccessfulMatchKey
-        case UnMatchableWithoutRetry => UnMatchableWithoutRetryKey
-        case UnMatchableWithRetry => UnMatchableWithRetryKey
+        case UnMatchable => UnMatchableKey
         case DetailsMismatch => DetailsMismatchKey
         case DetailsNotFound => DetailsNotFoundKey
       }
@@ -56,8 +53,7 @@ object KnownFactsMatchingResult {
     override def reads(json: JsValue): JsResult[KnownFactsMatchingResult] =
       (json).validate[String].collect(JsonValidationError("Invalid Known Facts Matching Result")) {
         case SuccessfulMatchKey => SuccessfulMatch
-        case UnMatchableWithRetryKey => UnMatchableWithRetry
-        case UnMatchableWithoutRetryKey => UnMatchableWithoutRetry
+        case UnMatchableKey => UnMatchable
         case DetailsMismatchKey => DetailsMismatch
         case DetailsNotFoundKey => DetailsNotFound
       }

@@ -167,7 +167,7 @@ class AuditService @Inject()(appConfig: AppConfig,
     optIdentifiersMatch match {
       case Some(SuccessfulMatch) => "true"
       case Some(DetailsMismatch) | Some(DetailsNotFound) => "false"
-      case Some(UnMatchableWithRetry) | Some(UnMatchableWithoutRetry) => "unmatchable"
+      case  Some(UnMatchable) => "unmatchable"
       case None => "false"
     }
 

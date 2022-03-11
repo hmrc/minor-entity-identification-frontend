@@ -20,6 +20,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.errorControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
+import java.lang.ProcessBuilder.Redirect
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -68,10 +69,10 @@ class TrustSubmissionService @Inject()(validateTrustKnownFactsService: ValidateT
         else
           Future.successful(())
       } yield aMatchingFailure match {
-        case UnMatchableWithoutRetry =>
+        case UnMatchable =>
           auditService.auditJourney(journeyId, journeyConfig)
           journeyConfig.fullContinueUrl(journeyId)
-        case DetailsNotFound | DetailsMismatch | UnMatchableWithRetry =>
+        case DetailsNotFound | DetailsMismatch =>
           auditService.auditJourney(journeyId, journeyConfig)
           errorControllers.routes.CannotConfirmBusinessController.show(journeyId).url
       }
