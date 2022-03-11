@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testCtutr, testPostcode}
-import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.ValidateUnincorporatedAssociationDetailsHttpParser.{DetailsMatch, DetailsMismatch, DetailsNotFound, UnincorporatedAssociationDetailsValidationResult}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, KnownFactsMatchingResult, SuccessfulMatch}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.ValidateUnincorporatedAssociationDetailsConnectorStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
@@ -41,17 +41,17 @@ class ValidateUnincorporatedAssociationDetailsConnectorISpec
 
       stubValidateUnincorporatedAssociationDetails(testCtutr, testPostcode)(OK, Json.obj("matched" -> true))
 
-      val result: UnincorporatedAssociationDetailsValidationResult =
+      val result: KnownFactsMatchingResult =
         await(validateUADetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testPostcode))
 
-      result mustBe DetailsMatch
+      result mustBe SuccessfulMatch
     }
 
     "return details do not match" in {
 
       stubValidateUnincorporatedAssociationDetails(testCtutr, testPostcode)(OK, Json.obj("matched" -> false))
 
-      val result: UnincorporatedAssociationDetailsValidationResult =
+      val result: KnownFactsMatchingResult =
         await(validateUADetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testPostcode))
 
       result mustBe DetailsMismatch
@@ -64,7 +64,7 @@ class ValidateUnincorporatedAssociationDetailsConnectorISpec
         "reason" -> "The back end has indicated that CT UTR cannot be returned"
       ))
 
-      val result: UnincorporatedAssociationDetailsValidationResult =
+      val result: KnownFactsMatchingResult =
         await(validateUADetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testPostcode))
 
       result mustBe DetailsNotFound
@@ -75,7 +75,7 @@ class ValidateUnincorporatedAssociationDetailsConnectorISpec
 
       stubValidateUnincorporatedAssociationDetails(testCtutr, testPostcode)(INTERNAL_SERVER_ERROR, Json.obj("error" -> "testError"))
 
-      val result: Future[UnincorporatedAssociationDetailsValidationResult] =
+      val result: Future[KnownFactsMatchingResult] =
         validateUADetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testPostcode)
 
       whenReady(result.failed) { ex =>

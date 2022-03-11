@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers.{routes => errorRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService, UnincorporatedAssociationSubmissionService}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.UaCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -35,6 +35,7 @@ import scala.concurrent.ExecutionContext
 class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            journeyService: JourneyService,
                                            storageService: StorageService,
+                                           unincorporatedAssociationSubmissionService: UnincorporatedAssociationSubmissionService,
                                            rowBuilder: UaCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page
@@ -68,16 +69,14 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           if (isEnabled(EnableFullUAJourney)) {
-            journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
-              journeyConfig =>
-                for {
-                  optUtr <- storageService.retrieveUtr(journeyId)
-                  optChrn <- storageService.retrieveCHRN(journeyId)
-                } yield (optUtr, optChrn) match {
-                  case (None, None) => Redirect(errorRoutes.CannotConfirmBusinessController.show(journeyId).url)
-                  case _ => Redirect(journeyConfig.continueUrl + s"?journeyId=$journeyId")
-                }
-            }
+            for {
+              journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
+              nextUrl <- unincorporatedAssociationSubmissionService.submit(
+                journeyId,
+                journeyConfig,
+                errorRoutes.CannotConfirmBusinessController.show(journeyId).url
+              )
+            } yield Redirect(nextUrl)
           } else
             throw new InternalServerException("Unincorporated Associated journey is not enabled")
         case None =>

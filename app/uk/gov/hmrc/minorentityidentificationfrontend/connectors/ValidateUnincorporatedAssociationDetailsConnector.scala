@@ -22,6 +22,7 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.ValidateUnincorporatedAssociationDetailsHttpParser._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,7 +30,7 @@ class ValidateUnincorporatedAssociationDetailsConnector @Inject()(httpClient: Ht
                                                                   appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def validateUnincorporatedAssociationDetails(ctUtr: String, postcode: String)
-                                              (implicit hc: HeaderCarrier): Future[UnincorporatedAssociationDetailsValidationResult] = {
+                                              (implicit hc: HeaderCarrier): Future[KnownFactsMatchingResult] = {
 
     val requestBody: JsObject = Json.obj(
       "ctutr" -> ctUtr,

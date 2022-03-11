@@ -17,7 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.helpers
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, Trusts}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, Trusts, UnincorporatedAssociation}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import java.util.UUID
@@ -42,6 +42,9 @@ object TestConstants {
   val testSafeId: String = UUID.randomUUID().toString
 
   def testTrustJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig = testJourneyConfig(Trusts, businessVerificationCheck)
+
+  def testUnincorporatedAssociationJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig =
+    testJourneyConfig(UnincorporatedAssociation, businessVerificationCheck)
 
   def testJourneyConfig(businessEntity: BusinessEntity, businessVerificationCheck: Boolean = true): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
