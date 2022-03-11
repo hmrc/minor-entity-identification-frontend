@@ -34,10 +34,9 @@ class RegistrationConnector @Inject()(httpClient: HttpClient,
   def register(sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
 
     val jsonBody = Json.obj(
-      "trust" -> Json.obj(
-        "sautr" -> sautr.toUpperCase,
-        "regime" -> regime
-      ))
+      "sautr" -> sautr.toUpperCase,
+      "regime" -> regime
+    )
 
     httpClient.POST[JsObject, RegistrationStatus](appConfig.registerUrl, jsonBody)(
       implicitly[Writes[JsObject]],
