@@ -19,20 +19,13 @@ package uk.gov.hmrc.minorentityidentificationfrontend.httpparsers
 import play.api.http.Status.{OK, BAD_REQUEST}
 import play.api.libs.json.JsSuccess
 import uk.gov.hmrc.http.{HttpReads, HttpResponse, InternalServerException}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, KnownFactsMatchingResult, SuccessfulMatch}
 
 object ValidateUnincorporatedAssociationDetailsHttpParser {
 
-  sealed trait UnincorporatedAssociationDetailsValidationResult
+  implicit object ValidateUnincorporatedAssociationDetailsHttpReads extends HttpReads[KnownFactsMatchingResult] {
 
-  case object DetailsMatch extends UnincorporatedAssociationDetailsValidationResult
-
-  case object DetailsMismatch extends UnincorporatedAssociationDetailsValidationResult
-
-  case object DetailsNotFound extends UnincorporatedAssociationDetailsValidationResult
-
-  implicit object ValidateUnincorporatedAssociationDetailsHttpReads extends HttpReads[UnincorporatedAssociationDetailsValidationResult] {
-
-    override def read(method: String, url: String, response: HttpResponse): UnincorporatedAssociationDetailsValidationResult = {
+    override def read(method: String, url: String, response: HttpResponse): KnownFactsMatchingResult = {
 
       def createInternalServerException(response: HttpResponse): InternalServerException =
         new InternalServerException(s"Invalid response from validate unincorporated association details: ${response.status}: ${response.body}")
@@ -40,7 +33,7 @@ object ValidateUnincorporatedAssociationDetailsHttpParser {
       response.status match {
         case OK =>
           (response.json \ "matched").validate[Boolean] match {
-            case JsSuccess(matched, _) if matched => DetailsMatch
+            case JsSuccess(matched, _) if matched => SuccessfulMatch
             case JsSuccess(_,_) => DetailsMismatch
             case _ => throw createInternalServerException(response)
           }
