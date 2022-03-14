@@ -44,7 +44,7 @@ class UnincorporatedAssociationSubmissionService @Inject()(auditService: AuditSe
       auditService.auditJourney(journeyId, journeyConfig)
 
       matchingResult match {
-        case SuccessfulMatch | UnMatchable => journeyConfig.continueUrl + s"?journeyId=$journeyId"
+        case SuccessfulMatch | UnMatchable => journeyConfig.fullContinueUrl(journeyId)
         case _ => retryUrl
       }
     }

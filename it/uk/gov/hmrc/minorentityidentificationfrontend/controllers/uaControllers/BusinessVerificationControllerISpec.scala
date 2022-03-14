@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
+package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 
 import play.api.libs.json.JsObject
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
@@ -23,15 +23,15 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 
 class BusinessVerificationControllerISpec extends AbstractBusinessVerificationControllerISpec {
 
-  override val businessVerificationResultUrlPrefix: String = s"/identify-your-trust/$testJourneyId/business-verification-result"
+  override val businessVerificationResultUrlPrefix: String = s"/identify-your-unincorporated-association/$testJourneyId/business-verification-result"
 
-  override val businessEntityBuilder: () => JourneyConfig = () => testTrustsJourneyConfig
+  override val businessEntityBuilder: () => JourneyConfig = () => testUAJourneyConfig
 
-  override val retrieveUtrJson: JsObject = testSautrJson
+  override val retrieveUtrJson: JsObject = testCtutrJson
 
-  override val testUtr: String = testSautr
+  override val testUtr: String = testCtutr
 
-  s"GET /identify-your-trust/<JourneyId>/business-verification-result" when {
+  s"GET /identify-your-unincorporated-association/<JourneyId>/business-verification-result" when {
     commonTest()
   }
 }

@@ -18,3 +18,5 @@ POST        /:journeyId/check-your-answers-business        uk.gov.hmrc.minorenti
 
 GET         /:journeyId/cannot-confirm-business            uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers.CannotConfirmBusinessController.show(journeyId)
 POST        /:journeyId/cannot-confirm-business            uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers.CannotConfirmBusinessController.submit(journeyId)
+
+GET         /:journeyId/business-verification-result       uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId)

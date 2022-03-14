@@ -18,11 +18,13 @@ package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.{CREATED, FORBIDDEN, NOT_FOUND}
 import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.mvc.Call
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
-import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessEntity, JourneyConfig}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,19 +35,20 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
                                                           )(implicit ec: ExecutionContext) {
 
   def createBusinessVerificationJourney(journeyId: String,
-                                        sautr: String,
+                                        utr: String,
                                         journeyConfig: JourneyConfig
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
+
+    val (identifierJsonKey, continueUrlJsonValue) = jsonPartsBy(businessEntity = journeyConfig.businessEntity, journeyId = journeyId)
 
     val jsonBody: JsObject =
       Json.obj(
         "journeyType" -> "BUSINESS_VERIFICATION",
         "origin" -> journeyConfig.regime,
         "identifiers" -> Json.arr(
-          Json.obj(
-            "saUtr" -> sautr
-          )),
-        "continueUrl" -> trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+          Json.obj(identifierJsonKey -> utr)
+        ),
+        "continueUrl" -> continueUrlJsonValue.url,
         "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl
       )
 
@@ -57,15 +60,21 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
     )
   }
 
+  private def jsonPartsBy(businessEntity: BusinessEntity, journeyId: String): (String, Call) = businessEntity match {
+    case BusinessEntity.Trusts                    => ("saUtr", trustControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId))
+    case BusinessEntity.UnincorporatedAssociation => ("ctUtr", uaControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId))
+    case BusinessEntity.OverseasCompany           => throw new IllegalArgumentException("Only Trusts and UnincorporatedAssociation business entities are supported.")
+  }
+
 }
 
 object CreateBusinessVerificationJourneyConnector {
 
   type BusinessVerificationJourneyCreationResponse = Either[BusinessVerificationJourneyCreationFailure, BusinessVerificationJourneyCreated]
 
-  case class BusinessVerificationJourneyCreated(redirectUri: String)
-
   sealed trait BusinessVerificationJourneyCreationFailure
+
+  case class BusinessVerificationJourneyCreated(redirectUri: String)
 
   case object NotEnoughEvidence extends BusinessVerificationJourneyCreationFailure
 
@@ -74,18 +83,18 @@ object CreateBusinessVerificationJourneyConnector {
   implicit object BusinessVerificationHttpReads extends HttpReads[BusinessVerificationJourneyCreationResponse] {
     override def read(method: String, url: String, response: HttpResponse): BusinessVerificationJourneyCreationResponse = {
       response.status match {
-        case CREATED =>
+        case CREATED   =>
           (response.json \ "redirectUri").asOpt[String] match {
             case Some(redirectUri) =>
               Right(BusinessVerificationJourneyCreated(redirectUri))
-            case _ =>
+            case _                 =>
               throw new InternalServerException(s"Business Verification API returned malformed JSON")
           }
         case NOT_FOUND =>
           Left(NotEnoughEvidence)
         case FORBIDDEN =>
           Left(UserLockedOut)
-        case status =>
+        case status    =>
           throw new InternalServerException(s"Business Verification API failed with status: $status")
       }
     }
