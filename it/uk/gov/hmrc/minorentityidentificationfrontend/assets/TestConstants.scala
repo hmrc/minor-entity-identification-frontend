@@ -17,6 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
 import play.api.libs.json.{JsObject, Json}
+import play.api.mvc.Call
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
@@ -38,6 +39,7 @@ object TestConstants {
   val testOfficePostcode: String = "AA22 2AA"
   val testCHRN: String = "AB99999"
   val testContinueUrl: String = "/test"
+  val testContinueUrlToPassToBVCall: String = s"/thisWhenWeCallBV/${UUID.randomUUID().toString}"
   val testDeskProServiceId: String = "vrs"
   val testSignOutUrl: String = "/sign-out"
   val testAccessibilityUrl: String = "/accessibility"
@@ -49,6 +51,8 @@ object TestConstants {
     "country" -> testOverseasTaxIdentifiers.country
   )
   val testSafeId: String = UUID.randomUUID().toString
+  val testTrustsJourneyConfig: JourneyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+  val testUAJourneyConfig: JourneyConfig = testTrustsJourneyConfig.copy(businessEntity = UnincorporatedAssociation)
 
   def testJourneyConfig(serviceName: Option[String] = None,
                         businessEntity: BusinessEntity,
@@ -258,14 +262,26 @@ object TestConstants {
   def testCreateBusinessVerificationJourneyJson(sautr: String,
                                                 journeyId: String,
                                                 journeyConfig: JourneyConfig): JsObject =
+    testCreateBusinessVerificationJourneyJson(
+      utrJson = testBVSaUtrJson(sautr),
+      continueUrlForBVCall = trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId),
+      journeyConfig = journeyConfig
+    )
+
+  def testBVSaUtrJson(utr: String): JsObject = Json.obj("saUtr" -> utr)
+
+  def testBVCtUtrJson(utr: String): JsObject = Json.obj("ctUtr" -> utr)
+
+  def testCreateBusinessVerificationJourneyJson(utrJson: JsObject,
+                                                continueUrlForBVCall: Call,
+                                                journeyConfig: JourneyConfig): JsObject =
     Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
       "origin" -> journeyConfig.regime,
-      "identifiers" -> Json.arr(
-        Json.obj(
-          "saUtr" -> sautr
-        )
-      ),
-      "continueUrl" -> trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId).url,
+      "identifiers" -> Json.arr(utrJson),
+      "continueUrl" -> continueUrlForBVCall.url,
       "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl
     )
+
+  def testBVRedirectURIJson(value: String): JsObject = Json.obj("redirectUri" -> value)
+
 }
