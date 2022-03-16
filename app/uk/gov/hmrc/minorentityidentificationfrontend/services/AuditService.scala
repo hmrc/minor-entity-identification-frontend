@@ -78,7 +78,7 @@ class AuditService @Inject()(appConfig: AppConfig,
     } yield {
       val auditJson = Json.obj(
         "callingService" -> callingService,
-        "businessType" -> "Trusts",
+        "businessType" -> "Trusts"
       ) ++ trustDetails
 
       auditConnector.sendExplicitAudit(
@@ -95,7 +95,7 @@ class AuditService @Inject()(appConfig: AppConfig,
     } yield {
       val auditJson = Json.obj(
         "callingService" -> callingService,
-        "businessType" -> "Unincorporated Association",
+        "businessType" -> "Unincorporated Association"
       ) ++ uaDetails
 
       auditConnector.sendExplicitAudit(
