@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{SuccessfulMatchKey, UnMatchableKey}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{DetailsMismatchKey, DetailsNotFoundKey, SuccessfulMatchKey, UnMatchableKey}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
@@ -87,7 +87,6 @@ object TestConstants {
 
   val testTrustJourneyDataJson: JsObject = Json.obj(
     "utr" -> testSautrJson,
-    "chrn" -> testCHRN,
     "postcode" -> testSaPostcode,
     "identifiersMatch" -> SuccessfulMatchKey,
     "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey),
@@ -96,7 +95,30 @@ object TestConstants {
       registeredBusinessPartnerIdKey -> testSafeId)
   )
 
-  val testLegacyJourneyDataJson: JsObject = Json.obj(
+  val testTrustIdFalseJourneyDataJson: JsObject = Json.obj(
+    "utr" -> testSautrJson,
+    "postcode" -> testSaPostcode,
+    "identifiersMatch" -> DetailsMismatchKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
+    "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
+  )
+
+  val testTrustBvFailJourneyDataJson: JsObject = Json.obj(
+    "utr" -> testSautrJson,
+    "postcode" -> testSaPostcode,
+    "identifiersMatch" -> SuccessfulMatchKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationFailKey),
+    "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
+  )
+
+  val testNoIdentifiersJourneyDataJson: JsObject = Json.obj(
+    "identifiersMatch" -> UnMatchableKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
+    "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
+  )
+
+  val testCHRNJourneyDataJson: JsObject = Json.obj(
+    "CHRN" -> testCHRN,
     "identifiersMatch" -> UnMatchableKey,
     "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
     "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
@@ -104,13 +126,21 @@ object TestConstants {
 
   val testUAJourneyDataJson: JsObject = Json.obj(
     "utr" -> testCtutrJson,
-    "chrn" -> testCHRN,
     "postcode" -> testSaPostcode,
     "identifiersMatch" -> SuccessfulMatchKey,
     "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey),
     "registration" -> Json.obj(
       registrationStatusKey -> RegisteredKey,
       registeredBusinessPartnerIdKey -> testSafeId)
+  )
+
+  val testUAJourneyDataJsonNotFound: JsObject = Json.obj(
+    "utr" -> testCtutrJson,
+    "postcode" -> testSaPostcode,
+    "identifiersMatch" -> DetailsNotFoundKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
+    "registration" -> Json.obj(
+      registrationStatusKey -> RegistrationNotCalledKey)
   )
 
   def testOverseasJourneyDataJson(utrBlock: JsObject): JsObject = Json.obj(

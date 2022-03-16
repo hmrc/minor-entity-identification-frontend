@@ -36,7 +36,7 @@ class UnincorporatedAssociationSubmissionServiceSpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val retryUrl: String ="/retry"
+  val retryUrl: String = "/retry"
   val expectedContinueUrl: String = testContinueUrl + s"?journeyId=$testJourneyId"
 
   object TestUnincorporatedAssociationSubmissionService extends
@@ -53,8 +53,7 @@ class UnincorporatedAssociationSubmissionServiceSpec
       mockValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
         testJourneyId,
         Some(testCtutr),
-        Some(testOfficePostcode),
-        None
+        Some(testOfficePostcode)
       ) returns Future.successful(SuccessfulMatch)
 
       mockAuditService.auditJourney(testJourneyId, testUnincorporatedAssociationJourneyConfig()) returns Future.successful(())
@@ -79,8 +78,7 @@ class UnincorporatedAssociationSubmissionServiceSpec
       mockValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
         testJourneyId,
         Some(testCtutr),
-        Some(testOfficePostcode),
-        None
+        Some(testOfficePostcode)
       ) returns Future.successful(DetailsMismatch)
 
       mockAuditService.auditJourney(testJourneyId, testUnincorporatedAssociationJourneyConfig()) returns Future.successful(())
@@ -105,8 +103,7 @@ class UnincorporatedAssociationSubmissionServiceSpec
       mockValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
         testJourneyId,
         Some(testCtutr),
-        Some(testOfficePostcode),
-        None
+        Some(testOfficePostcode)
       ) returns Future.successful(DetailsMismatch)
 
       mockAuditService.auditJourney(testJourneyId, testUnincorporatedAssociationJourneyConfig()) returns Future.successful(())
@@ -131,8 +128,7 @@ class UnincorporatedAssociationSubmissionServiceSpec
       mockValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
         testJourneyId,
         None,
-        None,
-        Some(testCHRN)
+        None
       ) returns Future.successful(UnMatchable)
 
       val result = await(TestUnincorporatedAssociationSubmissionService.submit(

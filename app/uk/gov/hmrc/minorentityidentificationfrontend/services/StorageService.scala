@@ -56,9 +56,6 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveCHRN(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, ChrnKey)
 
-  def retrieveIdentifiersMatch(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[KnownFactsMatchingResult]] =
-    connector.retrieveDataField[KnownFactsMatchingResult](journeyId, IdentifiersMatchKey)
-
   def storeRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[RegistrationStatus](journeyId, RegistrationKey, registrationStatus)
 
@@ -74,10 +71,15 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeAllData(journeyId)
 
-  def retrieveOverseasCompanyDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+  def retrieveOverseasCompanyDetails(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     connector.retrieveOverseasDetails(journeyId).map {
       case Some(overseasDetails) => Json.toJsObject(overseasDetails)
       case None => throw new InternalServerException("No Overseas Company data stored for journeyId: " + journeyId)
+    }
+
+  def retrieveOverseasAuditDetails(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+    connector.retrieveOverseasDetails(journeyId).map {
+      optOverseasDetails => OverseasCompanyDetails.writesForAudit(optOverseasDetails)
     }
 
   def retrieveTrustsDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
@@ -86,15 +88,25 @@ class StorageService @Inject()(connector: StorageConnector) {
       case None => throw new InternalServerException("No Trusts journey data stored for journeyId: " + journeyId)
     }
 
+  def retrieveTrustsAuditDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+    connector.retrieveTrustsDetails(journeyId).map {
+      optTrustDetails => TrustDetails.writesForAudit(optTrustDetails, journeyConfig.businessVerificationCheck)
+    }
+
   def retrieveUADetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     connector.retrieveUADetails(journeyId).map {
       case Some(uaDetails) => UADetails.writesForJourneyEnd(uaDetails, journeyConfig.businessVerificationCheck)
       case None => throw new InternalServerException("No UA journey data stored for journeyId: " + journeyId)
     }
 
+  def retrieveUAAuditDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+    connector.retrieveUADetails(journeyId).map {
+      optUADetails => UADetails.writesForAudit(optUADetails, journeyConfig.businessVerificationCheck)
+    }
+
   def retrieveAllData(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] = {
     journeyConfig.businessEntity match {
-      case OverseasCompany => retrieveOverseasCompanyDetails(journeyId, journeyConfig)
+      case OverseasCompany => retrieveOverseasCompanyDetails(journeyId)
       case Trusts => retrieveTrustsDetails(journeyId, journeyConfig)
       case UnincorporatedAssociation => retrieveUADetails(journeyId, journeyConfig)
     }
@@ -105,9 +117,6 @@ class StorageService @Inject()(connector: StorageConnector) {
 
   def retrieveOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Overseas]] =
     connector.retrieveDataField[Overseas](journeyId, OverseasKey)
-
-  def retrieveRegistrationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[RegistrationStatus]] =
-    connector.retrieveDataField[RegistrationStatus](journeyId, RegistrationKey)
 
   def storeBusinessVerificationStatus(journeyId: String,
                                       businessVerification: BusinessVerificationStatus

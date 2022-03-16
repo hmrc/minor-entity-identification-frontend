@@ -24,7 +24,6 @@ case object SuccessfulMatch extends KnownFactsMatchingResult
 
 sealed trait KnownFactsMatchFailure extends KnownFactsMatchingResult
 
-
 case object UnMatchable extends KnownFactsMatchFailure
 
 case object DetailsMismatch extends KnownFactsMatchFailure

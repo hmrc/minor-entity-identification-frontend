@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.{reset, when}
+import org.mockito.scalatest.IdiomaticMockito
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatestplus.mockito.MockitoSugar
@@ -26,7 +27,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.services.JourneyService
 
 import scala.concurrent.Future
 
-trait MockJourneyService extends MockitoSugar with BeforeAndAfterEach {
+trait MockJourneyService extends IdiomaticMockito with BeforeAndAfterEach {
   self: Suite =>
 
   val mockJourneyService: JourneyService = mock[JourneyService]

@@ -45,6 +45,8 @@ trait AbstractBusinessVerificationControllerISpec
 
   val testUtr: String
 
+  val testJourneyDataJson: JsObject
+
   def commonTest(): Unit = {
     s"the $BusinessVerificationStub feature switch is enabled" should {
       "redirect to the continue url" when {
@@ -63,10 +65,7 @@ trait AbstractBusinessVerificationControllerISpec
           stubRegister(testUtr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, SuccessfulMatchKey)
-          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-          stubRetrievePostcode(testJourneyId)(OK, testSaPostcode)
+          stubRetrieveEntityDetails(testJourneyId)(OK, testJourneyDataJson)
 
           lazy val result = get(businessVerificationResultUrlPrefix + s"?journeyId=$testBusinessVerificationJourneyId")
 
@@ -80,7 +79,6 @@ trait AbstractBusinessVerificationControllerISpec
           verifyAudit()
         }
       }
-
       "throw an exception when the query string is missing" in {
         enable(BusinessVerificationStub)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -114,10 +112,7 @@ trait AbstractBusinessVerificationControllerISpec
           stubRegister(testUtr, testRegime)(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
-          stubRetrieveRegistrationStatus(testJourneyId)(OK, testSuccessfulRegistrationJson)
-          stubRetrieveIdentifiersMatch(testJourneyId)(OK, SuccessfulMatchKey)
-          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-          stubRetrievePostcode(testJourneyId)(OK, testSaPostcode)
+          stubRetrieveEntityDetails(testJourneyId)(OK, testJourneyDataJson)
 
           lazy val result = get(businessVerificationResultUrlPrefix + s"?journeyId=$testBusinessVerificationJourneyId")
 
@@ -146,7 +141,6 @@ trait AbstractBusinessVerificationControllerISpec
         lazy val result = get(businessVerificationResultUrlPrefix)
 
         result.status mustBe INTERNAL_SERVER_ERROR
-
       }
     }
   }

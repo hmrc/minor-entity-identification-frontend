@@ -31,13 +31,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ValidateUnincorporatedAssociationDetailsServiceSpec extends AnyWordSpec
-    with Matchers
-    with ScalaFutures
-    with MockValidateUnincorporatedAssociationDetailsConnector
-    with MockStorageService {
+  with Matchers
+  with ScalaFutures
+  with MockValidateUnincorporatedAssociationDetailsConnector
+  with MockStorageService {
 
   object TestValidateUnincorporatedAssociationDetailsService extends
-  ValidateUnincorporatedAssociationDetailsService(mockValidateUnincorporatedAssociationDetailsConnector, mockStorageService)
+    ValidateUnincorporatedAssociationDetailsService(mockValidateUnincorporatedAssociationDetailsConnector, mockStorageService)
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -52,7 +52,7 @@ class ValidateUnincorporatedAssociationDetailsServiceSpec extends AnyWordSpec
         mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch).returns(Future.successful(SuccessfullyStored))
 
         val result = await(TestValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
-          testJourneyId, Some(testCtutr), Some(testOfficePostcode), optCHRN = None))
+          testJourneyId, Some(testCtutr), Some(testOfficePostcode)))
 
         result mustBe SuccessfulMatch
 
@@ -69,7 +69,7 @@ class ValidateUnincorporatedAssociationDetailsServiceSpec extends AnyWordSpec
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch).returns(Future.successful(SuccessfullyStored))
 
         val result = await(TestValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
-          testJourneyId, Some(testCtutr), Some(testOfficePostcode), optCHRN = None))
+          testJourneyId, Some(testCtutr), Some(testOfficePostcode)))
 
         result mustBe DetailsMismatch
 
@@ -87,7 +87,7 @@ class ValidateUnincorporatedAssociationDetailsServiceSpec extends AnyWordSpec
         mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound).returns(Future.successful(SuccessfullyStored))
 
         val result = await(TestValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
-          testJourneyId, Some(testCtutr), Some(testOfficePostcode), optCHRN = None))
+          testJourneyId, Some(testCtutr), Some(testOfficePostcode)))
 
         result mustBe DetailsNotFound
 
@@ -102,7 +102,7 @@ class ValidateUnincorporatedAssociationDetailsServiceSpec extends AnyWordSpec
 
         try {
           TestValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
-            testJourneyId, Some(testCtutr), optPostcode = None, optCHRN = None)
+            testJourneyId, Some(testCtutr), optPostcode = None)
 
           fail("Call to validate unincorporated association's details should have raised an IllegalStateException")
 
@@ -122,7 +122,7 @@ class ValidateUnincorporatedAssociationDetailsServiceSpec extends AnyWordSpec
         mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable).returns(Future.successful(SuccessfullyStored))
 
         val result = await(TestValidateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
-          testJourneyId, optCtUtr = None, optPostcode = None, optCHRN = Some(testCHRN)))
+          testJourneyId, optCtUtr = None, optPostcode = None))
 
         result mustBe UnMatchable
 
