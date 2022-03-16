@@ -19,13 +19,14 @@ package uk.gov.hmrc.minorentityidentificationfrontend.models
 import play.api.libs.json._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.writeForJourneyContinuation
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditHelper._
 
 case class UADetails(optUtr: Option[Utr],
                      optCtPostcode: Option[String],
                      optChrn: Option[String],
                      optIdentifiersMatch: Option[KnownFactsMatchingResult],
-                     businessVerificationStatus: Option[BusinessVerificationStatus],
-                     registrationStatus: Option[RegistrationStatus])
+                     optBusinessVerificationStatus: Option[BusinessVerificationStatus],
+                     optRegistrationStatus: Option[RegistrationStatus])
 
 object UADetails {
   def writesForJourneyEnd(uaDetails: UADetails, businessVerificationCheck: Boolean): JsObject = {
@@ -51,5 +52,37 @@ object UADetails {
     Json.obj("identifiersMatch" -> uaDetails.optIdentifiersMatch.contains(SuccessfulMatch),
       "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
     ) ++ utrBlock ++ saPostcodeBlock ++ chrnBlock ++ businessVerificationBlock
+  }
+
+  def writesForAudit(optUADetails: Option[UADetails], businessVerificationCheck: Boolean): JsObject = {
+    optUADetails match {
+      case Some(uaDetails) =>
+        val optCtutrBlock = uaDetails.optUtr match {
+          case Some(ctutr) => Json.obj("CTUTR" -> ctutr.value)
+          case None => Json.obj()
+        }
+
+        val optPostCodeBlock = uaDetails.optCtPostcode match {
+          case Some(postCode) => Json.obj("CTpostcode" -> postCode)
+          case None => Json.obj()
+        }
+
+        val optCHRNBlock = uaDetails.optChrn match {
+          case Some(chrn) => Json.obj("CHRN" -> chrn)
+          case None => Json.obj()
+        }
+
+        Json.obj(
+          "isMatch" -> defineAuditIdentifiersMatch(uaDetails.optIdentifiersMatch),
+          "VerificationStatus" -> defineAuditBusinessVerificationStatus(uaDetails.optBusinessVerificationStatus, businessVerificationCheck),
+          "RegisterApiStatus" -> defineAuditRegistrationStatus(uaDetails.optRegistrationStatus)
+        ) ++ optCtutrBlock ++ optPostCodeBlock ++ optCHRNBlock
+      case None =>
+        Json.obj(
+          "isMatch" -> defineAuditIdentifiersMatch(None),
+          "VerificationStatus" -> defineAuditBusinessVerificationStatus(None, businessVerificationCheck),
+          "RegisterApiStatus" -> defineAuditRegistrationStatus(None)
+        )
+    }
   }
 }

@@ -37,10 +37,9 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   with UaCheckYourAnswersSpecificViewTests
   with FeatureSwitching {
 
-  "GET /identify-your-trust/<testJourneyId>/check-your-answers-business" when {
+  "GET /identify-your-unincorporated-association/<testJourneyId>/check-your-answers-business" when {
 
     "the EnableFullTrustJourney is enabled" when {
-
       "the applicant has a Ctutr and a registered office postcode" should {
         enable(EnableFullUAJourney)
         lazy val result: WSResponse = {
@@ -54,6 +53,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
           stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+          stubAudit()
 
           get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
         }
@@ -82,6 +82,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveUtr(testJourneyId)(NOT_FOUND)
           stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
           stubRetrievePostcode(testJourneyId)(NOT_FOUND)
+          stubAudit()
 
           get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
         }
@@ -109,6 +110,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRetrieveUtr(testJourneyId)(NOT_FOUND)
           stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
+          stubAudit()
 
           get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
         }
@@ -123,6 +125,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         "redirect to sign in page" in {
           enable(EnableFullUAJourney)
           stubAuthFailure()
+          stubAudit()
 
           lazy val result: WSResponse = get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
 
@@ -140,6 +143,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         "return an INTERNAL_SERVER_ERROR status" in {
           enable(EnableFullUAJourney)
           stubAuth(OK, successfulAuthResponse(internalId = None))
+          stubAudit()
 
           lazy val result: WSResponse = get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
 
@@ -147,187 +151,23 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         }
       }
+    }
+    "the EnableFullUAJourney is disabled" should {
+      "throw an internal server exception" in {
+        disable(EnableFullUAJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubAudit()
 
-      "the EnableFullUAJourney is disabled" should {
-        "throw an internal server exception" in {
-          disable(EnableFullUAJourney)
-          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        val result = get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
 
-          val result = get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
-
-          result.status mustBe INTERNAL_SERVER_ERROR
-        }
+        result.status mustBe INTERNAL_SERVER_ERROR
       }
     }
   }
 
   "POST /identify-your-unincorporated-association/check-your-answers-business" should {
-
-    "redirect to the provided continueUrl when the identifiers are matched" in {
-      enable(EnableFullUAJourney)
-
-      await(insertJourneyConfig(
-        journeyId = testJourneyId,
-        internalId = testInternalId,
-        testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
-      ))
-
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
-      stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
-      stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-
-      stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> true))
-
-      stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
-
-      stubAudit()
-
-      val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
-
-      result must have {
-        httpStatus(SEE_OTHER)
-        redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
-      }
-
-      verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-      verifyAudit()
-    }
-
-    "redirect to the cannot confirm business error page when the identifiers are not matched" in {
-
-      enable(EnableFullUAJourney)
-
-      await(insertJourneyConfig(
-        journeyId = testJourneyId,
-        internalId = testInternalId,
-        testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
-      ))
-
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
-      stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
-      stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-
-      stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> false))
-
-      stubStoreIdentifiersMatch(testJourneyId, DetailsMismatchKey)(OK)
-
-      stubAudit()
-
-      val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
-
-      result must have {
-        httpStatus(SEE_OTHER)
-        redirectUri(expectedValue = errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
-      }
-
-      verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsMismatchKey))
-      verifyAudit()
-    }
-
-    "redirect to the cannot confirm business error page when the unincorporated association's details cannot be found" in {
-
-      enable(EnableFullUAJourney)
-
-      await(insertJourneyConfig(
-        journeyId = testJourneyId,
-        internalId = testInternalId,
-        testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
-      ))
-
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
-      stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
-      stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-
-      stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(BAD_REQUEST, Json.obj("code" -> "NOT_FOUND",
-        "reason" -> "The back end has indicated that CT UTR cannot be returned"
-      ))
-
-      stubStoreIdentifiersMatch(testJourneyId, DetailsNotFoundKey)(OK)
-
-      stubAudit()
-
-      val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
-
-      result must have {
-        httpStatus(SEE_OTHER)
-        redirectUri(expectedValue = errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
-      }
-
-      verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsNotFoundKey))
-      verifyAudit()
-    }
-
     "redirect to the provided continueUrl" when {
-
-      "the user provides only a charity reference number" in {
-
-        enable(EnableFullUAJourney)
-
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
-        ))
-
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveCHRN(testJourneyId)(OK, testCHRN)
-
-        stubStoreIdentifiersMatch(testJourneyId, UnMatchableKey)(OK)
-
-        stubAudit()
-
-        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
-
-        result must have {
-          httpStatus(SEE_OTHER)
-          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
-        }
-
-        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
-        verifyAudit()
-      }
-
-      "there is no Ctutr and no chrn" in {
-
-        enable(EnableFullUAJourney)
-
-        await(insertJourneyConfig(
-          journeyId = testJourneyId,
-          internalId = testInternalId,
-          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
-        ))
-
-        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
-
-        stubStoreIdentifiersMatch(testJourneyId, UnMatchableKey)(OK)
-
-        stubAudit()
-
-        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
-
-        result must have {
-          httpStatus(SEE_OTHER)
-          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
-        }
-
-        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
-        verifyAudit()
-      }
-
-    }
-
-    "handle an internal server error" when {
-
-      "the backend service responds with an unexpected status" in {
-
+      "the identifiers are matched" in {
         enable(EnableFullUAJourney)
 
         await(insertJourneyConfig(
@@ -339,20 +179,171 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
         stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> true))
+        stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson)
+        stubAudit()
 
+        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
+        verifyAudit()
+      }
+      "the user provides only a charity reference number" in {
+        enable(EnableFullUAJourney)
+
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
+        stubStoreIdentifiersMatch(testJourneyId, UnMatchableKey)(OK)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testCHRNJourneyDataJson)
+        stubAudit()
+
+        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
+        verifyAudit()
+      }
+      "there is no Ctutr and no chrn" in {
+        enable(EnableFullUAJourney)
+
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
+        stubStoreIdentifiersMatch(testJourneyId, UnMatchableKey)(OK)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testNoIdentifiersJourneyDataJson)
+        stubAudit()
+
+        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
+        verifyAudit()
+      }
+    }
+
+    "redirect to the cannot confirm business error page" when {
+      "the identifiers are not matched" in {
+        enable(EnableFullUAJourney)
+
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
+        stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
+        stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> false))
+        stubStoreIdentifiersMatch(testJourneyId, DetailsMismatchKey)(OK)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson)
+        stubAudit()
+
+        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsMismatchKey))
+        verifyAudit()
+      }
+      "the unincorporated association's details cannot be found" in {
+        enable(EnableFullUAJourney)
+
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
+        stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
+        stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(BAD_REQUEST, Json.obj("code" -> "NOT_FOUND",
+          "reason" -> "The back end has indicated that CT UTR cannot be returned"
+        ))
+        stubStoreIdentifiersMatch(testJourneyId, DetailsNotFoundKey)(OK)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJsonNotFound)
+        stubAudit()
+
+        val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+
+        result must have {
+          httpStatus(SEE_OTHER)
+          redirectUri(expectedValue = errorControllers.routes.CannotConfirmBusinessController.show(testJourneyId).url)
+        }
+
+        verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsNotFoundKey))
+        verifyAudit()
+      }
+    }
+
+    "handle an internal server error" when {
+      "the backend service responds with an unexpected status" in {
+        enable(EnableFullUAJourney)
+
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
+        stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
         stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(NOT_FOUND)
+        stubAudit()
 
         val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
 
         result.status mustBe INTERNAL_SERVER_ERROR
       }
+      "the user does not have an internal ID" in {
+        enable(EnableFullUAJourney)
+        stubAuth(OK, successfulAuthResponse(internalId = None))
+        stubAudit()
+
+        lazy val result: WSResponse = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+
+        result.status mustBe INTERNAL_SERVER_ERROR
+
+      }
     }
 
-    "the user is UNAUTHORISED" should {
-      "redirect to sign in page" in {
+    "redirect to sign in page" when {
+      "the user is UNAUTHORISED" in {
         enable(EnableFullUAJourney)
         stubAuthFailure()
+        stubAudit()
 
         lazy val result: WSResponse = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
 
@@ -366,21 +357,11 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       }
     }
 
-    "return an INTERNAL_SERVER_ERROR status" when {
-      "the user does not have an internal ID" in {
-        enable(EnableFullUAJourney)
-        stubAuth(OK, successfulAuthResponse(internalId = None))
-
-        lazy val result: WSResponse = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
-
-        result.status mustBe INTERNAL_SERVER_ERROR
-
-      }
-    }
-    "the EnableFullTrustJourney is disabled" should {
-      "throw an internal server exception" in {
+    "throw an internal server exception" when {
+      "the EnableFullTrustJourney is disabled" in {
         disable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubAudit()
 
         val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
 

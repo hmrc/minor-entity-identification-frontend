@@ -62,4 +62,32 @@ object OverseasCompanyDetails {
       }
     }
   }
+
+  def writesForAudit(optOverseasCompanyDetails: Option[OverseasCompanyDetails]): JsObject = {
+    optOverseasCompanyDetails match {
+      case Some(overseasDetails) =>
+        val optUtrBlock = overseasDetails.optUtr match {
+          case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value, "isMatch" -> "false")
+          case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "isMatch" -> "false")
+          case None => Json.obj("isMatch" -> "false")
+        }
+        val overseasIdentifiersBlock = overseasDetails.optOverseas match {
+          case Some(overseas) => Json.obj(
+            "overseasTaxIdentifier" -> overseas.taxIdentifier,
+            "overseasTaxIdentifierCountry" -> overseas.country)
+          case _ => Json.obj()
+        }
+
+        Json.obj(
+          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+          "RegisterApiStatus" -> "not called"
+        ) ++ optUtrBlock ++ overseasIdentifiersBlock
+      case None =>
+        Json.obj(
+          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+          "RegisterApiStatus" -> "not called",
+          "isMatch" -> "unmatchable"
+        )
+    }
+  }
 }

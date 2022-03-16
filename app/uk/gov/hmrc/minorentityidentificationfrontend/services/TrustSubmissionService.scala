@@ -20,7 +20,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.errorControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
-import java.lang.ProcessBuilder.Redirect
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,8 +35,7 @@ class TrustSubmissionService @Inject()(validateTrustKnownFactsService: ValidateT
     for {
       optSaUtr <- storageService.retrieveUtr(journeyId)
       optSaPostcode <- storageService.retrievePostcode(journeyId)
-      optCHRN <- storageService.retrieveCHRN(journeyId)
-      matchingResult <- validateTrustKnownFactsService.validateTrustKnownFacts(journeyId, optSaUtr.map(_.value), optSaPostcode, optCHRN)
+      matchingResult <- validateTrustKnownFactsService.validateTrustKnownFacts(journeyId, optSaUtr.map(_.value), optSaPostcode)
       redirectUrl <- handleBusinessVerificationCheck(journeyId, matchingResult, optSaUtr.map(_.value), journeyConfig)
     } yield redirectUrl
 
@@ -68,6 +66,7 @@ class TrustSubmissionService @Inject()(validateTrustKnownFactsService: ValidateT
           storageService.storeBusinessVerificationStatus(journeyId, BusinessVerificationNotEnoughInformationToCallBV)
         else
           Future.successful(())
+        _ <- storageService.storeRegistrationStatus(journeyId, RegistrationNotCalled)
       } yield aMatchingFailure match {
         case UnMatchable =>
           auditService.auditJourney(journeyId, journeyConfig)

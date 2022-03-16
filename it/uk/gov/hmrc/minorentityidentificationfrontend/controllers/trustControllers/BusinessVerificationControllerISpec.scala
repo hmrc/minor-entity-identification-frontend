@@ -31,6 +31,8 @@ class BusinessVerificationControllerISpec extends AbstractBusinessVerificationCo
 
   override val testUtr: String = testSautr
 
+  override val testJourneyDataJson: JsObject = testTrustJourneyDataJson
+
   s"GET /identify-your-trust/<JourneyId>/business-verification-result" when {
     commonTest()
   }

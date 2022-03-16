@@ -48,43 +48,21 @@ class AuditService @Inject()(appConfig: AppConfig,
 
     journeyConfig.businessEntity match {
       case OverseasCompany => auditOverseasCompanyJourney(journeyId, callingService)
-      case Trusts => auditTrustsJourney(journeyId, callingService, journeyConfig.businessVerificationCheck)
-      case UnincorporatedAssociation => auditUnincorporatedAssociationJourney(journeyId, callingService)
+      case Trusts => auditTrustsJourney(journeyId, callingService, journeyConfig)
+      case UnincorporatedAssociation => auditUnincorporatedAssociationJourney(journeyId, callingService, journeyConfig)
       case _ =>
         throw new InternalServerException(s"Unexpected business entity type encountered auditing minor entity journey for Journey ID $journeyId")
     }
-
   }
 
   private def auditOverseasCompanyJourney(journeyId: String, callingService: String)
                                          (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-
-    val retrieveUtr = storageService.retrieveUtr(journeyId)
-    val retrieveOverseasTaxIdentifiers = storageService.retrieveOverseasTaxIdentifiers(journeyId)
-
     for {
-      optUtr <- retrieveUtr
-      optOverseasTaxIdentifiers <- retrieveOverseasTaxIdentifiers
+      overseasDataJson <- storageService.retrieveOverseasAuditDetails(journeyId)
     } yield {
-      val optUtrBlock = optUtr match {
-        case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value, "cTUTRMatch" -> false)
-        case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "sautrMatch" -> false)
-        case None => Json.obj()
-      }
-      val overseasIdentifiersBlock =
-        optOverseasTaxIdentifiers match {
-          case Some(overseas) => Json.obj(
-            "overseasTaxIdentifier" -> overseas.taxIdentifier,
-            "overseasTaxIdentifierCountry" -> overseas.country)
-          case _ => Json.obj()
-        }
-
       val auditJson = Json.obj(
         "callingService" -> callingService,
-        "businessType" -> "Overseas Company",
-        "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-        "RegisterApiStatus" -> "not called"
-      ) ++ optUtrBlock ++ overseasIdentifiersBlock
+        "businessType" -> "Overseas Company") ++ overseasDataJson
 
       auditConnector.sendExplicitAudit(
         auditType = "OverseasCompanyRegistration",
@@ -93,47 +71,15 @@ class AuditService @Inject()(appConfig: AppConfig,
     }
   }
 
-  private def auditTrustsJourney(journeyId: String, callingService: String, businessVerificationCheck: Boolean)
+  private def auditTrustsJourney(journeyId: String, callingService: String, journeyConfig: JourneyConfig)
                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-
-    val retrieveSaUtr = storageService.retrieveUtr(journeyId)
-    val retrieveSaPostCode = storageService.retrievePostcode(journeyId)
-    val retrieveCHRN = storageService.retrieveCHRN(journeyId)
-    val retrieveIdentifiersMatch = storageService.retrieveIdentifiersMatch(journeyId)
-    val retrieveBusinessVerificationStatus = storageService.retrieveBusinessVerificationStatus(journeyId)
-    val retrieveRegistrationStatus = storageService.retrieveRegistrationStatus(journeyId)
-
     for {
-      optSaUtr <- retrieveSaUtr
-      optSaPostCode <- retrieveSaPostCode
-      optCHRN <- retrieveCHRN
-      optIdentifiersMatch <- retrieveIdentifiersMatch
-      optBusinessVerificationStatus <- retrieveBusinessVerificationStatus
-      optRegistrationStatus <- retrieveRegistrationStatus
+      trustDetails <- storageService.retrieveTrustsAuditDetails(journeyId, journeyConfig)
     } yield {
-
-      val optSaUtrBlock = optSaUtr match {
-        case Some(saUtr) => Json.obj("SAUTR" -> saUtr.value)
-        case None => Json.obj()
-      }
-
-      val optSaPostCodeBlock = optSaPostCode match {
-        case Some(saPostCode) => Json.obj("SApostcode" -> saPostCode)
-        case None => Json.obj()
-      }
-
-      val optCHRNBlock = optCHRN match {
-        case Some(chrn) => Json.obj("CHRN" -> chrn)
-        case None => Json.obj()
-      }
-
       val auditJson = Json.obj(
         "callingService" -> callingService,
         "businessType" -> "Trusts",
-        "isMatch" -> defineAuditIdentifiersMatch(optIdentifiersMatch),
-        "VerificationStatus" -> defineAuditBusinessVerificationStatus(optBusinessVerificationStatus, businessVerificationCheck),
-        "RegisterApiStatus" -> defineAuditRegistrationStatus(optRegistrationStatus)
-      ) ++ optSaUtrBlock ++ optSaPostCodeBlock ++ optCHRNBlock
+      ) ++ trustDetails
 
       auditConnector.sendExplicitAudit(
         auditType = "TrustsRegistration",
@@ -142,52 +88,20 @@ class AuditService @Inject()(appConfig: AppConfig,
     }
   }
 
-  private def auditUnincorporatedAssociationJourney(journeyId: String, callingService: String)
+  private def auditUnincorporatedAssociationJourney(journeyId: String, callingService: String, journeyConfig: JourneyConfig)
                                                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-
     for {
-      optRegistrationStatus <- storageService.retrieveRegistrationStatus(journeyId)
+      uaDetails <- storageService.retrieveUAAuditDetails(journeyId, journeyConfig)
     } yield {
       val auditJson = Json.obj(
         "callingService" -> callingService,
         "businessType" -> "Unincorporated Association",
-        "identifiersMatch" -> false,
-        "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-        "RegisterApiStatus" -> defineAuditRegistrationStatus(optRegistrationStatus)
-      )
+      ) ++ uaDetails
 
       auditConnector.sendExplicitAudit(
         auditType = "UnincorporatedAssociationRegistration",
         detail = auditJson
       )
-    }
-  }
-
-  private def defineAuditIdentifiersMatch(optIdentifiersMatch: Option[KnownFactsMatchingResult]): String =
-    optIdentifiersMatch match {
-      case Some(SuccessfulMatch) => "true"
-      case Some(DetailsMismatch) | Some(DetailsNotFound) => "false"
-      case  Some(UnMatchable) => "unmatchable"
-      case None => "false"
-    }
-
-  private def defineAuditRegistrationStatus(optRegistrationStatus: Option[RegistrationStatus]): String =
-    optRegistrationStatus match {
-      case Some(Registered(_)) => "success"
-      case Some(RegistrationFailed) => "fail"
-      case _ => "not called"
-    }
-
-  private def defineAuditBusinessVerificationStatus(optBusinessVerificationStatus: Option[BusinessVerificationStatus],
-                                                    businessVerificationCheck: Boolean): String = {
-    if (!businessVerificationCheck) "not requested"
-    else {
-      optBusinessVerificationStatus match {
-        case Some(BusinessVerificationPass) => "success"
-        case Some(BusinessVerificationFail) => "fail"
-        case Some(BusinessVerificationNotEnoughInformationToCallBV) | None => "Not enough information to call BV"
-        case Some(BusinessVerificationNotEnoughInformationToChallenge) => "Not Enough Information to challenge"
-      }
     }
   }
 }

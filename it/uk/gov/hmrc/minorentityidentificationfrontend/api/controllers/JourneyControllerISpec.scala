@@ -141,8 +141,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
             "businessVerification" -> Json.obj("verificationStatus" -> "PASS"),
             "registration" -> Json.obj("registrationStatus" -> "REGISTERED",
               "registeredBusinessPartnerId" -> testSafeId),
-            "saPostcode" -> testSaPostcode,
-            "chrn" -> testCHRN
+            "saPostcode" -> testSaPostcode
           )
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -169,7 +168,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
         )
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveEntityDetails(testJourneyId)(OK, testLegacyJourneyDataJson)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testNoIdentifiersJourneyDataJson)
         stubAudit()
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
@@ -188,12 +187,11 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
           ))
 
           val testDetailsJson = Json.obj(
-            "ctutr" -> "1000000001",
+            "ctutr" -> testCtutr,
             "identifiersMatch" -> true,
             "businessVerification" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
             "registration" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
-            "ctPostcode" -> testSaPostcode,
-            "chrn" -> testCHRN
+            "ctPostcode" -> testSaPostcode
           )
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -220,7 +218,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
         )
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        stubRetrieveEntityDetails(testJourneyId)(OK, testLegacyJourneyDataJson)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testNoIdentifiersJourneyDataJson)
         stubAudit()
 
         lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
@@ -350,12 +348,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
         stubAudit()
-        stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
-        stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
-        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveEntityDetails(testJourneyId)(OK, testNoIdentifiersJourneyDataJson)
 
         lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson)
 
@@ -487,12 +480,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
         disable(EnableFullUAJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
-        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
-        stubRetrievePostcode(testJourneyId)(NOT_FOUND)
-        stubRetrieveIdentifiersMatch(testJourneyId)(NOT_FOUND)
-        stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
-        stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+        stubRetrieveEntityDetails(testJourneyId)(NOT_FOUND)
         stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson)
@@ -507,6 +495,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
     "return Bad Request" when {
       "one URL provided for the journey config is not relative" in {
+        enable(EnableFullTrustJourney)
         val testJourneyConfigJson: JsObject = Json.obj(
           "continueUrl" -> testContinueUrl,
           "deskProServiceId" -> testDeskProServiceId,

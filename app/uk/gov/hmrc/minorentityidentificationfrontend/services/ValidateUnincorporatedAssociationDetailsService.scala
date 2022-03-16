@@ -16,30 +16,27 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
-import javax.inject.{Inject, Singleton}
-
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.ValidateUnincorporatedAssociationDetailsConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{KnownFactsMatchingResult, UnMatchable}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ValidateUnincorporatedAssociationDetailsService @Inject()(
-                                                                 validateUnincorporatedAssociationDetailsConnector: ValidateUnincorporatedAssociationDetailsConnector,
-                                                                 storageService: StorageService) {
+class ValidateUnincorporatedAssociationDetailsService @Inject()(validateUADetailsConnector: ValidateUnincorporatedAssociationDetailsConnector,
+                                                                storageService: StorageService) {
 
   def validateUnincorporatedAssociationDetails(journeyId: String,
                                                optCtUtr: Option[String],
-                                               optPostcode: Option[String],
-                                               optCHRN: Option[String])
+                                               optPostcode: Option[String])
                                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] = {
     optCtUtr match {
       case Some(ctUtr) =>
         optPostcode match {
           case Some(postcode) =>
             for {
-              validationResult <- validateUnincorporatedAssociationDetailsConnector.validateUnincorporatedAssociationDetails(ctUtr, postcode)
+              validationResult <- validateUADetailsConnector.validateUnincorporatedAssociationDetails(ctUtr, postcode)
               _ <- storageService.storeIdentifiersMatch(journeyId, validationResult)
             } yield validationResult
           case None =>

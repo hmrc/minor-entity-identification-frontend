@@ -29,8 +29,7 @@ class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector:
 
   def validateTrustKnownFacts(journeyId: String,
                               optSaUtr: Option[String],
-                              optSaPostcode: Option[String],
-                              optCHRN: Option[String])
+                              optSaPostcode: Option[String])
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] =
     optSaUtr match {
       case None =>

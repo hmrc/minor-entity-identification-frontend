@@ -17,7 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.helpers
 
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, Trusts, UnincorporatedAssociation}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{BusinessEntity, OverseasCompany, Trusts, UnincorporatedAssociation}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import java.util.UUID
@@ -33,7 +33,6 @@ object TestConstants {
   val testRegime: String = "VATC"
 
   val testSautr: String = "1234599999"
-  val testSautr1: String = "1234599998"
   val testCtutr: String = "1234500000"
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testSaPostcode = "AA1 1AA"
@@ -45,6 +44,8 @@ object TestConstants {
 
   def testUnincorporatedAssociationJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig =
     testJourneyConfig(UnincorporatedAssociation, businessVerificationCheck)
+
+  def testOverseasJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig = testJourneyConfig(OverseasCompany, businessVerificationCheck)
 
   def testJourneyConfig(businessEntity: BusinessEntity, businessVerificationCheck: Boolean = true): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
@@ -63,31 +64,22 @@ object TestConstants {
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Overseas Company",
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" ->  "not called",
-    "sautrMatch" -> false,
+    "RegisterApiStatus" -> "not called",
+    "isMatch" -> "false",
     "userSAUTR" -> testSautr)
-
-  val testOverseasCTUtrAuditEventJson: JsObject = Json.obj(
-    "callingService" -> testDefaultServiceName,
-    "businessType" -> "Overseas Company",
-    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" ->  "not called",
-    "cTUTRMatch" -> false,
-    "userCTUTR" -> testCtutr)
 
   val testUnincorporatedAssociationAuditEventJson: JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Unincorporated Association",
-    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-    "RegisterApiStatus" ->  "not called",
-    "identifiersMatch" -> false)
+    "VerificationStatus" -> "Not enough information to call BV",
+    "RegisterApiStatus" -> "not called",
+    "isMatch" -> "unmatchable")
 
-  def testSaUtrAndPostcodeTrustsAuditEventJson(
-                                                saUtr: String,
-                                                saPostCode: String,
-                                                identifiersMatch: String,
-                                                bvStatus: String,
-                                                regStatus: String): JsObject = Json.obj(
+  def testSaUtrAndPostcodeTrustsAuditEventJson(saUtr: String,
+                                               saPostCode: String,
+                                               identifiersMatch: String,
+                                               bvStatus: String,
+                                               regStatus: String): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Trusts",
     "SAUTR" -> saUtr,
@@ -97,10 +89,9 @@ object TestConstants {
     "RegisterApiStatus" -> regStatus
   )
 
-  def testSaUtrOnlyTrustsAuditEventJson(
-                                         identifiersMatch: String,
-                                         bvStatus: String,
-                                         regStatus: String): JsObject = Json.obj(
+  def testSaUtrOnlyTrustsAuditEventJson(identifiersMatch: String,
+                                        bvStatus: String,
+                                        regStatus: String): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Trusts",
     "SAUTR" -> testSautr,
@@ -109,10 +100,9 @@ object TestConstants {
     "RegisterApiStatus" -> regStatus
   )
 
-  def testCHRNOnlyTrustsAuditEventJson(
-                                        identifiersMatch: String,
-                                        bvStatus: String,
-                                        regStatus: String): JsObject = Json.obj(
+  def testCHRNOnlyTrustsAuditEventJson(identifiersMatch: String,
+                                       bvStatus: String,
+                                       regStatus: String): JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
     "businessType" -> "Trusts",
     "CHRN" -> testCHRN,
@@ -121,7 +111,17 @@ object TestConstants {
     "RegisterApiStatus" -> regStatus
   )
 
-  val testOverseasIdentifiersAuditEventJson: JsObject = Json.obj(
+  def testNoIdentifiersTrustsAuditEventJson(identifiersMatch: String,
+                                            bvStatus: String,
+                                            regStatus: String): JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
+    "businessType" -> "Trusts",
+    "isMatch" -> identifiersMatch,
+    "VerificationStatus" -> bvStatus,
+    "RegisterApiStatus" -> regStatus
+  )
+
+  val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
     "overseasTaxIdentifier" -> testOverseas.taxIdentifier,
     "overseasTaxIdentifierCountry" -> testOverseas.country
   )
@@ -129,4 +129,135 @@ object TestConstants {
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testSaPostcode), Some(testSaPostcode), isAbroad = false)
   val testTrustKnownFactsAbroadResponse: TrustKnownFacts = TrustKnownFacts(None, None, isAbroad = true)
   val testBusinessVerificationRedirectUrl = "/business-verification-start"
+
+  val testOverseasSautrDataJson: JsObject = Json.obj(
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> "not called",
+    "isMatch" -> "false",
+    "userSAUTR" -> testSautr
+  )
+
+  val testOverseasCtutrDataJson: JsObject = Json.obj(
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> "not called",
+    "isMatch" -> "false",
+    "userCTUTR" -> testCtutr
+  )
+
+  val testOverseasTaxIdentifiersDataJson: JsObject = Json.obj(
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> "not called",
+    "isMatch" -> "false"
+  )
+
+  val testLegacyDataJson: JsObject = Json.obj(
+    "isMatch" -> "false",
+    "VerificationStatus" -> "Not enough information to call BV",
+    "RegisterApiStatus" -> "not called"
+  )
+
+  val testUADataJson: JsObject = Json.obj(
+    "CTUTR" -> testCtutr,
+    "CTpostcode" -> testOfficePostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "success",
+    "RegisterApiStatus" -> "success"
+  )
+
+  def testUABvFailedDataJson(bvStatus: String): JsObject = Json.obj(
+    "CTUTR" -> testCtutr,
+    "CTpostcode" -> testOfficePostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> bvStatus,
+    "RegisterApiStatus" -> "not called"
+  )
+
+  val testUARegistrationFailedDataJson: JsObject = Json.obj(
+    "CTUTR" -> testCtutr,
+    "CTpostcode" -> testOfficePostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "success",
+    "RegisterApiStatus" -> "fail"
+  )
+
+  val testUABvNotRequestedDataJson: JsObject = Json.obj(
+    "CTUTR" -> testCtutr,
+    "CTpostcode" -> testOfficePostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "not requested",
+    "RegisterApiStatus" -> "success"
+  )
+
+  val testUADataJsonNoPostcode: JsObject = Json.obj(
+    "CTUTR" -> testCtutr,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "success",
+    "RegisterApiStatus" -> "success"
+  )
+
+  val testTrustsDataJson: JsObject = Json.obj(
+    "SAUTR" -> testSautr,
+    "SApostcode" -> testSaPostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "success",
+    "RegisterApiStatus" -> "success"
+  )
+
+  val testTrustsDataJsonNoPostcode: JsObject = Json.obj(
+    "SAUTR" -> testSautr,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "success",
+    "RegisterApiStatus" -> "success"
+  )
+
+  val testTrustsRegistrationFailedDataJson: JsObject = Json.obj(
+    "SAUTR" -> testSautr,
+    "SApostcode" -> testSaPostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "success",
+    "RegisterApiStatus" -> "fail"
+  )
+
+  def testTrustsBvFailedDataJson(bvStatus: String): JsObject = Json.obj(
+    "SAUTR" -> testSautr,
+    "SApostcode" -> testSaPostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> bvStatus,
+    "RegisterApiStatus" -> "not called"
+  )
+
+  val testTrustsIdMatchFailedDataJson: JsObject = Json.obj(
+    "SAUTR" -> testSautr,
+    "SApostcode" -> testSaPostcode,
+    "isMatch" -> "false",
+    "VerificationStatus" -> "Not enough information to call BV",
+    "RegisterApiStatus" -> "not called"
+  )
+
+  val testTrustsBvNotRequestedDataJson: JsObject = Json.obj(
+    "SAUTR" -> testSautr,
+    "SApostcode" -> testSaPostcode,
+    "isMatch" -> "true",
+    "VerificationStatus" -> "not requested",
+    "RegisterApiStatus" -> "success"
+  )
+
+  val testOnlyCHRNDataJson: JsObject = Json.obj(
+    "CHRN" -> testCHRN,
+    "isMatch" -> "unmatchable",
+    "VerificationStatus" -> "Not enough information to call BV",
+    "RegisterApiStatus" -> "not called"
+  )
+
+  val testNoIdentifiersDataJson: JsObject = Json.obj(
+    "isMatch" -> "unmatchable",
+    "VerificationStatus" -> "Not enough information to call BV",
+    "RegisterApiStatus" -> "not called"
+  )
+
+  val testOverseasNoIdentifiersDataJson: JsObject = Json.obj(
+    "isMatch" -> "unmatchable",
+    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "RegisterApiStatus" -> "not called"
+  )
 }

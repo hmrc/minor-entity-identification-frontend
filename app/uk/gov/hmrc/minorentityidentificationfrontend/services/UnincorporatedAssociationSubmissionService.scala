@@ -28,27 +28,21 @@ class UnincorporatedAssociationSubmissionService @Inject()(auditService: AuditSe
                                                            validateUnincorporatedAssociationDetailsService: ValidateUnincorporatedAssociationDetailsService) {
 
   def submit(journeyId: String, journeyConfig: JourneyConfig, retryUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = {
-
     for {
       optCtUtr <-  storageService.retrieveUtr(journeyId)
       optOfficePostcode <- storageService.retrievePostcode(journeyId)
-      optCHRN <- storageService.retrieveCHRN(journeyId)
       matchingResult <- validateUnincorporatedAssociationDetailsService.validateUnincorporatedAssociationDetails(
         journeyId,
         optCtUtr.map(_.value),
-        optOfficePostcode,
-        optCHRN
+        optOfficePostcode
       )
     } yield {
-
       auditService.auditJourney(journeyId, journeyConfig)
-
       matchingResult match {
         case SuccessfulMatch | UnMatchable => journeyConfig.fullContinueUrl(journeyId)
         case _ => retryUrl
       }
     }
-
   }
 
 }
