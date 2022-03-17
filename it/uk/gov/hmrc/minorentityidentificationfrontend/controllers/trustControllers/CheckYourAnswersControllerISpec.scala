@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
@@ -169,7 +169,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   "POST /identify-your-trust/check-your-answers-business" when {
     "the EnableFullTrustJourney is enabled" when {
       "identifier match is SuccessfulMatch (for example all postcodes are the same)" should {
-        "contact TrustKnownFacts api and create a BV journey. The redirect url is the BV start journey url" in {
+        "contact TrustKnownFacts api and create a BV journey. The redirect url is the BV start journey url.The journey is not audited" in {
           enable(EnableFullTrustJourney)
 
           await(insertJourneyConfig(
@@ -187,7 +187,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
           stubCreateBusinessVerificationJourney(
-            expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true))
+            expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true))
           )(status = CREATED, body = testBVRedirectURIJson(redirectUrl = testBusinessVerificationRedirectUrl))
 
           stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson)
@@ -201,14 +201,15 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
+          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
           verifyAudit()
         }
       }
+
       "identifier match is SuccessfulMatch (for example all postcodes are the same)" should {
         "contact TrustKnownFacts api and try to create a BV journey. " +
-          "Given BV returns NotEnoughEvidence a BV status is persisted. " +
-          "The redirect url is the fullContinueUrl" in {
+          "Given BV returns NOT_FOUND a BV status NOT_ENOUGH_INFORMATION_TO_CHALLENGE is persisted. " +
+          "The redirect url is the fullContinueUrl. The journey is audited" in {
           enable(EnableFullTrustJourney)
 
           await(insertJourneyConfig(
@@ -224,8 +225,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveTrustKnownFacts(testSautr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(NOT_FOUND)
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(NOT_FOUND)
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))(OK)
+
+          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
 
           stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson)
 
@@ -240,15 +243,17 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))
-          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
+          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
+          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
           verifyAudit()
         }
       }
+
       "identifier match is SuccessfulMatch (for example all postcodes are the same)" should {
         "contact TrustKnownFacts api and try to create a BV journey. " +
-          "Given BV returns FORBIDDEN a BV status is persisted. " +
-          "The redirect url is the fullContinueUrl" in {
+          "Given BV returns FORBIDDEN a BV status FAIL is persisted. " +
+          "The redirect url is the fullContinueUrl. The journey is audited" in {
           enable(EnableFullTrustJourney)
 
           await(insertJourneyConfig(
@@ -265,10 +270,13 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveTrustKnownFacts(testSautr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(FORBIDDEN)
+          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(FORBIDDEN)
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))(OK)
 
-          stubRetrieveEntityDetails(testJourneyId)(OK, testTrustBvFailJourneyDataJson)
+          stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+
+          stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson)
+
           stubAudit()
 
           val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
@@ -279,14 +287,15 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
+          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))
+          verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyAudit()
         }
       }
       "identifier match is DetailsMismatch (for example all postcodes are different)" should {
-        "persist NOT_ENOUGH_INFORMATION_TO_CALL_BV BV status " +
-          "and redirect to the Cannot Confirm Business error page after contacting TrustKnownFacts api" in {
+        "persist a BV status NOT_ENOUGH_INFORMATION_TO_CALL_BV " +
+          "and redirect to the Cannot Confirm Business error page after contacting TrustKnownFacts api. The journey is audited" in {
           enable(EnableFullTrustJourney)
 
           await(insertJourneyConfig(
@@ -308,6 +317,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+
           stubRetrieveEntityDetails(testJourneyId)(OK, testTrustIdFalseJourneyDataJson)
           stubAudit()
 
@@ -324,9 +334,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyAudit()
         }
       }
+
       "identifier match is DetailsNotFound (TrustKnownFacts does not found anything)" should {
-        "persist NOT_ENOUGH_INFORMATION_TO_CALL_BV BV status " +
-          "and redirect to the Cannot Confirm Business error page after contacting TrustKnownFacts api" in {
+        "persist a BV status NOT_ENOUGH_INFORMATION_TO_CALL_BV BV " +
+          "and redirect to the Cannot Confirm Business error page after contacting TrustKnownFacts api. The journey is audited" in {
           enable(EnableFullTrustJourney)
 
           await(insertJourneyConfig(
@@ -345,6 +356,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+
           stubRetrieveEntityDetails(testJourneyId)(OK, testTrustIdFalseJourneyDataJson)
           stubAudit()
 
@@ -362,7 +374,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
       }
       "identifier match is UnMatchable (No SaUtr)" should {
-        "redirect to the provided continueUrl without contacting TrustKnownFacts api and BV" in {
+        "redirect to the provided continueUrl without contacting TrustKnownFacts api and BV. The journey is audited" in {
           enable(EnableFullTrustJourney)
 
           await(insertJourneyConfig(
@@ -378,7 +390,9 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubStoreIdentifiersMatch(testJourneyId, UnMatchableKey)(OK)
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))(OK)
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
+
           stubRetrieveEntityDetails(testJourneyId)(OK, testCHRNJourneyDataJson)
+
           stubAudit()
 
           val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
@@ -423,6 +437,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
       }
     }
+
     "the user does not have an internal ID" should {
       "return an INTERNAL_SERVER_ERROR status" in {
         enable(EnableFullTrustJourney)
@@ -432,8 +447,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         lazy val result: WSResponse = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
 
         result.status mustBe INTERNAL_SERVER_ERROR
+
       }
     }
   }
-
 }

@@ -18,9 +18,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.models
 
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.writeForJourneyContinuation
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditHelper._
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WritesForJourneyEnd
 
 case class TrustDetails(optUtr: Option[Utr],
                         optSaPostcode: Option[String],
@@ -46,30 +45,18 @@ object TrustDetails {
       case None => Json.obj()
     }
 
-    val businessVerificationBlock: JsObject = {
-      if (!businessVerificationCheck) Json.obj()
-      else {
-        val businessVerificationValue = trustDetails.optBusinessVerificationStatus match {
-          case Some(status) => writeForJourneyContinuation(status)
-          case None => writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge)
-        }
-        Json.obj("businessVerification" -> businessVerificationValue)
-      }
-    }
+    val businessVerificationBlock: JsObject = WritesForJourneyEnd.businessVerificationBlock(trustDetails.optBusinessVerificationStatus, businessVerificationCheck)
 
-    val registrationBlock: JsObject = {
-      val regValue = trustDetails.optRegistrationStatus match {
-        case Some(regStatus) => Json.toJson(regStatus)(regFormat.writes)
-        case _ => Json.toJson(RegistrationNotCalled)(regFormat.writes)
-      }
-      Json.obj("registration" -> regValue)
-    }
+    val registrationBlock: JsObject = WritesForJourneyEnd.registrationBlock(trustDetails.optRegistrationStatus)
 
-    val identifiersMatchBlock: JsObject = {
-      Json.obj("identifiersMatch" -> trustDetails.optIdentifiersMatch.contains(SuccessfulMatch))
-    }
+    val identifiersMatchBlock: JsObject = Json.obj("identifiersMatch" -> trustDetails.optIdentifiersMatch.contains(SuccessfulMatch))
 
-    registrationBlock ++ utrBlock ++ saPostcodeBlock ++ chrnBlock ++ businessVerificationBlock ++ identifiersMatchBlock
+    registrationBlock ++
+      utrBlock ++
+      saPostcodeBlock ++
+      chrnBlock ++
+      businessVerificationBlock ++
+      identifiersMatchBlock
   }
 
   def writesForAudit(optTrustDetails: Option[TrustDetails], businessVerificationCheck: Boolean): JsObject = {

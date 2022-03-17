@@ -18,13 +18,11 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
 import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
 import org.scalatest.Suite
-import uk.gov.hmrc.minorentityidentificationfrontend.services.ValidateUnincorporatedAssociationDetailsService
+import uk.gov.hmrc.minorentityidentificationfrontend.services.MatchingResultCalculator
 
-
-trait MockValidateUnincorporatedAssociationDetailsService extends IdiomaticMockito with ResetMocksAfterEachTest {
+trait MockMatchingResultCalculator extends IdiomaticMockito with ResetMocksAfterEachTest {
   self: Suite =>
 
-  val mockValidateUnincorporatedAssociationDetailsService: ValidateUnincorporatedAssociationDetailsService =
-    mock[ValidateUnincorporatedAssociationDetailsService]
+  val mockMatchingResultCalculator: MatchingResultCalculator = mock[MatchingResultCalculator]
 
 }

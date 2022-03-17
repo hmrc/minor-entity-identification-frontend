@@ -40,6 +40,8 @@ object TestConstants {
   val testCHRN: String = UUID.randomUUID().toString
   val testSafeId: String = UUID.randomUUID().toString
 
+  val testRegistrationStatusRegistered: Registered = Registered(UUID.randomUUID().toString)
+
   def testTrustJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig = testJourneyConfig(Trusts, businessVerificationCheck)
   def testUAJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig = testJourneyConfig(UnincorporatedAssociation, businessVerificationCheck)
 
@@ -130,6 +132,7 @@ object TestConstants {
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testSaPostcode), Some(testSaPostcode), isAbroad = false)
   val testTrustKnownFactsAbroadResponse: TrustKnownFacts = TrustKnownFacts(None, None, isAbroad = true)
   val testBusinessVerificationRedirectUrl = "/business-verification-start"
+  val testCannotConfirmErrorPageUrl = "/bla/bla/someErrorPageUrl"
 
   val testOverseasSautrDataJson: JsObject = Json.obj(
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
@@ -261,4 +264,6 @@ object TestConstants {
     "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
     "RegisterApiStatus" -> "not called"
   )
+
+  def testRegistrationStatusJson(value: String): JsObject = Json.obj("registrationStatus" -> value)
 }

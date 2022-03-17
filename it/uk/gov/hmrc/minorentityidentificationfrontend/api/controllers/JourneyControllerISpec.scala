@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, Json, __}
+import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{NOT_FOUND, _}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
@@ -31,6 +32,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.stubAu
 class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub with AuthStub with StorageStub with FeatureSwitching {
 
   lazy val repo: JourneyConfigRepository = app.injector.instanceOf[JourneyConfigRepository]
+
+  def extractActualBusinessVerificationStatus(response: WSResponse): String = response.json.as[String]((__ \ "businessVerification" \ "verificationStatus").read)
 
   val testJourneyConfigJson: JsObject = Json.obj(
     "continueUrl" -> testContinueUrl,
@@ -189,8 +192,9 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
           val testDetailsJson = Json.obj(
             "ctutr" -> testCtutr,
             "identifiersMatch" -> true,
-            "businessVerification" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
-            "registration" -> Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED"),
+            "businessVerification" -> Json.obj("verificationStatus" -> "PASS"),
+            "registration" -> Json.obj("registrationStatus" -> "REGISTERED",
+              "registeredBusinessPartnerId" -> testSafeId),
             "ctPostcode" -> testSaPostcode
           )
 
@@ -225,6 +229,125 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
         result.status mustBe OK
         result.json mustBe testDetailsJson
+      }
+      "return a json with businessVerification PASS" when {
+        "BV is equals to PASS in the db" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson(verificationStatusValue = "PASS"))
+          stubAudit()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          extractActualBusinessVerificationStatus(response = result) mustBe "PASS"
+
+        }
+      }
+      "return a json with businessVerification FAIL" when {
+        "BV is equals to FAIL in the db" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson(verificationStatusValue = "FAIL"))
+          stubAudit()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          extractActualBusinessVerificationStatus(response = result) mustBe "FAIL"
+
+        }
+      }
+      "return a json with businessVerification UNCHALLENGED" when {
+        "BV is equals to NOT_ENOUGH_INFORMATION_TO_CALL_BV in the db" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
+          stubAudit()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
+
+        }
+      }
+      "return a json with businessVerification UNCHALLENGED" when {
+        "BV is equals to NOT_ENOUGH_INFORMATION_TO_CHALLENGE in the db" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))
+          stubAudit()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
+
+        }
+      }
+      "return a json with no businessVerification" when {
+        "businessVerificationCheck is false" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = false)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson)
+          stubAudit()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          result.json.toString() mustNot include("businessVerification")
+          result.json.toString() mustNot include("verificationStatus")
+        }
+      }
+      "return a json with businessVerification UNCHALLENGED" when {
+        "businessVerification is not persisted at all (legacy behavior)" in {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, JsObject.empty)
+          stubAudit()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+
+          extractActualBusinessVerificationStatus(response = result) mustBe "UNCHALLENGED"
+        }
       }
     }
     "the business entity is an Overseas Company" should {

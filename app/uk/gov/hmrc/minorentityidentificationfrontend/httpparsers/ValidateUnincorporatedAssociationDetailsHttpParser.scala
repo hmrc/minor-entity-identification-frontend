@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.httpparsers
 
-import play.api.http.Status.{OK, BAD_REQUEST}
+import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.JsSuccess
 import uk.gov.hmrc.http.{HttpReads, HttpResponse, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, KnownFactsMatchingResult, SuccessfulMatch}
@@ -33,12 +33,12 @@ object ValidateUnincorporatedAssociationDetailsHttpParser {
       response.status match {
         case OK =>
           (response.json \ "matched").validate[Boolean] match {
-            case JsSuccess(matched, _) if matched => SuccessfulMatch
-            case JsSuccess(_,_) => DetailsMismatch
+            case JsSuccess(true, _) => SuccessfulMatch
+            case JsSuccess(false, _) => DetailsMismatch
             case _ => throw createInternalServerException(response)
           }
         case BAD_REQUEST =>
-          (response.json\ "code").validate[String] match {
+          (response.json \ "code").validate[String] match {
             case JsSuccess("NOT_FOUND", _) => DetailsNotFound
             case _ => throw createInternalServerException(response)
           }

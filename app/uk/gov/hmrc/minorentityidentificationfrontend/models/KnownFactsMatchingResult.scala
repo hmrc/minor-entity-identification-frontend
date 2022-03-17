@@ -50,7 +50,7 @@ object KnownFactsMatchingResult {
     }
 
     override def reads(json: JsValue): JsResult[KnownFactsMatchingResult] =
-      (json).validate[String].collect(JsonValidationError("Invalid Known Facts Matching Result")) {
+      json.validate[String].collect(JsonValidationError("Invalid Known Facts Matching Result")) {
         case SuccessfulMatchKey => SuccessfulMatch
         case UnMatchableKey => UnMatchable
         case DetailsMismatchKey => DetailsMismatch
