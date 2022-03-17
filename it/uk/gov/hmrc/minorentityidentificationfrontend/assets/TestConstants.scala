@@ -312,6 +312,6 @@ object TestConstants {
       "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl
     )
 
-  def testBVRedirectURIJson(value: String): JsObject = Json.obj("redirectUri" -> value)
+  def testBVRedirectURIJson(redirectUrl: String): JsObject = Json.obj("redirectUri" -> redirectUrl)
 
 }
