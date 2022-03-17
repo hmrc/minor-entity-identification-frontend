@@ -11,11 +11,6 @@ error.title-prefix                                          = 'Error: '
 app.common.yes                                              = Yes
 app.common.no                                               = No
 
-## Banner
-phase.banner.before                                         = This is a new service - your
-phase.banner.link                                           = feedback
-phase.banner.after                                          = (opens in new tab) will help us to improve it.
-
 ## Capture UTR page
 utr.title                                                   = What is the company‘s UK Unique Taxpayer Reference?
 utr.line_1                                                  = This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘.
