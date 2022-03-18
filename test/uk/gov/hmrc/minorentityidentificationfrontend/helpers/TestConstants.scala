@@ -41,6 +41,7 @@ object TestConstants {
   val testSafeId: String = UUID.randomUUID().toString
 
   def testTrustJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig = testJourneyConfig(Trusts, businessVerificationCheck)
+  def testUAJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig = testJourneyConfig(UnincorporatedAssociation, businessVerificationCheck)
 
   def testUnincorporatedAssociationJourneyConfig(businessVerificationCheck: Boolean = true): JourneyConfig =
     testJourneyConfig(UnincorporatedAssociation, businessVerificationCheck)

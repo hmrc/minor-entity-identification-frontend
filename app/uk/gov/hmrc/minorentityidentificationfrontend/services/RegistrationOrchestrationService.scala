@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RegistrationConnector
+import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
 import javax.inject.{Inject, Singleton}
@@ -28,18 +29,31 @@ class RegistrationOrchestrationService @Inject()(storageService: StorageService,
                                                  registrationConnector: RegistrationConnector,
                                                  auditService: AuditService) {
 
-  def register(journeyId: String,
-               optSautr: Option[String],
-               journeyConfig: JourneyConfig
-              )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationStatus] = for {
-    registrationStatus <- storageService.retrieveBusinessVerificationStatus(journeyId).flatMap {
-      case Some(BusinessVerificationPass) => registrationConnector.register(optSautr.get, journeyConfig.regime)
-      case None if !journeyConfig.businessVerificationCheck && optSautr.isDefined =>
-        registrationConnector.register(optSautr.get, journeyConfig.regime)
-      case _ => Future.successful(RegistrationNotCalled)
+  private def internalRegister(utr: String, journeyConfig: JourneyConfig)
+                              (implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
+    journeyConfig.businessEntity match {
+      case Trusts => registrationConnector.registerTrust(utr, journeyConfig.regime)
+      case UnincorporatedAssociation => registrationConnector.registerUA(utr, journeyConfig.regime)
+      case OverseasCompany => throw new IllegalArgumentException("Overseas Company is not supported for registration.")
     }
-    _ <- storageService.storeRegistrationStatus(journeyId, registrationStatus)
-    _ <- auditService.auditJourney(journeyId, journeyConfig)
-  } yield registrationStatus
+  }
 
+  def register(journeyId: String,
+               optUtr: Option[String],
+               journeyConfig: JourneyConfig
+              )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[RegistrationStatus] = {
+    journeyConfig.businessEntity match {
+      case Trusts | UnincorporatedAssociation =>
+        for {
+          registrationStatus <- storageService.retrieveBusinessVerificationStatus(journeyId).flatMap {
+            case Some(BusinessVerificationPass) => internalRegister(optUtr.get, journeyConfig)
+            case None if !journeyConfig.businessVerificationCheck && optUtr.isDefined => internalRegister(optUtr.get, journeyConfig)
+            case _ => Future.successful(RegistrationNotCalled)
+          }
+          _ <- storageService.storeRegistrationStatus(journeyId, registrationStatus)
+          _ <- auditService.auditJourney(journeyId, journeyConfig)
+        } yield registrationStatus
+      case OverseasCompany => throw new IllegalArgumentException("Overseas Company is not supported for registration.")
+    }
+  }
 }

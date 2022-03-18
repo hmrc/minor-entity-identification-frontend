@@ -21,7 +21,6 @@ import play.api.libs.json.JsObject
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.SuccessfulMatchKey
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationPass, JourneyConfig, Registered}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
@@ -62,7 +61,7 @@ trait AbstractBusinessVerificationControllerISpec
           stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, testBusinessVerificationPassJson)
           stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
-          stubRegister(testUtr, testRegime)(OK, Registered(testSafeId))
+          stubRegister(testUtr, businessEntityBuilder())(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveEntityDetails(testJourneyId)(OK, testJourneyDataJson)
@@ -109,7 +108,7 @@ trait AbstractBusinessVerificationControllerISpec
           stubRetrieveBusinessVerificationResultFromStub(testBusinessVerificationJourneyId)(OK, testBusinessVerificationPassJson)
           stubStoreBusinessVerificationStatus(journeyId = testJourneyId, businessVerificationStatus = BusinessVerificationPass)(status = OK)
           stubRetrieveBusinessVerificationStatus(testJourneyId)(OK, testBusinessVerificationPassJson)
-          stubRegister(testUtr, testRegime)(OK, Registered(testSafeId))
+          stubRegister(testUtr, businessEntityBuilder())(OK, Registered(testSafeId))
           stubStoreRegistrationStatus(testJourneyId, Registered(testSafeId))(OK)
           stubAudit()
           stubRetrieveEntityDetails(testJourneyId)(OK, testJourneyDataJson)

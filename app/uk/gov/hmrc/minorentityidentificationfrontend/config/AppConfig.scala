@@ -108,6 +108,8 @@ class AppConfig @Inject()(config: Configuration,
 
   }
 
-  def registerUrl: String = s"$backendUrl/minor-entity-identification/register-trust"
+  def registerTrustUrl: String = s"$backendUrl/minor-entity-identification/register-trust"
+
+  def registerUAUrl: String = s"$backendUrl/minor-entity-identification/register-ua"
 
 }

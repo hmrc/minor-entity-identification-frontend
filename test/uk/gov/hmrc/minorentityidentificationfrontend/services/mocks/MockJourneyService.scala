@@ -17,11 +17,10 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito.when
 import org.mockito.scalatest.IdiomaticMockito
 import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.{BeforeAndAfterEach, Suite}
-import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.services.JourneyService
 
