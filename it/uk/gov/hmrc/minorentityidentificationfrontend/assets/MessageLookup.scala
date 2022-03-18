@@ -43,7 +43,7 @@ object MessageLookup {
   }
 
   object CaptureUtr {
-    val title = "What is the company‘s UK Unique Taxpayer Reference?"
+    val title = "What is the company’s UK Unique Taxpayer Reference?"
     val line_1 = "This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘."
     val no_utr_link = "The company does not have a UTR"
 
@@ -55,10 +55,10 @@ object MessageLookup {
   }
 
   object CaptureTrustUtr {
-    val title = "What is your Unique Taxpayer Reference?"
+    val title = "What is the trust’s Unique Taxpayer Reference?"
     val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can"
     val line_1_ending = "find a lost UTR number."
-    val no_utr_link = "The company does not have a UTR"
+    val no_utr_link = "The trust does not have a Self Assessment UTR"
 
     object Error {
       val error_not_entered = "Enter your UK Unique Taxpayer Reference"
