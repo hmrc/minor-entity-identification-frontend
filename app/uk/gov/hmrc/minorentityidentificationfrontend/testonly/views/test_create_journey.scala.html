@@ -54,12 +54,12 @@
 @html = {
     @formWithCSRF(action = formAction) {
 
-        @p(Html("All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out to Business Verification (rather than stub it) all non-relative urls will fail."))
+        @p(Html("All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out to Business Verification (rather than stub it) all absolute urls will fail."))
 
         @govukInput(
             Input(
                 label = Label(content=Text("Continue URL"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
-                hint = Some(Hint(content = Text("Must be non-relative for staging, qa and production"))),
+                hint = Some(Hint(content = Text("Must be relative for staging, qa and production"))),
                 classes = "govuk-input--width-35"
             ).withFormField(form("continueUrl"))
         )
@@ -81,7 +81,7 @@
         @govukInput(
             Input(
                 label = Label(content=Text("Sign Out Url"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
-                hint = Some(Hint(content = Text("Must be non-relative for staging, qa and production"))),
+                hint = Some(Hint(content = Text("Must be relative for staging, qa and production"))),
                 classes = "govuk-input--width-35"
             ).withFormField(form("signOutUrl"))
         )
@@ -115,7 +115,7 @@
         @govukInput(
             Input(
                 label = Label(content=Text("Accessibility Statement Url"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
-                hint = Some(Hint(content = Text("Must be non-relative for staging, qa and production"))),
+                hint = Some(Hint(content = Text("Must be relative for staging, qa and production"))),
                 classes = "govuk-input--width-35"
             ).withFormField(form("accessibilityUrl"))
         )
