@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testRegisterUAJson
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, RegistrationStatus}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{WiremockHelper, WiremockMethods}
@@ -33,9 +34,9 @@ trait RegisterStub extends WiremockMethods {
 
   def stubRegisterTrust(sautr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
     val jsonBody = Json.obj(
-        "sautr" -> sautr.toUpperCase,
-        "regime" -> regime
-      )
+      "sautr" -> sautr.toUpperCase,
+      "regime" -> regime
+    )
 
     when(method = POST, uri = "/minor-entity-identification/register-trust", jsonBody)
       .thenReturn(
@@ -45,25 +46,23 @@ trait RegisterStub extends WiremockMethods {
   }
 
   def stubRegisterUA(ctutr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
-    val jsonBody = Json.obj(
-      "ctutr" -> ctutr.toUpperCase,
-      "regime" -> regime
-    )
-
-    when(method = POST, uri = "/minor-entity-identification/register-ua", jsonBody)
+    when(method = POST, uri = "/minor-entity-identification/register-ua", testRegisterUAJson(ctutr.toUpperCase, regime))
       .thenReturn(
         status = status,
         body = Json.obj("registration" -> body)
       )
   }
 
-  def verifyRegister(sautr: String, regime: String): Unit = {
+  def verifyRegisterTrust(sautr: String, regime: String): Unit = {
     val jsonBody = Json.obj(
-        "sautr" -> sautr.toUpperCase,
-        "regime" -> regime
-      )
+      "sautr" -> sautr.toUpperCase,
+      "regime" -> regime
+    )
 
     WiremockHelper.verifyPost(uri = "/minor-entity-identification/register-trust", optBody = Some(jsonBody.toString()))
   }
+
+  def verifyRegisterUA(jsonBody: JsObject): Unit =
+    WiremockHelper.verifyPost(uri = "/minor-entity-identification/register-ua", optBody = Some(jsonBody.toString()))
 
 }

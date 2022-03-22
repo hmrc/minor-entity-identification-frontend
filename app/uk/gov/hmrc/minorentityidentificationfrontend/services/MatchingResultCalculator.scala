@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
+package uk.gov.hmrc.minorentityidentificationfrontend.services
 
-import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
-import org.scalatest.Suite
-import uk.gov.hmrc.minorentityidentificationfrontend.services.ValidateTrustKnownFactsService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult
 
-trait MockValidateTrustKnownFactsService extends IdiomaticMockito with ResetMocksAfterEachTest {
-  self: Suite =>
+import scala.concurrent.{ExecutionContext, Future}
 
-  val mockValidateTrustKnownFactsService: ValidateTrustKnownFactsService = mock[ValidateTrustKnownFactsService]
+trait MatchingResultCalculator {
 
+  def matchKnownFacts(journeyId: String,
+                      optUtr: Option[String],
+                      optPostcode: Option[String])
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult]
 }

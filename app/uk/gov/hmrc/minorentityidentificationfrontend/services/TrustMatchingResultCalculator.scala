@@ -24,16 +24,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ValidateTrustKnownFactsService @Inject()(retrieveTrustKnownFactsConnector: RetrieveTrustKnownFactsConnector,
-                                               storageService: StorageService) {
+class TrustMatchingResultCalculator @Inject()(retrieveTrustKnownFactsConnector: RetrieveTrustKnownFactsConnector,
+                                              storageService: StorageService) extends MatchingResultCalculator {
 
-  def validateTrustKnownFacts(journeyId: String,
-                              optSaUtr: Option[String],
-                              optSaPostcode: Option[String])
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] =
+  def matchKnownFacts(journeyId: String,
+                      optSaUtr: Option[String],
+                      optSaPostcode: Option[String])
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[KnownFactsMatchingResult] =
     optSaUtr match {
       case None =>
-        val identifiersMatchFailure: KnownFactsMatchFailure =  UnMatchable
+        val identifiersMatchFailure: KnownFactsMatchFailure = UnMatchable
         storageService.storeIdentifiersMatch(journeyId, identifiersMatchFailure).map(_ => identifiersMatchFailure)
       case Some(saUtr) =>
         for {

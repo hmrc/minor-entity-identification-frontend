@@ -16,18 +16,13 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
-import org.mockito.scalatest.IdiomaticMockito
-import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
+import org.scalatest.Suite
 import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService
 
-trait MockStorageService extends IdiomaticMockito with BeforeAndAfterEach {
+trait MockStorageService extends IdiomaticMockito with ResetMocksAfterEachTest  {
   self: Suite =>
 
   val mockStorageService: StorageService = mock[StorageService]
-
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockStorageService)
-  }
 
 }

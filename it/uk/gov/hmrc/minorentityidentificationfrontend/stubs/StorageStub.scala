@@ -181,10 +181,13 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
-  def stubStoreRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(status: Int): Unit = {
+  def stubStoreRegistrationStatus(journeyId: String, registrationStatus: RegistrationStatus)(status: Int): Unit =
+    stubStoreRegistrationStatus(journeyId, Json.toJsObject(registrationStatus))(status)
+
+  def stubStoreRegistrationStatus(journeyId: String, jsonBody: JsObject)(status: Int): Unit = {
     when(method = PUT,
       uri = s"/minor-entity-identification/journey/$journeyId/registration",
-      body = Json.toJsObject(registrationStatus)
+      body = jsonBody
     ).thenReturn(
       status = status
     )
@@ -194,6 +197,9 @@ trait StorageStub extends WiremockMethods {
     val jsonBody = Json.toJsObject(registrationStatus)
     WiremockHelper.verifyPut(uri = s"/minor-entity-identification/journey/$journeyId/registration", optBody = Some(jsonBody.toString()))
   }
+
+  def verifyStoreRegistrationStatus(journeyId: String, jsonBody: JsObject): Unit =
+    WiremockHelper.verifyPut(uri = s"/minor-entity-identification/journey/$journeyId/registration", optBody = Some(jsonBody.toString()))
 
   def stubRetrieveBusinessVerificationStatus(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
     when(method = GET,

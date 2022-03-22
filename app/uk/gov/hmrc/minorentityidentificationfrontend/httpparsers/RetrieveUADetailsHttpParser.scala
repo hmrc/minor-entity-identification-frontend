@@ -47,7 +47,7 @@ object RetrieveUADetailsHttpParser {
       optChrn <- (json \ "chrn").validateOpt[String]
       optIdentifiersMatch <- (json \ "identifiersMatch").validateOpt[KnownFactsMatchingResult]
       optBusinessVerificationStatus <- (json \ "businessVerification").validateOpt[BusinessVerificationStatus]
-      optRegistrationStatus <- (json \ "registrationStatus").validateOpt[RegistrationStatus]
+      optRegistrationStatus <- (json \ "registration").validateOpt[RegistrationStatus]
     } yield {
       val optSautr = if (optUtr.nonEmpty) Some(Ctutr(optUtr.get)) else None
       UADetails(optSautr, optPostcode, optChrn, optIdentifiersMatch, optBusinessVerificationStatus, optRegistrationStatus)

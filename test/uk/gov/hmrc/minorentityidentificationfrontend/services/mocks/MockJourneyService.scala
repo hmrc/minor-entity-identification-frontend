@@ -18,23 +18,18 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import org.mockito.scalatest.IdiomaticMockito
+import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
 import org.mockito.stubbing.OngoingStubbing
-import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.scalatest.Suite
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.services.JourneyService
 
 import scala.concurrent.Future
 
-trait MockJourneyService extends IdiomaticMockito with BeforeAndAfterEach {
+trait MockJourneyService extends IdiomaticMockito with ResetMocksAfterEachTest {
   self: Suite =>
 
   val mockJourneyService: JourneyService = mock[JourneyService]
-
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockJourneyService)
-  }
 
   def mockGetJourneyConfig(journeyId: String,
                             authInternalId: String)

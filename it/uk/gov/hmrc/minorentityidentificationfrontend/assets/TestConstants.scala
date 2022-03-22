@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.assets
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.Call
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{DetailsMismatchKey, DetailsNotFoundKey, SuccessfulMatchKey, UnMatchableKey}
@@ -111,6 +112,8 @@ object TestConstants {
     "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
   )
 
+  val testThisIsADummyJson: JsObject = Json.obj()
+
   val testNoIdentifiersJourneyDataJson: JsObject = Json.obj(
     "identifiersMatch" -> UnMatchableKey,
     "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
@@ -124,11 +127,13 @@ object TestConstants {
     "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
   )
 
-  val testUAJourneyDataJson: JsObject = Json.obj(
+  val testUAJourneyDataJson: JsObject = testUAJourneyDataJson(verificationStatusValue = "PASS")
+
+  def testUAJourneyDataJson(verificationStatusValue: String): JsObject = Json.obj(
     "utr" -> testCtutrJson,
     "postcode" -> testSaPostcode,
     "identifiersMatch" -> SuccessfulMatchKey,
-    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey),
+    "businessVerification" -> Json.obj("verificationStatus" -> verificationStatusValue),
     "registration" -> Json.obj(
       registrationStatusKey -> RegisteredKey,
       registeredBusinessPartnerIdKey -> testSafeId)
@@ -289,12 +294,21 @@ object TestConstants {
   def testVerificationStatusJson(verificationStatusValue: String): JsObject =
     Json.obj("verificationStatus" -> verificationStatusValue)
 
-  def testCreateBusinessVerificationJourneyJson(sautr: String,
-                                                journeyId: String,
-                                                journeyConfig: JourneyConfig): JsObject =
+  def testCreateBusinessVerificationTrustJourneyJson(sautr: String,
+                                                     journeyId: String,
+                                                     journeyConfig: JourneyConfig): JsObject =
     testCreateBusinessVerificationJourneyJson(
       utrJson = testBVSaUtrJson(sautr),
       continueUrlForBVCall = trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId),
+      journeyConfig = journeyConfig
+    )
+
+  def testCreateBusinessVerificationUAJourneyJson(sautr: String,
+                                                     journeyId: String,
+                                                     journeyConfig: JourneyConfig): JsObject =
+    testCreateBusinessVerificationJourneyJson(
+      utrJson = testBVCtUtrJson(sautr),
+      continueUrlForBVCall = uaControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId),
       journeyConfig = journeyConfig
     )
 
@@ -313,5 +327,11 @@ object TestConstants {
     )
 
   def testBVRedirectURIJson(redirectUrl: String): JsObject = Json.obj("redirectUri" -> redirectUrl)
+
+  def testRegisterUAJson(utr: String, regime: String): JsObject = Json.obj(
+    "ctutr" -> utr.toUpperCase,
+    "regime" -> regime
+  )
+
 
 }

@@ -17,9 +17,8 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.models
 
 import play.api.libs.json._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.writeForJourneyContinuation
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditHelper._
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WritesForJourneyEnd
 
 case class UADetails(optUtr: Option[Utr],
                      optCtPostcode: Option[String],
@@ -45,13 +44,18 @@ object UADetails {
       case None => Json.obj()
     }
 
-    val businessVerificationBlock: JsObject =
-      if (!businessVerificationCheck) Json.obj()
-      else Json.obj("businessVerification" -> Json.toJson(Json.toJson(writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge))))
+    val businessVerificationBlock: JsObject = WritesForJourneyEnd.businessVerificationBlock(uaDetails.optBusinessVerificationStatus, businessVerificationCheck)
 
-    Json.obj("identifiersMatch" -> uaDetails.optIdentifiersMatch.contains(SuccessfulMatch),
-      "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
-    ) ++ utrBlock ++ saPostcodeBlock ++ chrnBlock ++ businessVerificationBlock
+    val registrationBlock: JsObject = WritesForJourneyEnd.registrationBlock(uaDetails.optRegistrationStatus)
+
+    val identifiersMatchBlock: JsObject = Json.obj("identifiersMatch" -> uaDetails.optIdentifiersMatch.contains(SuccessfulMatch))
+
+    identifiersMatchBlock ++
+      registrationBlock ++
+      utrBlock ++
+      saPostcodeBlock ++
+      chrnBlock ++
+      businessVerificationBlock
   }
 
   def writesForAudit(optUADetails: Option[UADetails], businessVerificationCheck: Boolean): JsObject = {

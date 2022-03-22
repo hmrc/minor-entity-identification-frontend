@@ -18,15 +18,15 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import org.mockito.scalatest.IdiomaticMockito
-import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
+import org.scalatest.Suite
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.services.BusinessVerificationService
 
 import scala.concurrent.Future
 
-trait MockBusinessVerificationService extends IdiomaticMockito with BeforeAndAfterEach {
+trait MockBusinessVerificationService extends IdiomaticMockito with ResetMocksAfterEachTest {
   self: Suite =>
 
   val mockBusinessVerificationService: BusinessVerificationService = mock[BusinessVerificationService]
@@ -42,8 +42,4 @@ trait MockBusinessVerificationService extends IdiomaticMockito with BeforeAndAft
     )(ArgumentMatchers.any[HeaderCarrier])
     ).thenReturn(response)
 
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockBusinessVerificationService)
-  }
 }
