@@ -38,9 +38,6 @@ class StorageConnector @Inject()(http: HttpClient,
                                    hc: HeaderCarrier): Future[Option[DataType]] =
     http.GET[Option[DataType]](s"${appConfig.minorEntityIdentificationUrl(journeyId)}/$dataKey")
 
-  def retrieveAllDataFields(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[JsObject]] =
-    http.GET[Option[JsObject]](s"${appConfig.minorEntityIdentificationUrl(journeyId)}")
-
   def retrieveOverseasDetails(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[OverseasCompanyDetails]] =
     http.GET[Option[OverseasCompanyDetails]](appConfig.minorEntityIdentificationUrl(journeyId))
 

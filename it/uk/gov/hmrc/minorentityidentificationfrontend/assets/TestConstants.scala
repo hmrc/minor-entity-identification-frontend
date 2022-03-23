@@ -110,6 +110,9 @@ object TestConstants {
       registeredBusinessPartnerIdKey -> testSafeId)
   )
 
+  val testTrustJourneyDataWithRegistrationFailedJson: JsObject =
+    testTrustJourneyDataJson ++ testRegistrationJourneyDataPart(value = "REGISTRATION_FAILED")
+
   val testTrustIdFalseJourneyDataJson: JsObject = Json.obj(
     "utr" -> testSautrJson,
     "postcode" -> testSaPostcode,
@@ -143,9 +146,11 @@ object TestConstants {
 
   val testUAJourneyDataJson: JsObject = testUAJourneyDataJson(verificationStatusValue = "PASS")
 
+  val testUAJourneyDataWithRegistrationFailedJson: JsObject = testUAJourneyDataJson(verificationStatusValue = "PASS") ++ testRegistrationJourneyDataPart(value = "REGISTRATION_FAILED")
+
   def testUAJourneyDataJson(verificationStatusValue: String): JsObject = Json.obj(
     "utr" -> testCtutrJson,
-    "postcode" -> testSaPostcode,
+    "postcode" -> testPostcode,
     "identifiersMatch" -> SuccessfulMatchKey,
     "businessVerification" -> Json.obj("verificationStatus" -> verificationStatusValue),
     "registration" -> Json.obj(
@@ -155,11 +160,10 @@ object TestConstants {
 
   val testUAJourneyDataJsonNotFound: JsObject = Json.obj(
     "utr" -> testCtutrJson,
-    "postcode" -> testSaPostcode,
+    "postcode" -> testPostcode,
     "identifiersMatch" -> DetailsNotFoundKey,
     "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationNotEnoughInfoToCallKey),
-    "registration" -> Json.obj(
-      registrationStatusKey -> RegistrationNotCalledKey)
+    "registration" -> Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
   )
 
   def testOverseasJourneyDataJson(utrBlock: JsObject): JsObject = Json.obj(
@@ -360,6 +364,8 @@ object TestConstants {
     "ctutr" -> utr.toUpperCase,
     "regime" -> regime
   )
+
+  def testRegistrationJourneyDataPart(value: String) = Json.obj("registration" ->  Json.obj("registrationStatus" -> value))
 
 
 }
