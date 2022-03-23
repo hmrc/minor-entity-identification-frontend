@@ -39,18 +39,22 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
                                         journeyConfig: JourneyConfig
                                        )(implicit hc: HeaderCarrier): Future[BusinessVerificationJourneyCreationResponse] = {
 
-    val (identifierJsonKey, continueUrlJsonValue) = jsonPartsBy(businessEntity = journeyConfig.businessEntity, journeyId = journeyId)
+    val (identifierJsonKey, continueUrlJsonValue, optEntityTypeJson) = jsonPartsBy(businessEntity = journeyConfig.businessEntity, journeyId = journeyId)
+
+    val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
 
     val jsonBody: JsObject =
       Json.obj(
-        "journeyType" -> "BUSINESS_VERIFICATION",
+        "continueUrl" -> continueUrlJsonValue.url,
         "origin" -> journeyConfig.regime,
+        "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId,
+        "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
+        "pageTitle" -> callingService,
+        "journeyType" -> "BUSINESS_VERIFICATION",
         "identifiers" -> Json.arr(
           Json.obj(identifierJsonKey -> utr)
-        ),
-        "continueUrl" -> continueUrlJsonValue.url,
-        "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl
-      )
+        )
+      ) ++ optEntityTypeJson
 
     http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(
       implicitly[Writes[JsObject]],
@@ -60,10 +64,13 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
     )
   }
 
-  private def jsonPartsBy(businessEntity: BusinessEntity, journeyId: String): (String, Call) = businessEntity match {
-    case BusinessEntity.Trusts                    => ("saUtr", trustControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId))
-    case BusinessEntity.UnincorporatedAssociation => ("ctUtr", uaControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId))
-    case BusinessEntity.OverseasCompany           => throw new IllegalArgumentException("Only Trusts and UnincorporatedAssociation business entities are supported.")
+  private def jsonPartsBy(businessEntity: BusinessEntity, journeyId: String): (String, Call, JsObject) = businessEntity match {
+    case BusinessEntity.Trusts                    =>
+      ("saUtr", trustControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId), Json.obj("entityType" -> "TRUST"))
+    case BusinessEntity.UnincorporatedAssociation =>
+      ("ctUtr", uaControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId), Json.obj())
+    case BusinessEntity.OverseasCompany           =>
+      throw new IllegalArgumentException("Only Trusts and UnincorporatedAssociation business entities are supported.")
   }
 
 }

@@ -47,13 +47,17 @@ object TestConstants {
   val testLocalAccessibilityUrl: String = "http://localhost:12346/accessibility-statement/vat-registration"
   val testStagingAccessibilityUrl: String = "https://www.staging.tax.service.gov.uk/accessibility-statement/vat-registration"
   val testRegime: String = "VATC"
+  val testServiceName: String = "TestService"
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
     "taxIdentifier" -> testOverseasTaxIdentifiers.taxIdentifier,
     "country" -> testOverseasTaxIdentifiers.country
   )
   val testSafeId: String = UUID.randomUUID().toString
   val testTrustsJourneyConfig: JourneyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+  val testTrustsJourneyConfigWithCallingService: JourneyConfig = testTrustJourneyConfigWithCallingService(businessVerificationCheck = true)
   val testUAJourneyConfig: JourneyConfig = testTrustsJourneyConfig.copy(businessEntity = UnincorporatedAssociation)
+  val testUAJourneyConfigWithCallingService: JourneyConfig = testTrustsJourneyConfigWithCallingService.copy(businessEntity = UnincorporatedAssociation)
+  val testDefaultServiceName: String = "Entity Validation Service"
 
   def testJourneyConfig(serviceName: Option[String] = None,
                         businessEntity: BusinessEntity,
@@ -70,8 +74,18 @@ object TestConstants {
   def testTrustsJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(businessEntity = Trusts, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
+  def testTrustJourneyConfigWithCallingService(businessVerificationCheck: Boolean): JourneyConfig =
+    testJourneyConfig(serviceName = Some(testServiceName), businessEntity = Trusts, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
+
   def testUnincorporatedAssociationJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(businessEntity = UnincorporatedAssociation, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
+
+  def testUnincorporatedAssociationJourneyConfigWithCallingService(businessVerificationCheck: Boolean): JourneyConfig =
+    testJourneyConfig(
+      serviceName = Some(testServiceName),
+      businessEntity = UnincorporatedAssociation,
+      businessVerificationCheck = businessVerificationCheck,
+      regime = testRegime)
 
   def testOverseasCompanyJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(businessEntity = OverseasCompany, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
@@ -297,17 +311,17 @@ object TestConstants {
   def testCreateBusinessVerificationTrustJourneyJson(sautr: String,
                                                      journeyId: String,
                                                      journeyConfig: JourneyConfig): JsObject =
-    testCreateBusinessVerificationJourneyJson(
+    testCreateBusinessVerificationTrustJourneyJson(
       utrJson = testBVSaUtrJson(sautr),
       continueUrlForBVCall = trustControllersRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId),
       journeyConfig = journeyConfig
     )
 
-  def testCreateBusinessVerificationUAJourneyJson(sautr: String,
-                                                     journeyId: String,
-                                                     journeyConfig: JourneyConfig): JsObject =
-    testCreateBusinessVerificationJourneyJson(
-      utrJson = testBVCtUtrJson(sautr),
+  def testCreateBusinessVerificationUAJourneyJson(ctutr: String,
+                                                  journeyId: String,
+                                                  journeyConfig: JourneyConfig): JsObject =
+    testCreateBusinessVerificationUAJourneyJson(
+      utrJson = testBVCtUtrJson(ctutr),
       continueUrlForBVCall = uaControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId),
       journeyConfig = journeyConfig
     )
@@ -316,15 +330,29 @@ object TestConstants {
 
   def testBVCtUtrJson(utr: String): JsObject = Json.obj("ctUtr" -> utr)
 
-  def testCreateBusinessVerificationJourneyJson(utrJson: JsObject,
-                                                continueUrlForBVCall: Call,
-                                                journeyConfig: JourneyConfig): JsObject =
-    Json.obj("journeyType" -> "BUSINESS_VERIFICATION",
+  def testCreateBusinessVerificationTrustJourneyJson(utrJson: JsObject,
+                                                     continueUrlForBVCall: Call,
+                                                     journeyConfig: JourneyConfig): JsObject = {
+
+    testCreateBusinessVerificationUAJourneyJson(utrJson, continueUrlForBVCall, journeyConfig) ++
+      Json.obj("entityType" -> "TRUST")
+  }
+
+  def testCreateBusinessVerificationUAJourneyJson(utrJson: JsObject,
+                                                  continueUrlForBVCall: Call,
+                                                  journeyConfig: JourneyConfig): JsObject = {
+
+    val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(testDefaultServiceName)
+
+    Json.obj("continueUrl" -> continueUrlForBVCall.url,
       "origin" -> journeyConfig.regime,
-      "identifiers" -> Json.arr(utrJson),
-      "continueUrl" -> continueUrlForBVCall.url,
-      "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl
+      "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId,
+      "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
+      "pageTitle" -> callingService,
+      "journeyType" -> "BUSINESS_VERIFICATION",
+      "identifiers" -> Json.arr(utrJson)
     )
+  }
 
   def testBVRedirectURIJson(redirectUrl: String): JsObject = Json.obj("redirectUri" -> redirectUrl)
 
