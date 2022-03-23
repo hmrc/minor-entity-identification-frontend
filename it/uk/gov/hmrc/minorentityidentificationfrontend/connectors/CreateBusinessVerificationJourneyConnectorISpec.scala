@@ -47,15 +47,25 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
 
   "createBusinessVerificationJourneyConnector" when {
 
-    val expectedUABVCallJson = testCreateBusinessVerificationJourneyJson(
+    val expectedUABVCallJson = testCreateBusinessVerificationUAJourneyJson(
       utrJson = testBVCtUtrJson(testCtutr),
       continueUrlForBVCall = uaRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
       journeyConfig = testUAJourneyConfig)
 
-    val expectedTrustBVCallJson: JsObject = testCreateBusinessVerificationJourneyJson(
+    val expectedUABVCallJsonWithCallingService = testCreateBusinessVerificationUAJourneyJson(
+      utrJson = testBVCtUtrJson(testCtutr),
+      continueUrlForBVCall = uaRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
+      journeyConfig = testUAJourneyConfigWithCallingService)
+
+    val expectedTrustBVCallJson: JsObject = testCreateBusinessVerificationTrustJourneyJson(
       utrJson = testBVSaUtrJson(testSautr),
       continueUrlForBVCall = trustRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
       journeyConfig = testTrustsJourneyConfig)
+
+    val expectedTrustBVCallJsonWithCallingService: JsObject = testCreateBusinessVerificationTrustJourneyJson(
+      utrJson = testBVSaUtrJson(testSautr),
+      continueUrlForBVCall = trustRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
+      journeyConfig = testTrustsJourneyConfigWithCallingService)
 
     s"the $BusinessVerificationStub feature switch is enabled (we will invoke the test backend)" when {
       "the journey creation has been successful" when {
@@ -68,6 +78,23 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig))
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedTrustBVCallJson)
+          }
+        }
+        "the journey is for a Trust business entity and the calling service name has been specified" should {
+          "return the redirect uri" in {
+            enable(BusinessVerificationStub)
+
+            stubCreateBusinessVerificationJourneyFromStub(expBody = expectedTrustBVCallJsonWithCallingService)(status = CREATED, body = testBVRedirectURIJson(testContinueUrlToPassToBVCall))
+
+            val result =
+              await(createBusinessVerificationJourneyConnector
+                .createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfigWithCallingService))
+
+            result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedTrustBVCallJsonWithCallingService)
           }
         }
         "the journey is for a UA business entity" should {
@@ -78,6 +105,21 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfig))
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedUABVCallJson)
+          }
+        }
+        "the journey is for a UA business entity and the calling service name has been specified" should {
+          "return the redirect uri" in {
+            enable(BusinessVerificationStub)
+            stubCreateBusinessVerificationJourneyFromStub(expBody = expectedUABVCallJsonWithCallingService)(CREATED, body = testBVRedirectURIJson(testContinueUrlToPassToBVCall))
+
+            val result = await(createBusinessVerificationJourneyConnector
+              .createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfigWithCallingService))
+
+            result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedUABVCallJsonWithCallingService)
           }
         }
       }
@@ -90,6 +132,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig))
 
             result mustBe Left(NotEnoughEvidence)
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedTrustBVCallJson)
           }
           "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
             enable(BusinessVerificationStub)
@@ -98,6 +142,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig))
 
             result mustBe Left(UserLockedOut)
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedTrustBVCallJson)
           }
         }
 
@@ -109,6 +155,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfig))
 
             result mustBe Left(NotEnoughEvidence)
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedUABVCallJson)
           }
 
           "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
@@ -118,6 +166,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfig))
 
             result mustBe Left(UserLockedOut)
+
+            verifyCreateBusinessVerificationJourneyFromStub(expectedUABVCallJson)
           }
         }
       }
@@ -132,6 +182,21 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig))
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourney(expectedTrustBVCallJson)
+          }
+        }
+        "the journey is for a Trust business entity and the calling service has been specified" should {
+          "return the redirect uri" in {
+
+            stubCreateBusinessVerificationJourney(expBody = expectedTrustBVCallJsonWithCallingService)(status = CREATED, body = testBVRedirectURIJson(testContinueUrlToPassToBVCall))
+
+            val result = await(createBusinessVerificationJourneyConnector
+              .createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfigWithCallingService))
+
+            result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourney(expectedTrustBVCallJsonWithCallingService)
           }
         }
         "the journey is for a UA business entity" should {
@@ -142,6 +207,20 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfig))
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourney(expectedUABVCallJson)
+          }
+        }
+        "the journey is for a UA business entity and the calling service has been specified" should {
+          "return the redirect uri" in {
+            stubCreateBusinessVerificationJourney(expBody = expectedUABVCallJsonWithCallingService)(CREATED, body = testBVRedirectURIJson(testContinueUrlToPassToBVCall))
+
+            val result = await(createBusinessVerificationJourneyConnector
+              .createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfigWithCallingService))
+
+            result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
+
+            verifyCreateBusinessVerificationJourney(expectedUABVCallJsonWithCallingService)
           }
         }
       }
@@ -154,6 +233,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig))
 
             result mustBe Left(NotEnoughEvidence)
+
+            verifyCreateBusinessVerificationJourney(expectedTrustBVCallJson)
           }
           "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
 
@@ -162,6 +243,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfig))
 
             result mustBe Left(UserLockedOut)
+
+            verifyCreateBusinessVerificationJourney(expectedTrustBVCallJson)
           }
         }
 
@@ -173,6 +256,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfig))
 
             result mustBe Left(NotEnoughEvidence)
+
+            verifyCreateBusinessVerificationJourney(expectedUABVCallJson)
           }
 
           "the journey creation has been unsuccessful because the user has had too many attempts and is logged out" in {
@@ -182,6 +267,8 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             val result = await(createBusinessVerificationJourneyConnector.createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfig))
 
             result mustBe Left(UserLockedOut)
+
+            verifyCreateBusinessVerificationJourney(expectedUABVCallJson)
           }
         }
       }

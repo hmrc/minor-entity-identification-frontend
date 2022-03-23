@@ -56,6 +56,12 @@ trait BusinessVerificationStub extends WiremockMethods {
         body = body
       )
 
+  def verifyCreateBusinessVerificationJourneyFromStub(expBody: JsObject): Unit =
+    WiremockHelper.verifyPost(
+      uri = "/identify-your-trust/test-only/business-verification/journey",
+      optBody = Some(Json.stringify(expBody))
+    )
+
   def verifyCreateBusinessVerificationJourney(expBody: JsObject): Unit =
     WiremockHelper.verifyPost(
       uri = s"/business-verification/journey",
