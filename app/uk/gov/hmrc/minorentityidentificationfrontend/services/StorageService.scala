@@ -77,9 +77,9 @@ class StorageService @Inject()(connector: StorageConnector) {
       case None => throw new InternalServerException("No Overseas Company data stored for journeyId: " + journeyId)
     }
 
-  def retrieveOverseasAuditDetails(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+  def retrieveOverseasAuditDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     connector.retrieveOverseasDetails(journeyId).map {
-      optOverseasDetails => OverseasCompanyDetails.writesForAudit(optOverseasDetails)
+      optOverseasDetails => OverseasCompanyDetails.writesForAudit(optOverseasDetails, journeyConfig.businessVerificationCheck)
     }
 
   def retrieveTrustsDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =

@@ -41,7 +41,7 @@ object OverseasCompanyDetails {
       }
 
       Json.obj(
-        "identifiersMatch" -> false,
+        "isMatch" -> "unmatchable",
         "businessVerification" -> Json.toJson(Json.toJson(writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge))),
         "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
       ) ++ utrBlock ++ overseasTaxIdentifiersBlock
@@ -63,13 +63,14 @@ object OverseasCompanyDetails {
     }
   }
 
-  def writesForAudit(optOverseasCompanyDetails: Option[OverseasCompanyDetails]): JsObject = {
+  def writesForAudit(optOverseasCompanyDetails: Option[OverseasCompanyDetails], businessVerificationCheck: Boolean): JsObject = {
+    val unMatchable = "unmatchable"
     optOverseasCompanyDetails match {
       case Some(overseasDetails) =>
         val optUtrBlock = overseasDetails.optUtr match {
-          case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value, "isMatch" -> "false")
-          case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "isMatch" -> "false")
-          case None => Json.obj("isMatch" -> "false")
+          case Some(utr: Ctutr) => Json.obj("userCTUTR" -> utr.value, "isMatch" -> unMatchable)
+          case Some(utr: Sautr) => Json.obj("userSAUTR" -> utr.value, "isMatch" -> unMatchable)
+          case None => Json.obj("isMatch" -> unMatchable)
         }
         val overseasIdentifiersBlock = overseasDetails.optOverseas match {
           case Some(overseas) => Json.obj(
@@ -79,15 +80,24 @@ object OverseasCompanyDetails {
         }
 
         Json.obj(
-          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+          "VerificationStatus" -> checkVerificationStatus(businessVerificationCheck),
           "RegisterApiStatus" -> "not called"
         ) ++ optUtrBlock ++ overseasIdentifiersBlock
       case None =>
         Json.obj(
-          "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+          "VerificationStatus" -> checkVerificationStatus(businessVerificationCheck),
           "RegisterApiStatus" -> "not called",
-          "isMatch" -> "unmatchable"
+          "isMatch" -> unMatchable
         )
     }
   }
+
+  private def checkVerificationStatus(businessVerificationCheck: Boolean): String = {
+    if (businessVerificationCheck) {
+      "Not Enough Information to call BV"
+    } else {
+      "not requested"
+    }
+  }
+
 }
