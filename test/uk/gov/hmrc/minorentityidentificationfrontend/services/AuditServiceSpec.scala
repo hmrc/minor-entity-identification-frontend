@@ -49,7 +49,7 @@ class AuditServiceSpec
     "send an event" when {
       "the entity is an OverseasCompany" in {
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
-        mockStorageService.retrieveOverseasAuditDetails(testJourneyId) returns Future.successful(testOverseasSautrDataJson)
+        mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()) returns Future.successful(testOverseasSautrDataJson)
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
