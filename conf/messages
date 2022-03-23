@@ -12,16 +12,16 @@ app.common.yes                                              = Yes
 app.common.no                                               = No
 
 ## Capture UTR page
-utr.title                                                   = What is the company‘s UK Unique Taxpayer Reference?
+utr.title                                                   = What is the company’s UK Unique Taxpayer Reference?
 utr.line_1                                                  = This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘.
 utr.no_utr_link                                             = The company does not have a UTR
 utr.error_not_entered                                       = Enter the company‘s UK Unique Taxpayer Reference
 utr.error_invalid_characters                                = Enter the UK Unique Taxpayer Reference using numbers only
 utr.error_invalid_length                                    = Enter a UK Unique Taxpayer Reference that is 10 numbers
-utr.trust.title                                             = What is your Unique Taxpayer Reference?
+utr.trust.title                                             = What is the trust’s Unique Taxpayer Reference?
 utr.trust.line_1                                            = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
 utr.trust.line_1_ending                                     = find a lost UTR number.
-utr.trust.no_utr_link                                       = The business does not have a Self Assessment UTR
+utr.trust.no_utr_link                                       = The trust does not have a Self Assessment UTR
 utr.trust.error_not_entered                                 = Enter your UK Unique Taxpayer Reference
 utr.trust.error_invalid_characters                          = Enter the UK Unique Taxpayer Reference using numbers only
 utr.trust.error_invalid_length                              = Enter a UK Unique Taxpayer Reference that is 10 numbers
