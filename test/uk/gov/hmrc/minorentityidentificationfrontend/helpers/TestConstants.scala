@@ -135,23 +135,23 @@ object TestConstants {
   val testCannotConfirmErrorPageUrl = "/bla/bla/someErrorPageUrl"
 
   val testOverseasSautrDataJson: JsObject = Json.obj(
-    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> "not called",
-    "isMatch" -> "false",
+    "isMatch" -> "unmatchable",
     "userSAUTR" -> testSautr
   )
 
   val testOverseasCtutrDataJson: JsObject = Json.obj(
-    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> "not called",
-    "isMatch" -> "false",
+    "isMatch" -> "unmatchable",
     "userCTUTR" -> testCtutr
   )
 
   val testOverseasTaxIdentifiersDataJson: JsObject = Json.obj(
-    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> "not called",
-    "isMatch" -> "false"
+    "isMatch" -> "unmatchable"
   )
 
   val testLegacyDataJson: JsObject = Json.obj(
@@ -261,7 +261,7 @@ object TestConstants {
 
   val testOverseasNoIdentifiersDataJson: JsObject = Json.obj(
     "isMatch" -> "unmatchable",
-    "VerificationStatus" -> Json.obj("verificationStatus" -> "UNCHALLENGED"),
+    "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> "not called"
   )
 
