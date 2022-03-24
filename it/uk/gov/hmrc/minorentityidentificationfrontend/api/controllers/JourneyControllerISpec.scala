@@ -193,9 +193,10 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
             "ctutr" -> testCtutr,
             "identifiersMatch" -> true,
             "businessVerification" -> Json.obj("verificationStatus" -> "PASS"),
-            "registration" -> Json.obj("registrationStatus" -> "REGISTERED",
+            "registration" -> Json.obj(
+              "registrationStatus" -> "REGISTERED",
               "registeredBusinessPartnerId" -> testSafeId),
-            "ctPostcode" -> testSaPostcode
+            "ctPostcode" -> testPostcode
           )
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))

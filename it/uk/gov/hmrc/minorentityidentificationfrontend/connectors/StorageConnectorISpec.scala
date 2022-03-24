@@ -88,4 +88,141 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
       result mustBe SuccessfullyRemoved
     }
   }
+
+  "given BusinessVerificationPass retrieveUADetails" should {
+    "return a UADetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson)
+
+      val result = await(storageConnector.retrieveUADetails(testJourneyId))
+
+      result.get mustBe UADetails(
+        optUtr = Some(Ctutr(testCtutr)),
+        optCtPostcode = Some(testPostcode),
+        optChrn = None,
+        optIdentifiersMatch = Some(SuccessfulMatch),
+        optBusinessVerificationStatus = Some(BusinessVerificationPass),
+        optRegistrationStatus = Some(Registered(testSafeId))
+      )
+    }
+  }
+
+  "given BusinessVerificationPass but Registration failed retrieveUADetails" should {
+    "return a UADetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataWithRegistrationFailedJson)
+
+      val result = await(storageConnector.retrieveUADetails(testJourneyId))
+
+      result.get mustBe UADetails(
+        optUtr = Some(Ctutr(testCtutr)),
+        optCtPostcode = Some(testPostcode),
+        optChrn = None,
+        optIdentifiersMatch = Some(SuccessfulMatch),
+        optBusinessVerificationStatus = Some(BusinessVerificationPass),
+        optRegistrationStatus = Some(RegistrationFailed)
+      )
+    }
+  }
+
+  "given BusinessVerificationNotEnoughInfoToCallKey retrieveUADetails" should {
+    "return a UADetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJsonNotFound)
+
+      val result = await(storageConnector.retrieveUADetails(testJourneyId))
+
+      result.get mustBe UADetails(
+        optUtr = Some(Ctutr(testCtutr)),
+        optCtPostcode = Some(testPostcode),
+        optChrn = None,
+        optIdentifiersMatch = Some(DetailsNotFound),
+        optBusinessVerificationStatus = Some(BusinessVerificationNotEnoughInformationToCallBV),
+        optRegistrationStatus = Some(RegistrationNotCalled)
+      )
+    }
+  }
+
+  "given no data retrieveUADetails" should {
+    "return a an empty UADetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, JsObject.empty)
+
+      val result = await(storageConnector.retrieveUADetails(testJourneyId))
+
+      result.get mustBe UADetails(
+        optUtr = None,
+        optCtPostcode = None,
+        optChrn = None,
+        optIdentifiersMatch = None,
+        optBusinessVerificationStatus = None,
+        optRegistrationStatus = None
+      )
+    }
+  }
+
+  "given BusinessVerificationPass retrieveTrustsDetails" should {
+    "return a TrustDetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson)
+
+      val result = await(storageConnector.retrieveTrustsDetails(testJourneyId))
+
+      result.get mustBe TrustDetails(
+        optUtr = Some(Sautr(testSautr)),
+        optSaPostcode = Some(testSaPostcode),
+        optChrn = None,
+        optIdentifiersMatch = Some(SuccessfulMatch),
+        optBusinessVerificationStatus = Some(BusinessVerificationPass),
+        optRegistrationStatus = Some(Registered(testSafeId))
+      )
+    }
+  }
+
+  "given BusinessVerificationPass but Registration failed retrieveTrustsDetails" should {
+    "return a TrustDetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataWithRegistrationFailedJson)
+
+      val result = await(storageConnector.retrieveTrustsDetails(testJourneyId))
+
+      result.get mustBe TrustDetails(
+        optUtr = Some(Sautr(testSautr)),
+        optSaPostcode = Some(testSaPostcode),
+        optChrn = None,
+        optIdentifiersMatch = Some(SuccessfulMatch),
+        optBusinessVerificationStatus = Some(BusinessVerificationPass),
+        optRegistrationStatus = Some(RegistrationFailed)
+      )
+    }
+  }
+
+  "given BusinessVerificationNotEnoughInfoToCallKey retrieveTrustsDetails" should {
+    "return a TrustDetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, testTrustIdFalseJourneyDataJson)
+
+      val result = await(storageConnector.retrieveTrustsDetails(testJourneyId))
+
+      result.get mustBe TrustDetails(
+        optUtr = Some(Sautr(testSautr)),
+        optSaPostcode = Some(testSaPostcode),
+        optChrn = None,
+        optIdentifiersMatch = Some(DetailsMismatch),
+        optBusinessVerificationStatus = Some(BusinessVerificationNotEnoughInformationToCallBV),
+        optRegistrationStatus = Some(RegistrationNotCalled)
+      )
+    }
+  }
+
+  "given no data retrieveTrustsDetails" should {
+    "return a an empty TrustDetails" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, JsObject.empty)
+
+      val result = await(storageConnector.retrieveTrustsDetails(testJourneyId))
+
+      result.get mustBe TrustDetails(
+        optUtr = None,
+        optSaPostcode = None,
+        optChrn = None,
+        optIdentifiersMatch = None,
+        optBusinessVerificationStatus = None,
+        optRegistrationStatus = None
+      )
+    }
+  }
+
 }
