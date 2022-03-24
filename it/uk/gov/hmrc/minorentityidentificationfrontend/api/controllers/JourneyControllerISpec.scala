@@ -361,7 +361,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
           val testDetailsJson = Json.obj(
             "ctutr" -> testCtutr,
-            "identifiersMatch" -> false,
+            "isMatch" -> "unmatchable",
             "businessVerification" -> Json.obj(
               "verificationStatus" -> "UNCHALLENGED"
             ),
@@ -389,7 +389,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
           val testDetailsJson = Json.obj(
             "sautr" -> testSautr,
-            "identifiersMatch" -> false,
+            "isMatch" -> "unmatchable",
             "businessVerification" -> Json.obj(
               "verificationStatus" -> "UNCHALLENGED"
             ),
