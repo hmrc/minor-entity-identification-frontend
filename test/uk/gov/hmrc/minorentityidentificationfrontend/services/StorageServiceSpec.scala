@@ -38,7 +38,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
       "a sautr is entered" in {
         mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
           Future.successful(Some(OverseasCompanyDetails(Some(Sautr(testSautr)), Some(testOverseas))))
-        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId))
+        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasSautrDataJson ++ testOverseasTaxIdentifiersJson
       }
@@ -46,7 +46,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
         mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
           Future.successful(Some(OverseasCompanyDetails(Some(Ctutr(testCtutr)), None)))
 
-        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId))
+        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasCtutrDataJson
       }
@@ -54,14 +54,14 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
         mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
           Future.successful(Some(OverseasCompanyDetails(None, Some(testOverseas))))
 
-        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId))
+        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasTaxIdentifiersDataJson ++ testOverseasTaxIdentifiersJson
       }
       "no data is entered" in {
         mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns Future.successful(None)
 
-        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId))
+        val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasNoIdentifiersDataJson
       }

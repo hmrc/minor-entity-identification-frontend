@@ -47,7 +47,7 @@ class AuditService @Inject()(appConfig: AppConfig,
     val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
 
     journeyConfig.businessEntity match {
-      case OverseasCompany => auditOverseasCompanyJourney(journeyId, callingService)
+      case OverseasCompany => auditOverseasCompanyJourney(journeyId, callingService, journeyConfig)
       case Trusts => auditTrustsJourney(journeyId, callingService, journeyConfig)
       case UnincorporatedAssociation => auditUnincorporatedAssociationJourney(journeyId, callingService, journeyConfig)
       case _ =>
@@ -55,10 +55,10 @@ class AuditService @Inject()(appConfig: AppConfig,
     }
   }
 
-  private def auditOverseasCompanyJourney(journeyId: String, callingService: String)
+  private def auditOverseasCompanyJourney(journeyId: String, callingService: String, journeyConfig: JourneyConfig)
                                          (implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     for {
-      overseasDataJson <- storageService.retrieveOverseasAuditDetails(journeyId)
+      overseasDataJson <- storageService.retrieveOverseasAuditDetails(journeyId, journeyConfig)
     } yield {
       val auditJson = Json.obj(
         "callingService" -> callingService,
