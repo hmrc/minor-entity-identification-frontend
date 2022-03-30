@@ -35,7 +35,7 @@
 
 @(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@layout(pageConfig, title = title(messages("chrn.title"), form)) {
+@layout(pageConfig, title = title("chrn.title", pageConfig, form)) {
 
     @if(form.errors.nonEmpty){
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))

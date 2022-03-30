@@ -1,4 +1,5 @@
 service.name                                                = minor-entity-identification-frontend
+service.govuk                                               = GOV.UK
 
 ## Base
 getpagehelp.linkText                                        = Is this page not working properly?

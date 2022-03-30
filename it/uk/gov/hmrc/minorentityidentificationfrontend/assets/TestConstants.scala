@@ -90,6 +90,14 @@ object TestConstants {
   def testOverseasCompanyJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(businessEntity = OverseasCompany, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
+  def testOverseasCompanyJourneyConfigWithCallingService(businessVerificationCheck: Boolean): JourneyConfig =
+    testJourneyConfig(
+      serviceName = Some(testServiceName),
+      businessEntity = OverseasCompany,
+      businessVerificationCheck = businessVerificationCheck,
+      regime = testRegime
+    )
+
   val testSautrJson: JsObject = Json.obj(
     "type" -> "sautr",
     "value" -> testSautr
