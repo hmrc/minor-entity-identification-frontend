@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureUtr => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testServiceName, testDefaultServiceName, testSignOutUrl}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -49,7 +49,7 @@ trait CaptureUtrViewTests {
     }
 
     "have the correct title" in {
-      doc.title mustBe messages.title
+      doc.title mustBe s"${messages.title} - $testServiceName - GOV.UK"
     }
 
     "have the correct heading" in {
@@ -76,6 +76,10 @@ trait CaptureUtrViewTests {
   def testCaptureUtrViewNoUtr(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe s"${Base.Error.error}${messages.title} - $testDefaultServiceName - GOV.UK"
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.error_not_entered
@@ -88,6 +92,10 @@ trait CaptureUtrViewTests {
   def testCaptureUtrViewInvalidUtr(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe s"${Base.Error.error}${messages.title} - $testDefaultServiceName - GOV.UK"
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.error_invalid_format
@@ -99,6 +107,10 @@ trait CaptureUtrViewTests {
 
   def testCaptureUtrViewInvalidUtrLength(result: => WSResponse): Unit = {
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe s"${Base.Error.error}${messages.title} - $testDefaultServiceName - GOV.UK"
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title

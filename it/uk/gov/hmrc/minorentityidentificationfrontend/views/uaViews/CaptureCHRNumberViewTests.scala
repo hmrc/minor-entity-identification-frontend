@@ -21,7 +21,7 @@ import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureUaChrn => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testSignOutUrl
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testDefaultServiceName, testSignOutUrl}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -52,7 +52,7 @@ trait CaptureCHRNumberViewTests {
     }
 
     "have the correct title" in {
-      doc.title mustBe messages.title
+      doc.title mustBe s"${messages.title} - $testDefaultServiceName - GOV.UK"
     }
 
     "have the correct page header" in {
@@ -110,6 +110,10 @@ trait CaptureCHRNumberViewTests {
 
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe s"${Base.Error.error}${messages.title} - $testDefaultServiceName - GOV.UK"
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.error_not_entered
@@ -125,6 +129,10 @@ trait CaptureCHRNumberViewTests {
 
     lazy val doc: Document = Jsoup.parse(result.body)
 
+    "have the correct title" in {
+      doc.title mustBe s"${Base.Error.error}${messages.title} - $testDefaultServiceName - GOV.UK"
+    }
+
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.error_invalid_characters
@@ -139,6 +147,10 @@ trait CaptureCHRNumberViewTests {
   def testCaptureCHRNErrorMessageMaximumLengthExceeded(result: => WSResponse): Unit = {
 
     lazy val doc: Document = Jsoup.parse(result.body)
+
+    "have the correct title" in {
+      doc.title mustBe s"${Base.Error.error}${messages.title} - $testDefaultServiceName - GOV.UK"
+    }
 
     "correctly display the error summary" in {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title

@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.h1
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
@@ -30,7 +31,7 @@
 
 @(pageConfig: PageConfig, formAction: Call, summaryRows: Seq[SummaryListRow])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@layout(pageConfig, title = messages("check-your-answers.title")) {
+@layout(pageConfig, title = title("check-your-answers.title", pageConfig)) {
 
     @h1(messages("check-your-answers.heading"))
 

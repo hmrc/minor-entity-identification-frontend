@@ -32,7 +32,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
       await(insertJourneyConfig(
         journeyId = testJourneyId,
         internalId = testInternalId,
-        testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
+        testOverseasCompanyJourneyConfigWithCallingService(businessVerificationCheck = true)
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
       get(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")
