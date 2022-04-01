@@ -2,7 +2,6 @@ service.name                                                = minor-entity-ident
 service.govuk                                               = GOV.UK
 
 ## Base
-getpagehelp.linkText                                        = Is this page not working properly?
 base.save_and_continue                                      = Save and continue
 base.change                                                 = Change
 base.confirm_and_continue                                   = Confirm and continue

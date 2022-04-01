@@ -79,6 +79,10 @@ object ViewSpecHelper {
     lazy val getSignOutLink: String = element.select(".hmrc-sign-out-nav__link").attr("href")
 
     lazy val getSignOutText: String = element.select(".hmrc-sign-out-nav__link").text
+
+    lazy val getTechnicalHelpLink: String = element.getElementsByClass("hmrc-report-technical-issue").attr("href")
+
+    lazy val getTechnicalHelpLinkText: String = element.getElementsByClass("hmrc-report-technical-issue").text
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =

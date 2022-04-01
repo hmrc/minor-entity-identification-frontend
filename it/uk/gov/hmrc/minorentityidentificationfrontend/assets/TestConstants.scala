@@ -58,6 +58,7 @@ object TestConstants {
   val testUAJourneyConfig: JourneyConfig = testTrustsJourneyConfig.copy(businessEntity = UnincorporatedAssociation)
   val testUAJourneyConfigWithCallingService: JourneyConfig = testTrustsJourneyConfigWithCallingService.copy(businessEntity = UnincorporatedAssociation)
   val testDefaultServiceName: String = "Entity Validation Service"
+  val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=vrs"
 
   def testJourneyConfig(serviceName: Option[String] = None,
                         businessEntity: BusinessEntity,

@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureUtr => messages}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testServiceName, testDefaultServiceName, testSignOutUrl}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testServiceName, testDefaultServiceName, testSignOutUrl, testTechnicalHelpUrl}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
@@ -69,7 +69,8 @@ trait CaptureUtrViewTests {
     }
 
     "have a link to contact frontend" in {
-      doc.getLink("get-help").text mustBe Base.getHelp
+      doc.getTechnicalHelpLinkText mustBe Base.getHelp
+      doc.getTechnicalHelpLink mustBe testTechnicalHelpUrl
     }
   }
 
