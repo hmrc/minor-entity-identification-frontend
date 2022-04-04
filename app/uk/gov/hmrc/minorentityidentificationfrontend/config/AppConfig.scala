@@ -41,7 +41,7 @@ class AppConfig @Inject()(config: Configuration,
   lazy val selfBaseUrl: String = servicesConfig.baseUrl("self")
   lazy val selfUrl: String = servicesConfig.getString("microservice.services.self.url")
 
-  private lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
+  lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
 
   private lazy val backendUrl: String = servicesConfig.baseUrl("minor-entity-identification")
 
@@ -71,12 +71,6 @@ class AppConfig @Inject()(config: Configuration,
 
   lazy val accessibilityStatementPath: String = servicesConfig.getString("accessibility-statement.host")
   lazy val vatRegAccessibilityStatementUrl: String = s"$accessibilityStatementPath/accessibility-statement/vat-registration"
-
-  def reportAProblemPartialUrl(serviceIdentifier: String): String =
-    s"$contactHost/contact/problem_reports_ajax?service=$serviceIdentifier"
-
-  def reportAProblemNonJSUrl(serviceIdentifier: String): String =
-    s"$contactHost/contact/problem_reports_nonjs?service=$serviceIdentifier"
 
   def minorEntityIdentificationUrl(journeyId: String): String = s"$backendUrl/minor-entity-identification/journey/$journeyId"
 

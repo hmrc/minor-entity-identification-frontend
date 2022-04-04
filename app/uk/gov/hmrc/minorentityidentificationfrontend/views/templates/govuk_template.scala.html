@@ -16,6 +16,8 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcTrackingConsentSnippet, HmrcLayout, HmrcTimeoutDialogHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.reporttechnicalissue.ReportTechnicalIssue
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcReportTechnicalIssue
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
@@ -26,7 +28,8 @@
     appConfig: AppConfig,
     hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
     standardBetaBanner: StandardBetaBanner,
-    hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper)
+    hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
+    hmrcReportTechnicalIssue: HmrcReportTechnicalIssue)
 
 @(pageConfig: PageConfig, title: String, startUrl: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
@@ -40,11 +43,10 @@
         @contentBlock
     </div>
 
-    <div class="govuk-body">
-        <a id="get-help" lang="en" hreflang="en" class="govuk-link " target="_blank" href="@{appConfig.reportAProblemNonJSUrl(pageConfig.deskProServiceId)}">
-            @messages("getpagehelp.linkText")
-        </a>
-    </div>
+    @hmrcReportTechnicalIssue(ReportTechnicalIssue(
+        serviceId = pageConfig.deskProServiceId,
+        baseUrl = Some(appConfig.contactHost)
+    ))
 }
 
 @hmrcLayout(
