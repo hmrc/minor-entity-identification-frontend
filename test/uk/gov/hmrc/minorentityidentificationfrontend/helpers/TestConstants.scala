@@ -247,7 +247,7 @@ object TestConstants {
   )
 
   val testOnlyCHRNDataJson: JsObject = Json.obj(
-    "CHRN" -> testCHRN,
+    "CHRN" -> testCHRN.toUpperCase,
     "isMatch" -> "unmatchable",
     "VerificationStatus" -> "Not enough information to call BV",
     "RegisterApiStatus" -> "not called"

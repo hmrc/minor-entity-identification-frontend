@@ -167,7 +167,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             enable(EnableFullUAJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            post(s"/identify-your-unincorporated-association/$testJourneyId/chrn")("chrn" -> "ab99999")
+            post(s"/identify-your-unincorporated-association/$testJourneyId/chrn")("chrn" -> "ab99p99")
           }
 
           "return a bad request" in {

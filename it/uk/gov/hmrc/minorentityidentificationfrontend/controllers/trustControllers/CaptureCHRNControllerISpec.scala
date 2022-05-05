@@ -168,7 +168,7 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
             enable(EnableFullTrustJourney)
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> "ab99999")
+            post(s"/identify-your-trust/$testJourneyId/chrn")("chrn" -> "AZ9999V")
           }
 
           "return a bad request" in {

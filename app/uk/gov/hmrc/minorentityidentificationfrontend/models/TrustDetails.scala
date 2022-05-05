@@ -41,7 +41,7 @@ object TrustDetails {
     }
 
     val chrnBlock: JsObject = trustDetails.optChrn match {
-      case Some(charityHMRCReferenceNumber) => Json.obj("chrn" -> charityHMRCReferenceNumber)
+      case Some(charityHMRCReferenceNumber) => Json.obj("chrn" -> charityHMRCReferenceNumber.toUpperCase)
       case None => Json.obj()
     }
 
@@ -73,7 +73,7 @@ object TrustDetails {
         }
 
         val optCHRNBlock = trustDetails.optChrn match {
-          case Some(chrn) => Json.obj("CHRN" -> chrn)
+          case Some(chrn) => Json.obj("CHRN" -> chrn.toUpperCase)
           case None => Json.obj()
         }
 
