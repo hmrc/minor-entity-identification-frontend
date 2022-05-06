@@ -38,7 +38,7 @@ object TestConstants {
   val testSaPostcode: String = "AA00 0AA"
   val testPostcode: String = "AA1 1AA"
   val testOfficePostcode: String = "AA22 2AA"
-  val testCHRN: String = "AB99999"
+  val testCHRN: String = "Ab99999"
   val testContinueUrl: String = "/test"
   val testContinueUrlToPassToBVCall: String = s"/thisWhenWeCallBV/${UUID.randomUUID().toString}"
   val testDeskProServiceId: String = "vrs"

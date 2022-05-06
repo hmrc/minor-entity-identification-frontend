@@ -32,7 +32,7 @@ object CaptureCHRNForm {
   val ChrnInvalidCharactersErrorKey: String = "chrn.ua.error.invalid_format"
   val ChrnInvalidLengthErrorKey: String = "chrn.ua.error.invalid_length"
 
-  val ChrnRegex: Regex = "[A-Z]{1,2}[0-9]{1,5}".r
+  val ChrnRegex: Regex = "[A-Za-z]{1,2}[0-9]{1,5}".r
 
   def chrnEmpty: Constraint[String] = Constraint("chrn.not_entered")(
     chrn => validate(constraint = chrn.isEmpty, errMsg = ChrnNotEnteredErrorKey)

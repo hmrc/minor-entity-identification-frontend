@@ -19,7 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.models
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers._
 import play.api.libs.json.{JsObject, Json, __}
-import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testRegistrationStatusJson, testRegistrationStatusRegistered}
+import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testCHRN, testRegistrationStatusJson, testRegistrationStatusRegistered}
 
 class TrustDetailsSpec extends AnyFlatSpec {
 
@@ -88,6 +88,19 @@ class TrustDetailsSpec extends AnyFlatSpec {
     })
   }
 
+  "chrn values with lower case alphabetic characters" should "have the lower case characters converted to upper case" in {
+
+    List(true, false).foreach(businessVerificationCheck => {
+      val actualJson = TrustDetails.writesForJourneyEnd(
+        trustDetails = anEmptyTrustDetails.copy(optChrn = Some(testCHRN)),
+        businessVerificationCheck = businessVerificationCheck
+      )
+      extractCHRN(actualJson) should be(testCHRN.toUpperCase)
+    })
+
+  }
+
+  private def extractCHRN(json: JsObject): String = (json \ "chrn").as[String]
   private def extractRegistrationTag(json: JsObject): JsObject = json.as[JsObject]((__ \ "registration").read)
 
 }

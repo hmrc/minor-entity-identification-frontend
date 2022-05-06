@@ -19,7 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks.MockStorageConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
@@ -334,6 +334,38 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
         result mustBe testUADataJsonNoPostcode
       }
     }
+  }
+
+  "retrieveTrustDetails" should {
+    "return the correct json" when {
+
+      "user is on the legacy journey" in {
+        mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(None)
+
+        val theActualException: InternalServerException  = intercept[InternalServerException] {
+          await(TestStorageService.retrieveTrustsDetails(testJourneyId, testTrustJourneyConfig()))
+        }
+
+        theActualException.getMessage mustBe "No Trusts journey data stored for journeyId: " + testJourneyId
+      }
+
+    }
+  }
+
+  "retrieveUADetails" should {
+    "return the correct json" when {
+
+      "user is on the legacy journey" in {
+        mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(None)
+
+        val theActualException: InternalServerException = intercept[InternalServerException] {
+          await(TestStorageService.retrieveUADetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
+        }
+
+        theActualException.getMessage mustBe "No UA journey data stored for journeyId: " + testJourneyId
+      }
+    }
+
   }
 
 }
