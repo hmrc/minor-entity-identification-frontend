@@ -20,8 +20,8 @@
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
-@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 
 @this(layout: govuk_template,
@@ -43,17 +43,16 @@
 
     @formWithCSRF(action = formAction) {
 
-    @h1(messages("chrn.title"))
+        @h1(messages("chrn.title"))
 
-    @inset(messages("chrn.inset"))
+        @inset(messages("chrn.inset"))
 
-    @govukInput(
-
-          Input(
-               hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-body">${messages("chrn.line_1")}</p>"""))),
-               classes = "govuk-input--width-20"
-                ).withFormField(form("chrn"))
-
+        @govukInput(
+            Input(
+                hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-body">${messages("chrn.hint")}</p>"""))),
+                label = Label(content = Text(messages("chrn.label")), isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("chrn"))
         )
 
         <p class="govuk-body">
@@ -61,9 +60,9 @@
         </p>
 
         @govukButton(Button(
-          attributes = Map("id" -> "save-and-continue"),
-          classes = "govuk-!-margin-right-1",
-          content = Text(messages("base.save_and_continue"))
+            attributes = Map("id" -> "save-and-continue"),
+            classes = "govuk-!-margin-right-1",
+            content = Text(messages("base.save_and_continue"))
         ))
 
     }
