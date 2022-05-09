@@ -83,6 +83,8 @@ object ViewSpecHelper {
     lazy val getTechnicalHelpLink: String = element.getElementsByClass("hmrc-report-technical-issue").attr("href")
 
     lazy val getTechnicalHelpLinkText: String = element.getElementsByClass("hmrc-report-technical-issue").text
+
+    lazy val getBackLinks: Elements = element.getElementsByClass("govuk-back-link")
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =

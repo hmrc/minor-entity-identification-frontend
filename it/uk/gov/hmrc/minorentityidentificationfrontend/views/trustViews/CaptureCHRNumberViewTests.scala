@@ -55,7 +55,15 @@ trait CaptureCHRNumberViewTests {
       doc.title mustBe s"${messages.title} - $testDefaultServiceName - GOV.UK"
     }
 
-    "have the correct page haeder" in {
+    "have a back link" in {
+      val backLinks: Elements = doc.getBackLinks
+
+      backLinks.size mustBe 1
+
+      backLinks.first.text mustBe Base.back
+    }
+
+    "have the correct page header" in {
       val headers: Elements = doc.getElementsByTag("h1")
 
       headers.size mustBe >= (1)

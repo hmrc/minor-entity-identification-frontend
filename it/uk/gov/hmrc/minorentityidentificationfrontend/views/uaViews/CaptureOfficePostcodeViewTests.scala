@@ -54,6 +54,14 @@ trait CaptureOfficePostcodeViewTests {
       doc.title mustBe s"${messages.title} - $testDefaultServiceName - GOV.UK"
     }
 
+    "have a back link" in {
+      val backLinks: Elements = doc.getBackLinks
+
+      backLinks.size mustBe 1
+
+      backLinks.first.text mustBe Base.back
+    }
+
     "have the correct page header" in {
       val headers: Elements = doc.getElementsByTag("h1")
 
