@@ -76,6 +76,10 @@ trait CaptureCHRNumberViewTests {
       doc.getParagraphs.get(1).text mustBe messages.hint
     }
 
+    "have the correct label" in {
+      doc.getLabelElement.first().text() mustBe messages.label
+    }
+
     "have an input text box with the identifier 'chrn'" in {
 
       val optInput: Option[Element] = Option(doc.getElementById("chrn"))

@@ -20,8 +20,8 @@
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaControllersRoutes}
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
-@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 
 @this(layout: govuk_template,
@@ -43,25 +43,26 @@
 
     @formWithCSRF(action = formAction) {
 
-    @h1(messages("chrn.ua.title"))
+        @h1(messages("chrn.ua.title"))
 
-    @inset(messages("chrn.ua.inset"))
+        @inset(messages("chrn.ua.inset"))
 
-    @govukInput(
-          Input(
-               hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-hint">${messages("chrn.ua.hint")}</p>"""))),
-               classes = "govuk-input--width-20"
-          ).withFormField(form("chrn"))
-    )
+        @govukInput(
+            Input(
+                hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-hint">${messages("chrn.ua.hint")}</p>"""))),
+                label = Label(content = Text(messages("chrn.ua.label")), isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("chrn"))
+        )
 
         <p class="govuk-body">
             <a class="govuk-link" id="no-chrn" href="@uaControllersRoutes.CaptureCHRNController.noChrn(journeyId)">@messages("chrn.ua.no_chrn_link")</a>
         </p>
 
         @govukButton(Button(
-          attributes = Map("id" -> "save-and-continue"),
-          classes = "govuk-!-margin-right-1",
-          content = Text(messages("base.save_and_continue"))
+            attributes = Map("id" -> "save-and-continue"),
+            classes = "govuk-!-margin-right-1",
+            content = Text(messages("base.save_and_continue"))
         ))
 
     }
