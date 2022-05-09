@@ -44,8 +44,9 @@
             Input(
                 label = HmrcPageHeadingLabel(content = Text(messages("utr.title"))),
                 hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-body">${messages("utr.line_1")}</p>"""))),
-                classes = "govuk-input--width-20"
-            ).withFormField(form("utr"))
+                classes = "govuk-input--width-20",
+                inputmode = Some("numeric"),
+                ).withFormField(form("utr"))
         )
 
         <p class="govuk-body">
