@@ -49,6 +49,10 @@
     ))
 }
 
+@scripts = {
+  <script @{CSPNonce.attr} src='@controllers.routes.Assets.versioned("javascripts/backLink.js")'></script>
+}
+
 @hmrcLayout(
     pageTitle = Some(title),
     isWelshTranslationAvailable = false,
@@ -57,5 +61,7 @@
     accessibilityStatementUrl = Some(pageConfig.accessibilityUrl),
     nonce = CSPNonce.get,
     phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUrl(pageConfig.deskProServiceId))),
-    serviceName = Some(pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName))
+    serviceName = Some(pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)),
+    backLinkUrl = Some("#"),
+    additionalScriptsBlock = Some(scripts)
 )(content)

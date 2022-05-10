@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureOverseasTaxIdentifiers => messages}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testDefaultServiceName, testSignOutUrl, testTechnicalHelpUrl}
@@ -51,6 +52,14 @@ trait CaptureOverseasTaxIdentifiersTests {
 
     "have the correct title" in {
       doc.title mustBe s"${messages.title} - $testDefaultServiceName - GOV.UK"
+    }
+
+    "have a back link" in {
+      val backLinks: Elements = doc.getBackLinks
+
+      backLinks.size mustBe 1
+
+      backLinks.first.text mustBe Base.back
     }
 
     "have the correct heading" in {
