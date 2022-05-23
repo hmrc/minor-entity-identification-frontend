@@ -64,7 +64,7 @@
             name = "country",
             label = Label(content = HtmlContent(messages("tax-identifiers.field_2")), classes = "govuk-label govuk-!-font-weight-bold"),
             errorMessage = form("country").error.map(fe ⇒ ErrorMessage(content = HtmlContent(messages("error.no_tax_identifier_country")))),
-            items = Seq(SelectItem(value = Some(""), text="Select a country")) ++ countries.map {
+            items = Seq(SelectItem(value = Some(""), text = messages("country.select"))) ++ countries.map {
                 case Country(code, name) ⇒ SelectItem(
                     value = Some(code),
                     text = name,

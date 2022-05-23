@@ -15,13 +15,16 @@
  */
 
 package uk.gov.hmrc.minorentityidentificationfrontend.views.helpers
+import play.api.i18n.{Messages, MessagesApi}
+import play.api.mvc.Cookie
+import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Actions, Key, SummaryListRow, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testOverseas, testSautr}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.Sautr
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Overseas, Sautr}
 
 class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilderSpec {
 
@@ -69,7 +72,6 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
         )
 
       }
-
       "the user could entered utr and overseas tax identifier buy they did not" in {
 
         val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
@@ -84,7 +86,37 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
         )
 
       }
-
     }
+
+    "build a summary list sequence containing cy translation" when {
+      "there is a cookie specifying cy language" in {
+        val incomingRequest = FakeRequest().withCookies(Cookie("PLAY_LANG","cy"))
+        val messagesInWelsh: Messages = app.injector.instanceOf[MessagesApi].preferred(incomingRequest)
+
+        val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
+          journeyId = testJourneyId,
+          optOverseasTaxId = Some(Overseas(taxIdentifier = "134124532", country = "AF")),
+          optUtr = Some(Sautr(testSautr))
+        )(messagesInWelsh, mockAppConfig)
+
+        actualSummaryList.size must  be(2)
+
+        actualSummaryList(1) must be(
+          SummaryListRow(
+            key = Key(content = Text("Dynodydd treth tramor")),
+            value = Value(HtmlContent(s"${testOverseas.taxIdentifier}<br>Affganistan")),
+            actions = Some(Actions(items = Seq(
+              ActionItem(
+                href = overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url,
+                content = Text("Newid"),
+                visuallyHiddenText = Some("Dynodydd treth tramor")
+              )
+            )))
+          )
+        )
+
+      }
+    }
+
   }
 }
