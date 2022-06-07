@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.config
 
+import org.apache.commons.io.IOUtils
 import play.api.{Configuration, Environment}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.InternalServerException
@@ -24,13 +25,13 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.Country
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
 
+import java.io.IOException
 import javax.inject.{Inject, Singleton}
 import scala.collection.JavaConverters.asScalaBufferConverter
 
 @Singleton
 class AppConfig @Inject()(config: Configuration,
                           servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
   lazy val allowedHosts: Set[String] = config.underlying.getStringList("microservice.hosts.allowList").asScala.toSet
 
@@ -92,13 +93,41 @@ class AppConfig @Inject()(config: Configuration,
     }
   }
 
-  lazy val orderedCountryList: Seq[Country] = countries.values.toSeq.sortBy(_.name)
+  private lazy val countriesListInEnglish: Map[String, Country] = getCountryList("/countries.json")
 
-  def getCountryName(countryCode: String): String = countries.get(countryCode) match {
+  private lazy val countriesListInWelsh: Map[String, Country] = getCountryList("/countries_cy.json")
+
+  private lazy val orderedCountryListInEnglish: Seq[Country] = countriesListInEnglish.values.toSeq.sortBy(_.name)
+
+  private lazy val orderedCountryListInWelsh: Seq[Country] =  countriesListInWelsh.values.toSeq.sortBy(_.name)
+
+  private def getCountryListByLanguage(code: String = "en"): Map[String, Country] = if(code == "cy") countriesListInWelsh else countriesListInEnglish
+
+  def getOrderedCountryListByLanguage(code: String = "en"): Seq[Country] = if(code == "cy") orderedCountryListInWelsh else orderedCountryListInEnglish
+
+  def getCountryName(countryCode: String, langCode: String = "en"): String = getCountryListByLanguage(langCode).get(countryCode) match {
     case Some(Country(_, name)) =>
       name
     case None =>
       throw new InternalServerException("Invalid country code")
+  }
+
+  def getCountryList(fileName: String) : Map[String, Country] = {
+
+    environment.resourceAsStream(fileName) match {
+      case Some(countriesStream) =>
+        try {
+          Json.parse(countriesStream).as[Map[String, Country]]
+        } finally {
+          try {
+            IOUtils.close(countriesStream)
+          } catch {
+            case ex : IOException =>
+              throw new InternalServerException(s"I/O exception raised on closing file $fileName : ${ex.getMessage}")
+          }
+        }
+      case None => throw new InternalServerException(s"Country list file $fileName cannot be found")
+    }
 
   }
 

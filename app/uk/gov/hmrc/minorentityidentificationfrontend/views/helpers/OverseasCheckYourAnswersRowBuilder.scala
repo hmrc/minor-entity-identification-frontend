@@ -41,7 +41,7 @@ class OverseasCheckYourAnswersRowBuilder() {
     val overseasTaxIdentifiersRow: Aliases.SummaryListRow = CheckYourAnswersRowBuilder.buildSummaryRow(
       messages("check-your-answers.tax_identifiers"),
       optOverseasTaxId match {
-        case Some(overseasTaxId) => Seq(overseasTaxId.taxIdentifier, config.getCountryName(overseasTaxId.country)).mkString("<br>")
+        case Some(overseasTaxId) => Seq(overseasTaxId.taxIdentifier, config.getCountryName(overseasTaxId.country, messages.lang.code)).mkString("<br>")
         case None                => messages("check-your-answers.no_tax-identifiers")
       },
       changeValuePageLink = overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(journeyId),

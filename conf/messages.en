@@ -1,4 +1,4 @@
-service.name                                                = minor-entity-identification-frontend
+service.name.default                                        = Entity Validation Service
 service.govuk                                               = GOV.UK
 
 ## Base
@@ -10,6 +10,8 @@ error.title-prefix                                          = 'Error: '
 
 app.common.yes                                              = Yes
 app.common.no                                               = No
+
+country.select                                              = Select a country
 
 ## Capture UTR page
 utr.title                                                   = What is the company’s UK Unique Taxpayer Reference?
@@ -80,7 +82,6 @@ chrn.no_chrn_link                                           = The charity does n
 chrn.error_not_entered                                      = Enter the HMRC reference number
 chrn.error_invalid_characters                               = Enter the HMRC reference number in the correct format
 chrn.error_invalid_length                                   = Enter a HMRC reference number that is 7 characters or less
-
 
 chrn.ua.title                                               = What is the association’s HMRC reference Number?
 chrn.ua.inset                                               = If the association has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register.
