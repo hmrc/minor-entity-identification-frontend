@@ -37,9 +37,8 @@ class AuditService @Inject()(appConfig: AppConfig,
       journeyConfig => auditByBusinessType(journeyId, journeyConfig)
     }
 
-  def auditJourney(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def auditJourney(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     auditByBusinessType(journeyId, journeyConfig)
-  }
 
   private def auditByBusinessType(journeyId: String, journeyConfig: JourneyConfig)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {

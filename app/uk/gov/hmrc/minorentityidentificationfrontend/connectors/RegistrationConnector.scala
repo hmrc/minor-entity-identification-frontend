@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.OK
 import play.api.libs.json.{JsObject, Json, Writes}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RegistrationHttpParser.RegistrationHttpReads
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{RegistrationFailed, RegistrationStatus}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,14 +31,13 @@ class RegistrationConnector @Inject()(httpClient: HttpClient,
                                       appConfig: AppConfig
                                      )(implicit ec: ExecutionContext) {
 
-  private def register(jsonBody: JsObject, postUrl: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
+  private def register(jsonBody: JsObject, postUrl: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
     httpClient.POST[JsObject, RegistrationStatus](postUrl, jsonBody)(
       implicitly[Writes[JsObject]],
       RegistrationHttpReads,
       hc,
       ec
     )
-  }
 
   def registerTrust(sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
     register(
@@ -66,8 +65,6 @@ object RegistrationHttpParser {
       response.status match {
         case OK =>
           (response.json \ registrationKey).as[RegistrationStatus]
-        case INTERNAL_SERVER_ERROR =>
-          RegistrationFailed
         case _ =>
           throw new InternalServerException(s"Unexpected response from Register API - status = ${response.status}, body = ${response.body}")
       }
