@@ -174,6 +174,28 @@ Trust with full flow enabled:
 }
 ```
 
+Trust with full flow enabled where Registration failed:
+
+```
+{
+  "sautr": "0000030000",
+  "saPostcode": "AA1 1AA",
+  "identifiersMatch": true,
+  "businessVerification": {
+    "verificationStatus": "PASS"
+  },
+  "registration": {
+    "registrationStatus": "REGISTRATION_FAILED",
+    "failures": [
+      {
+        "code": "PARTY_TYPE_MISMATCH",
+        "reason": "The remote endpoint has indicated there is Party Type mismatch"
+      }
+    ]
+  }
+}
+```
+
 Unincorporated Association:
 
 ```
@@ -185,6 +207,28 @@ Unincorporated Association:
     "registration": {
         "registrationStatus":"REGISTRATION_NOT_CALLED"
     }
+}
+```
+
+Unincorporated Association where Registration failed:
+
+```
+{
+  "ctutr": "1234229999",
+  "ctPostcode": "AA1 1AA",
+  "identifiersMatch": true,
+  "businessVerification": {
+    "verificationStatus": "PASS"
+  },
+  "registration": {
+    "registrationStatus": "REGISTRATION_FAILED",
+    "failures": [
+      {
+        "code": "PARTY_TYPE_MISMATCH",
+        "reason": "The remote endpoint has indicated there is Party Type mismatch"
+      }
+    ]
+  }
 }
 ```
 

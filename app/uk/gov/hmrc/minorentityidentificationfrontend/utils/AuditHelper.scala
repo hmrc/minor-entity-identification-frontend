@@ -31,7 +31,7 @@ object AuditHelper {
   def defineAuditRegistrationStatus(optRegistrationStatus: Option[RegistrationStatus]): String =
     optRegistrationStatus match {
       case Some(Registered(_)) => "success"
-      case Some(RegistrationFailed) => "fail"
+      case Some(RegistrationFailed(_)) => "fail"
       case _ => "not called"
     }
 

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.assets
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsArray, JsObject, Json}
 import play.api.mvc.Call
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
@@ -312,12 +312,6 @@ object TestConstants {
   val testBusinessVerificationNotEnoughInfoToChallengeJson: JsObject = Json.obj("verificationStatus" -> "NOT_ENOUGH_INFORMATION_TO_CHALLENGE")
   val testBusinessVerificationNotEnoughInfoToCallJson: JsObject = Json.obj("verificationStatus" -> "NOT_ENOUGH_INFORMATION_TO_CALL_BV")
 
-  val testSuccessfulRegistrationJson: JsObject = Json.obj(
-    "registrationStatus" -> "REGISTERED",
-    "registeredBusinessPartnerId" -> testSafeId)
-
-  val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
-
   def testVerificationStatusJson(verificationStatusValue: String): JsObject =
     Json.obj("verificationStatus" -> verificationStatusValue)
 
@@ -374,7 +368,22 @@ object TestConstants {
     "regime" -> regime
   )
 
-  def testRegistrationJourneyDataPart(value: String) = Json.obj("registration" ->  Json.obj("registrationStatus" -> value))
+  val testRegistrationNotCalledJson: JsObject = Json.obj("registrationStatus" -> "REGISTRATION_NOT_CALLED")
+
+  def testRegistrationJourneyDataPart(value: String): JsObject = registrationJson(content = Json.obj("registrationStatus" -> value))
+
+  def testBackendFailedRegistrationJson(failures: JsArray): JsObject = registrationJson(content = Json.obj(
+    "registrationStatus" -> "REGISTRATION_FAILED",
+    "failures" -> failures
+  ))
+
+  def testBackEndRegisteredJson(safeId: String): JsObject = registrationJson(content = testSuccessfulRegistrationJson(safeId))
+
+  def testSuccessfulRegistrationJson(safeId: String): JsObject = Json.obj(
+    "registrationStatus" -> "REGISTERED",
+    "registeredBusinessPartnerId" -> safeId)
+
+  private def registrationJson(content: JsObject): JsObject = Json.obj("registration" -> content)
 
 
 }

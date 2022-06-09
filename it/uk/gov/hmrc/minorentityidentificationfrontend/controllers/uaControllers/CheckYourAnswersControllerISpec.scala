@@ -22,7 +22,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Registered, RegistrationNotCalled}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationNotCalled
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
@@ -349,8 +349,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
       stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-      stubRegisterUA(testCtutr, testRegime)(OK, Registered(testSafeId))
-      stubStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson)(OK)
+      stubRegisterUA(testCtutr, testRegime)(OK, testBackEndRegisteredJson(testSafeId))
+      stubStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson(testSafeId))(OK)
 
       stubRetrieveEntityDetails(testJourneyId)(OK, testThisIsADummyJson)
 
@@ -364,7 +364,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       }
 
       verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-      verifyStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson)
+      verifyStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson(testSafeId))
       verifyRegisterUA(testRegisterUAJson(testCtutr, testRegime))
       verifyAudit()
     }

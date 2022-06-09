@@ -17,11 +17,11 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.UNAUTHORIZED
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Registered, RegistrationFailed, RegistrationNotCalled}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.RegisterStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
@@ -31,13 +31,11 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  private val jsonBody = Json.obj("registration" -> testRegistrationNotCalledJson)
-
   "register trust" should {
     "return Registered" when {
       "the registration has been successful" when {
         "the user has a sautr" in {
-          stubRegisterTrust(testSautr, testRegime)(OK, Registered(testSafeId))
+          stubRegisterTrust(testSautr, testRegime)(OK, testBackEndRegisteredJson(testSafeId))
 
           val result = await(registrationConnector.registerTrust(testSautr, testRegime))
 
@@ -47,23 +45,58 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
     }
 
     "return RegistrationFailed" when {
-      "the registration has not been successful" in {
-        stubRegisterTrust(testSautr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
+      "the registration failed with 1 error" in {
+
+        val singleRegistrationFailure: JsArray = Json.arr(Json.obj(
+          "code" -> "code1",
+          "reason" -> "reason1"
+        ))
+
+        stubRegisterTrust(testSautr, testRegime)(OK, testBackendFailedRegistrationJson(failures = singleRegistrationFailure))
+
+        val result: RegistrationStatus = await(registrationConnector.registerTrust(testSautr, testRegime))
+
+        result match {
+          case RegistrationFailed(Some(failures)) => failures mustBe Array(Failure(code = "code1", reason = "reason1"))
+          case _ => fail("Incorrect RegistrationStatus has been returned")
+        }
+      }
+
+      "the registration failed with more than 1 error" in {
+
+        val multipleRegistrationFailure = Json.arr(Json.obj(
+          "code" -> "code1",
+          "reason" -> "reason1"
+        ),
+          Json.obj(
+            "code" -> "code2",
+            "reason" -> "reason2"
+          )
+        )
+
+        stubRegisterTrust(testSautr, testRegime)(OK, testBackendFailedRegistrationJson(failures = multipleRegistrationFailure))
 
         val result = await(registrationConnector.registerTrust(testSautr, testRegime))
 
-        result mustBe RegistrationFailed
+        result match {
+          case RegistrationFailed(Some(failures)) => failures mustBe Array(
+            Failure("code1", "reason1"),
+            Failure("code2", "reason2")
+          )
+          case _ => fail("Incorrect RegistrationStatus has been returned")
+        }
+
       }
     }
 
     "throws InternalServerException" when {
       "the registration http status is different from Ok and INTERNAL_SERVER_ERROR" in {
-        stubRegisterTrust(testSautr, testRegime)(UNAUTHORIZED, RegistrationNotCalled)
+        stubRegisterTrust(testSautr, testRegime)(UNAUTHORIZED, Json.obj())
 
         val actualException: InternalServerException = intercept[InternalServerException] {
           await(registrationConnector.registerTrust(testSautr, testRegime))
         }
-        actualException.getMessage mustBe s"Unexpected response from Register API - status = 401, body = $jsonBody"
+        actualException.getMessage mustBe s"Unexpected response from Register API - status = 401, body = {}"
       }
     }
   }
@@ -72,7 +105,8 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
     "return Registered" when {
       "the registration has been successful" when {
         "the user has a ctutr" in {
-          stubRegisterUA(testCtutr, testRegime)(OK, Registered(testSafeId))
+
+          stubRegisterUA(testCtutr, testRegime)(OK, body = testBackEndRegisteredJson(testSafeId))
 
           val result = await(registrationConnector.registerUA(testCtutr, testRegime))
 
@@ -82,24 +116,59 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
     }
 
     "return RegistrationFailed" when {
-      "the registration has not been successful" in {
-        stubRegisterUA(testCtutr, testRegime)(INTERNAL_SERVER_ERROR, RegistrationFailed)
+      "the registration failed with 1 error" in {
+
+        val singleRegistrationFailure = Json.arr(Json.obj(
+          "code" -> "code1",
+          "reason" -> "reason1"
+        ))
+
+        stubRegisterUA(testCtutr, testRegime)(OK, testBackendFailedRegistrationJson(failures = singleRegistrationFailure))
 
         val result = await(registrationConnector.registerUA(testCtutr, testRegime))
 
-        result mustBe RegistrationFailed
+        result match {
+          case RegistrationFailed(Some(failures)) => failures mustBe Array(Failure(code = "code1", reason = "reason1"))
+          case _ => fail("Incorrect RegistrationStatus has been returned")
+        }
+      }
+
+      "the registration failed with more than 1 error" in {
+
+        val multipleRegistrationFailure = Json.arr(Json.obj(
+          "code" -> "code1",
+          "reason" -> "reason1"
+        ),
+          Json.obj(
+            "code" -> "code2",
+            "reason" -> "reason2"
+          )
+        )
+
+        stubRegisterUA(testCtutr, testRegime)(OK, testBackendFailedRegistrationJson(failures = multipleRegistrationFailure))
+
+        val result = await(registrationConnector.registerUA(testCtutr, testRegime))
+
+        result match {
+          case RegistrationFailed(Some(failures)) => failures mustBe Array(
+            Failure("code1", "reason1"),
+            Failure("code2", "reason2")
+          )
+          case _ => fail("Incorrect RegistrationStatus has been returned")
+        }
+
       }
     }
 
     "throws InternalServerException" when {
       "the registration http status is different from Ok and INTERNAL_SERVER_ERROR" in {
-        stubRegisterUA(testCtutr, testRegime)(UNAUTHORIZED, RegistrationNotCalled)
+        stubRegisterUA(testCtutr, testRegime)(UNAUTHORIZED,  body = Json.obj())
 
         val actualException: InternalServerException = intercept[InternalServerException] {
           await(registrationConnector.registerUA(testCtutr, testRegime))
         }
 
-        actualException.getMessage mustBe s"Unexpected response from Register API - status = 401, body = $jsonBody"
+        actualException.getMessage mustBe s"Unexpected response from Register API - status = 401, body = {}"
       }
     }
   }

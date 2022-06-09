@@ -19,12 +19,12 @@ package uk.gov.hmrc.minorentityidentificationfrontend.stubs
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testRegisterUAJson
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, RegistrationStatus}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{WiremockHelper, WiremockMethods}
 
 trait RegisterStub extends WiremockMethods {
 
-  def stubRegister(utr: String, journeyConfig: JourneyConfig)(status: Int, body: RegistrationStatus): Unit = {
+  def stubRegister(utr: String, journeyConfig: JourneyConfig)(status: Int, body: JsObject): Unit = {
     journeyConfig.businessEntity match {
       case Trusts => stubRegisterTrust(utr, journeyConfig.regime)(status, body)
       case UnincorporatedAssociation => stubRegisterUA(utr, journeyConfig.regime)(status, body)
@@ -32,7 +32,7 @@ trait RegisterStub extends WiremockMethods {
     }
   }
 
-  def stubRegisterTrust(sautr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
+  def stubRegisterTrust(sautr: String, regime: String)(status: Int, body: JsObject): Unit = {
     val jsonBody = Json.obj(
       "sautr" -> sautr.toUpperCase,
       "regime" -> regime
@@ -41,17 +41,16 @@ trait RegisterStub extends WiremockMethods {
     when(method = POST, uri = "/minor-entity-identification/register-trust", jsonBody)
       .thenReturn(
         status = status,
-        body = Json.obj("registration" -> body)
+        body = body
       )
   }
 
-  def stubRegisterUA(ctutr: String, regime: String)(status: Int, body: RegistrationStatus): Unit = {
+  def stubRegisterUA(ctutr: String, regime: String)(status: Int, body: JsObject): Unit =
     when(method = POST, uri = "/minor-entity-identification/register-ua", testRegisterUAJson(ctutr.toUpperCase, regime))
       .thenReturn(
         status = status,
-        body = Json.obj("registration" -> body)
+        body = body
       )
-  }
 
   def verifyRegisterTrust(sautr: String, regime: String): Unit = {
     val jsonBody = Json.obj(

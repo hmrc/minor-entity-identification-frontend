@@ -118,7 +118,7 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
         optChrn = None,
         optIdentifiersMatch = Some(SuccessfulMatch),
         optBusinessVerificationStatus = Some(BusinessVerificationPass),
-        optRegistrationStatus = Some(RegistrationFailed)
+        optRegistrationStatus = Some(RegistrationFailed(None))
       )
     }
   }
@@ -176,7 +176,7 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
 
   "given BusinessVerificationPass but Registration failed retrieveTrustsDetails" should {
     "return a TrustDetails" in {
-      stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataWithRegistrationFailedJson)
+      stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson ++ testRegistrationJourneyDataPart(value = "REGISTRATION_FAILED"))
 
       val result = await(storageConnector.retrieveTrustsDetails(testJourneyId))
 
@@ -186,7 +186,7 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
         optChrn = None,
         optIdentifiersMatch = Some(SuccessfulMatch),
         optBusinessVerificationStatus = Some(BusinessVerificationPass),
-        optRegistrationStatus = Some(RegistrationFailed)
+        optRegistrationStatus = Some(RegistrationFailed(None))
       )
     }
   }

@@ -50,11 +50,36 @@ class TrustDetailsSpec extends AnyFlatSpec {
 
   }
 
-  "RegistrationStatus RegistrationFailed" should "create a json with REGISTRATION_FAILED status and no Id" in {
+  "RegistrationStatus RegistrationFailed" should "create a json with REGISTRATION_FAILED status and the reasons of failure" in {
 
     List(true, false).foreach(businessVerificationCheck => {
+
+      val aFailure = Failure("code1", "reason1")
+
       val actualJson = TrustDetails.writesForJourneyEnd(
-        trustDetails = anEmptyTrustDetails.copy(optRegistrationStatus = Some(RegistrationFailed)),
+        trustDetails = anEmptyTrustDetails.copy(optRegistrationStatus = Some(RegistrationFailed(registrationFailures = Some(Array(aFailure))))),
+        businessVerificationCheck = businessVerificationCheck
+      )
+
+      extractRegistrationTag(actualJson) should be(testRegistrationStatusJson(value = "REGISTRATION_FAILED") ++ Json.obj(
+        "failures" -> Json.arr(
+          Json.obj(
+            "code" -> aFailure.code,
+            "reason" -> aFailure.reason
+          )
+        )
+      ))
+
+    })
+
+  }
+
+  "RegistrationStatus RegistrationFailed for old data (with no failure reason)" should "create a json with REGISTRATION_FAILED status and no reasons of failure" in {
+
+    List(true, false).foreach(businessVerificationCheck => {
+
+      val actualJson = TrustDetails.writesForJourneyEnd(
+        trustDetails = anEmptyTrustDetails.copy(optRegistrationStatus = Some(RegistrationFailed(None))),
         businessVerificationCheck = businessVerificationCheck
       )
 
