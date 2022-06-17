@@ -17,12 +17,12 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors
 
 import play.api.http.Status.CREATED
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{JsObject, Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.{routes => apiRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, JourneyLabels}
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors.TestCreateJourneyConnector.journeyConfigWriter
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
@@ -69,5 +69,14 @@ object TestCreateJourneyConnector {
     accessibilityUrlKey -> journeyConfig.pageConfig.accessibilityUrl,
     businessVerificationCheckKey -> journeyConfig.businessVerificationCheck,
     regimeKey -> journeyConfig.regime
-  )
+  ) ++ labelsAsOptJsObject(journeyConfig.pageConfig.labels)
+
+  private def labelsAsOptJsObject(optJourneyLabels: Option[JourneyLabels]): JsObject = {
+
+    optJourneyLabels match {
+      case Some(journeyLabels) => Json.obj(labelsKey -> Json.toJsObject(journeyLabels))
+      case _ => Json.obj()
+    }
+
+  }
 }
