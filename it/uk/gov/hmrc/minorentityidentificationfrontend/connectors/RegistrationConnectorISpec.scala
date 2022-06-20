@@ -57,7 +57,7 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
         val result: RegistrationStatus = await(registrationConnector.registerTrust(testSautr, testRegime))
 
         result match {
-          case RegistrationFailed(Some(failures)) => failures mustBe Array(Failure(code = "code1", reason = "reason1"))
+          case RegistrationFailed(failures) => failures mustBe Array(Failure(code = "code1", reason = "reason1"))
           case _ => fail("Incorrect RegistrationStatus has been returned")
         }
       }
@@ -79,7 +79,7 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
         val result = await(registrationConnector.registerTrust(testSautr, testRegime))
 
         result match {
-          case RegistrationFailed(Some(failures)) => failures mustBe Array(
+          case RegistrationFailed(failures) => failures mustBe Array(
             Failure("code1", "reason1"),
             Failure("code2", "reason2")
           )
@@ -128,7 +128,7 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
         val result = await(registrationConnector.registerUA(testCtutr, testRegime))
 
         result match {
-          case RegistrationFailed(Some(failures)) => failures mustBe Array(Failure(code = "code1", reason = "reason1"))
+          case RegistrationFailed(failures) => failures mustBe Array(Failure(code = "code1", reason = "reason1"))
           case _ => fail("Incorrect RegistrationStatus has been returned")
         }
       }
@@ -150,7 +150,7 @@ class RegistrationConnectorISpec extends ComponentSpecHelper with RegisterStub {
         val result = await(registrationConnector.registerUA(testCtutr, testRegime))
 
         result match {
-          case RegistrationFailed(Some(failures)) => failures mustBe Array(
+          case RegistrationFailed(failures) => failures mustBe Array(
             Failure("code1", "reason1"),
             Failure("code2", "reason2")
           )

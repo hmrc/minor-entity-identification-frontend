@@ -119,8 +119,17 @@ object TestConstants {
       registeredBusinessPartnerIdKey -> testSafeId)
   )
 
-  val testTrustJourneyDataWithRegistrationFailedJson: JsObject =
-    testTrustJourneyDataJson ++ testRegistrationJourneyDataPart(value = "REGISTRATION_FAILED")
+  val testRegistrationFailure: Array[Failure] = Array(Failure(code = "PARTY_TYPE_MISMATCH", reason = "The remote endpoint has indicated there is Party Type mismatch"))
+
+  val testTrustJourneyDataWithRegistrationFailedJson: JsObject = Json.obj(
+    "utr" -> testSautrJson,
+    "postcode" -> testSaPostcode,
+    "identifiersMatch" -> SuccessfulMatchKey,
+    "businessVerification" -> Json.obj(BusinessVerificationStatusKey -> BusinessVerificationPassKey),
+    "registration" -> Json.obj(
+      "registrationStatus" -> "REGISTRATION_FAILED",
+      "failures" -> Json.toJson(testRegistrationFailure)
+    ))
 
   val testTrustIdFalseJourneyDataJson: JsObject = Json.obj(
     "utr" -> testSautrJson,
@@ -155,8 +164,6 @@ object TestConstants {
 
   val testUAJourneyDataJson: JsObject = testUAJourneyDataJson(verificationStatusValue = "PASS")
 
-  val testUAJourneyDataWithRegistrationFailedJson: JsObject = testUAJourneyDataJson(verificationStatusValue = "PASS") ++ testRegistrationJourneyDataPart(value = "REGISTRATION_FAILED")
-
   def testUAJourneyDataJson(verificationStatusValue: String): JsObject = Json.obj(
     "utr" -> testCtutrJson,
     "postcode" -> testPostcode,
@@ -166,6 +173,16 @@ object TestConstants {
       registrationStatusKey -> RegisteredKey,
       registeredBusinessPartnerIdKey -> testSafeId)
   )
+
+  def testUAJourneyDataWithRegistrationFailedJson: JsObject = Json.obj(
+    "utr" -> testCtutrJson,
+    "postcode" -> testPostcode,
+    "identifiersMatch" -> SuccessfulMatchKey,
+    "businessVerification" -> Json.obj("verificationStatus" -> "PASS"),
+    "registration" -> Json.obj(
+      "registrationStatus" -> "REGISTRATION_FAILED",
+      "failures" -> Json.toJson(testRegistrationFailure)
+    ))
 
   val testUAJourneyDataJsonNotFound: JsObject = Json.obj(
     "utr" -> testCtutrJson,
