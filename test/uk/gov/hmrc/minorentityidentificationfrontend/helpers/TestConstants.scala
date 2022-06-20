@@ -266,4 +266,7 @@ object TestConstants {
   )
 
   def testRegistrationStatusJson(value: String): JsObject = Json.obj("registrationStatus" -> value)
+
+  val testRegistrationFailure: Array[Failure] = Array(Failure(code = "PARTY_TYPE_MISMATCH", reason ="The remote endpoint has indicated there is Party Type mismatch"))
+
 }

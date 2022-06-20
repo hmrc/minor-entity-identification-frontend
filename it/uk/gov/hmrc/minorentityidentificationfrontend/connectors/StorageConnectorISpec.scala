@@ -110,16 +110,17 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
     "return a UADetails" in {
       stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataWithRegistrationFailedJson)
 
-      val result = await(storageConnector.retrieveUADetails(testJourneyId))
+      val result = await(storageConnector.retrieveUADetails(testJourneyId)).get
 
-      result.get mustBe UADetails(
-        optUtr = Some(Ctutr(testCtutr)),
-        optCtPostcode = Some(testPostcode),
-        optChrn = None,
-        optIdentifiersMatch = Some(SuccessfulMatch),
-        optBusinessVerificationStatus = Some(BusinessVerificationPass),
-        optRegistrationStatus = Some(RegistrationFailed(None))
-      )
+      result.optUtr mustBe Some(Ctutr(testCtutr))
+      result.optCtPostcode mustBe Some(testPostcode)
+      result.optChrn mustBe None
+      result.optIdentifiersMatch mustBe Some(SuccessfulMatch)
+      result.optBusinessVerificationStatus mustBe Some(BusinessVerificationPass)
+      result.optRegistrationStatus match {
+        case Some(RegistrationFailed(failures)) => failures mustBe testRegistrationFailure
+        case _ => fail("test returned the wrong Registration result")
+      }
     }
   }
 
@@ -176,18 +177,19 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
 
   "given BusinessVerificationPass but Registration failed retrieveTrustsDetails" should {
     "return a TrustDetails" in {
-      stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson ++ testRegistrationJourneyDataPart(value = "REGISTRATION_FAILED"))
+      stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataWithRegistrationFailedJson)
 
-      val result = await(storageConnector.retrieveTrustsDetails(testJourneyId))
+      val result = await(storageConnector.retrieveTrustsDetails(testJourneyId)).get
 
-      result.get mustBe TrustDetails(
-        optUtr = Some(Sautr(testSautr)),
-        optSaPostcode = Some(testSaPostcode),
-        optChrn = None,
-        optIdentifiersMatch = Some(SuccessfulMatch),
-        optBusinessVerificationStatus = Some(BusinessVerificationPass),
-        optRegistrationStatus = Some(RegistrationFailed(None))
-      )
+      result.optUtr mustBe Some(Sautr(testSautr))
+      result.optSaPostcode mustBe Some(testSaPostcode)
+      result.optChrn mustBe None
+      result.optIdentifiersMatch mustBe Some(SuccessfulMatch)
+      result.optBusinessVerificationStatus mustBe Some(BusinessVerificationPass)
+      result.optRegistrationStatus match {
+        case Some(RegistrationFailed(failures)) => failures mustBe testRegistrationFailure
+        case _ => fail("test returned the wrong Registration result")
+      }
     }
   }
 

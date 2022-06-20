@@ -52,9 +52,11 @@ class UADetailsSpec extends AnyFlatSpec {
 
   "RegistrationStatus RegistrationFailed" should "create a json with REGISTRATION_FAILED status and the reasons of failure" in {
 
+    val aFailure = Failure("code1", "reason1")
+
     List(true, false).foreach(businessVerificationCheck => {
       val actualJson = UADetails.writesForJourneyEnd(
-        uaDetails = anEmptyUADetails.copy(optRegistrationStatus = Some(RegistrationFailed(registrationFailures = Some(Array(Failure("code1", "reason1")))))),
+        uaDetails = anEmptyUADetails.copy(optRegistrationStatus = Some(RegistrationFailed(registrationFailures = Array(aFailure)))),
         businessVerificationCheck = businessVerificationCheck
       )
 
@@ -66,20 +68,6 @@ class UADetailsSpec extends AnyFlatSpec {
           )
         )
       ))
-
-    })
-
-  }
-
-  "RegistrationStatus RegistrationFailed for old data (with no failure reason)" should "create a json with REGISTRATION_FAILED status and no reasons of failure" in {
-
-    List(true, false).foreach(businessVerificationCheck => {
-      val actualJson = UADetails.writesForJourneyEnd(
-        uaDetails = anEmptyUADetails.copy(optRegistrationStatus = Some(RegistrationFailed(None))),
-        businessVerificationCheck = businessVerificationCheck
-      )
-
-      extractRegistrationTag(actualJson) should be(testRegistrationStatusJson(value = "REGISTRATION_FAILED"))
 
     })
 

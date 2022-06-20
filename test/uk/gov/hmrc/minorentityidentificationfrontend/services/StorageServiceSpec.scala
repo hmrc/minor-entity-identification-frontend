@@ -160,7 +160,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             None,
             Some(SuccessfulMatch),
             Some(BusinessVerificationPass),
-            Some(RegistrationFailed(registrationFailures = Some(Array(Failure("code1", "reason1")))))
+            Some(RegistrationFailed(testRegistrationFailure))
           )
           mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
 
@@ -294,7 +294,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             None,
             Some(SuccessfulMatch),
             Some(BusinessVerificationPass),
-            Some(RegistrationFailed(registrationFailures = Some(Array(Failure("code1", "reason1")))))
+            Some(RegistrationFailed(registrationFailures = Array(Failure("code1", "reason1"))))
           )
           mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
 

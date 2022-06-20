@@ -23,7 +23,7 @@ sealed trait RegistrationStatus
 
 case class Registered(registeredBusinessPartnerId: String) extends RegistrationStatus
 
-case class RegistrationFailed(registrationFailures: Option[Array[Failure]]) extends RegistrationStatus
+case class RegistrationFailed(registrationFailures: Array[Failure]) extends RegistrationStatus
 
 case object RegistrationNotCalled extends RegistrationStatus
 
@@ -46,12 +46,9 @@ object RegistrationStatus {
           registrationStatusKey -> RegisteredKey,
           registeredBusinessPartnerIdKey -> businessPartnerId
         )
-        case RegistrationFailed(failures) =>
-          val failuresJson = failures match {
-            case Some(errors: Array[Failure]) => Json.obj(registrationFailuresKey -> errors)
-            case _ => Json.obj()
-          }
-          Json.obj(registrationStatusKey -> RegistrationFailedKey) ++ failuresJson
+        case RegistrationFailed(failures) => Json.obj(
+          registrationStatusKey -> RegistrationFailedKey,
+          registrationFailuresKey -> failures)
         case RegistrationNotCalled =>
           Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
         case _ =>
@@ -65,9 +62,8 @@ object RegistrationStatus {
             businessPartnerId => Registered(businessPartnerId)
           }
         case JsSuccess(RegistrationFailedKey, path) =>
-          (json \ registrationFailuresKey).validate[Array[Failure]] match {
-            case JsSuccess(failures, _) => JsSuccess(RegistrationFailed(Some(failures)), path)
-            case _ => JsSuccess(RegistrationFailed(None), path)
+          (json \ registrationFailuresKey).validate[Array[Failure]].map {
+            failures => RegistrationFailed(failures)
           }
         case JsSuccess(RegistrationNotCalledKey, path) =>
           JsSuccess(RegistrationNotCalled, path)

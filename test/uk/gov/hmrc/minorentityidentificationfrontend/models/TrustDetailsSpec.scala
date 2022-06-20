@@ -57,7 +57,7 @@ class TrustDetailsSpec extends AnyFlatSpec {
       val aFailure = Failure("code1", "reason1")
 
       val actualJson = TrustDetails.writesForJourneyEnd(
-        trustDetails = anEmptyTrustDetails.copy(optRegistrationStatus = Some(RegistrationFailed(registrationFailures = Some(Array(aFailure))))),
+        trustDetails = anEmptyTrustDetails.copy(optRegistrationStatus = Some(RegistrationFailed(registrationFailures = Array(aFailure)))),
         businessVerificationCheck = businessVerificationCheck
       )
 
@@ -74,20 +74,6 @@ class TrustDetailsSpec extends AnyFlatSpec {
 
   }
 
-  "RegistrationStatus RegistrationFailed for old data (with no failure reason)" should "create a json with REGISTRATION_FAILED status and no reasons of failure" in {
-
-    List(true, false).foreach(businessVerificationCheck => {
-
-      val actualJson = TrustDetails.writesForJourneyEnd(
-        trustDetails = anEmptyTrustDetails.copy(optRegistrationStatus = Some(RegistrationFailed(None))),
-        businessVerificationCheck = businessVerificationCheck
-      )
-
-      extractRegistrationTag(actualJson) should be(testRegistrationStatusJson(value = "REGISTRATION_FAILED"))
-
-    })
-
-  }
 
   "RegistrationStatus RegistrationNotCalled" should "create a json with REGISTRATION_NOT_CALLED status and no Id" in {
 
@@ -126,6 +112,7 @@ class TrustDetailsSpec extends AnyFlatSpec {
   }
 
   private def extractCHRN(json: JsObject): String = (json \ "chrn").as[String]
+
   private def extractRegistrationTag(json: JsObject): JsObject = json.as[JsObject]((__ \ "registration").read)
 
 }
