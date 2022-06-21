@@ -26,6 +26,9 @@ Creates a new journey for an Overseas Company, storing the journeyConfig against
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 
+labels enables custom welsh translations for the service name to be supplied by the calling service. If the labels
+object is omitted or present, but the "cy" property is not fully defined, the default values will be used.
+
 The businessVerificationCheck field allows the calling service to bypass the business verification and continue to
 register where a successful match is found. The field will default to true if it is not provided.
 
@@ -42,7 +45,12 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "deskProServiceId" : "abc",
     "optServiceName" : "Service Name",
     "regime" : "VATC",    
-    "signOutUrl" : "/sign-out"
+    "signOutUrl" : "/sign-out",
+    "labels" : {
+      "cy" : {
+         "optServiceName" : "Service name in welsh"
+      }
+    }
 }
 ```
 
@@ -55,6 +63,9 @@ Creates a new journey for a Trust, storing the journeyConfig against the journey
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
 
+labels enables custom welsh translations for the service name to be supplied by the calling service. If the labels
+object is omitted or present, but the "cy" property is not fully defined, the default values will be used.
+
 The businessVerificationCheck field allows the calling service to bypass the business verification and continue to
 register where a successful match is found. The field will default to true if it is not provided.
 
@@ -71,7 +82,12 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "deskProServiceId" : "abc",
     "optServiceName" : "Service Name",
     "regime" : "VATC",    
-    "signOutUrl" : "/sign-out"
+    "signOutUrl" : "/sign-out",
+    "labels" : {
+      "cy" : {
+         "optServiceName" : "Service name in welsh"
+      }
+    }
 }
 ```
 
@@ -83,6 +99,9 @@ Creates a new journey for an Unincorporated Association, storing the journeyConf
 #### Request:
 
 optServiceName will default to `Entity Validation Service` if the field is not provided.
+
+labels enables custom welsh translations for the service name to be supplied by the calling service. If the labels
+object is omitted or present, but the "cy" property is not fully defined, the default values will be used.
 
 The businessVerificationCheck field allows the calling service to bypass the business verification and continue to
 register where a successful match is found. The field will default to true if it is not provided.
@@ -100,7 +119,12 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "deskProServiceId" : "abc",
     "optServiceName" : "Service Name",
     "regime" : "VATC"    
-    "signOutUrl" : "/sign-out"
+    "signOutUrl" : "/sign-out",
+    "labels" : {
+      "cy" : {
+         "optServiceName" : "Service name in welsh"
+      }
+    }
 }
 ```
 

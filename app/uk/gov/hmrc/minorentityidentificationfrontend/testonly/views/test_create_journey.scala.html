@@ -120,6 +120,13 @@
             ).withFormField(form("accessibilityUrl"))
         )
 
+        @govukInput(
+            Input(
+                label = Label(content=Text("Welsh translation for Service Name"),isPageHeading = false, classes = "govuk-label govuk-!-font-weight-bold"),
+                classes = "govuk-input--width-20"
+            ).withFormField(form("welshServiceName"))
+        )
+
         @govukButton(Button(
             attributes = Map("id" -> "save-and-continue"),
             classes = "govuk-!-margin-right-1",

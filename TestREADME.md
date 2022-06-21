@@ -54,6 +54,10 @@ to Business Verification (rather than stub it) all non-relative urls will cause 
     - Shown in the HMRC footer
     - This is currently autofilled but can be changed
 
+8. Welsh translation for Service Name (Optional)
+
+   - Welsh language translation for service name
+
 ### GET /identify-your-trust/test-only/create-trusts-journey
 
 ---
@@ -98,6 +102,10 @@ to Business Verification (rather than stub it) all non-relative urls will cause 
     - Shown in the HMRC footer
     - This is currently autofilled but can be changed
 
+8. Welsh translation for Service Name (Optional)
+
+   - Welsh language translation for service name
+
 ### GET /identify-your-unincorporated-association/test-only/create-unincorporated-association-journey
 
 ---
@@ -141,6 +149,10 @@ to Business Verification (rather than stub it) all non-relative urls will cause 
 
     - Shown in the footer - a link to the accessibility statement for the calling service
     - This is currently autofilled but can be changed
+
+8. Welsh translation for Service Name (Optional)
+
+   - Welsh language translation for service name
 
 ### Retrieve journey Data
 

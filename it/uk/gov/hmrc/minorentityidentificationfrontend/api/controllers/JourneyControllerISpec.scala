@@ -24,6 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControl
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, EnableFullUAJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, JourneyStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
@@ -78,6 +79,24 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
         result.status mustBe CREATED
       }
+    }
+
+    "return correct Journey configuration data when an optional welsh service name is supplied" in {
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+      stubAudit()
+
+      lazy val result = post("/minor-entity-identification/api/overseas-company-journey", testJourneyConfigJson ++ optLabelsAsJson)
+
+      result.status mustBe CREATED
+
+      val expectedJourneyConfig: JourneyConfig = testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
+        .copy(pageConfig =  testOverseasCompanyJourneyConfig(businessVerificationCheck = true).pageConfig
+          .copy(labels = Some(optLabels))
+        )
+
+      await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
+
     }
 
     "return Bad Request" when {
@@ -504,6 +523,45 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
       }
     }
 
+    "return correct Journey configuration data when an optional welsh service name is supplied" when {
+      "trust journey FS is enabled" in {
+        enable(EnableFullTrustJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveRegistrationStatus(testJourneyId)(NOT_FOUND)
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson ++ optLabelsAsJson)
+
+        result.status mustBe CREATED
+
+        val expectedJourneyConfig: JourneyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+          .copy(pageConfig = testTrustsJourneyConfig(businessVerificationCheck = true).pageConfig
+            .copy(labels = Some(optLabels))
+          )
+
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
+      }
+      "trust journey FS is disabled" in {
+        disable(EnableFullTrustJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson ++ optLabelsAsJson)
+
+        result.status mustBe CREATED
+
+        val expectedJourneyConfig: JourneyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+          .copy(pageConfig = testTrustsJourneyConfig(businessVerificationCheck = true).pageConfig
+            .copy(labels = Some(optLabels))
+          )
+
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
+      }
+    }
+
     "return Bad Request" when {
       "one URL provided for the journey config is not relative" in {
         val testJourneyConfigJson: JsObject = Json.obj(
@@ -614,6 +672,44 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
         result.status mustBe CREATED
 
         await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
+      }
+    }
+
+    "return correct Journey configuration data when an optional welsh service name is supplied" when {
+      "UA journey FS is enabled" in {
+        enable(EnableFullUAJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson ++ optLabelsAsJson)
+
+        result.status mustBe CREATED
+
+        val expectedJourneyConfig: JourneyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          .copy(pageConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).pageConfig
+            .copy(labels = Some(optLabels))
+          )
+
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
+      }
+      "UA journey FS is disabled" in {
+        disable(EnableFullUAJourney)
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubRetrieveEntityDetails(testJourneyId)(NOT_FOUND)
+        stubAudit()
+
+        lazy val result = post("/minor-entity-identification/api/unincorporated-association-journey", testJourneyConfigJson ++ optLabelsAsJson)
+
+        result.status mustBe CREATED
+
+        val expectedJourneyConfig: JourneyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          .copy(pageConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).pageConfig
+            .copy(labels = Some(optLabels))
+          )
+
+        await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
       }
     }
 

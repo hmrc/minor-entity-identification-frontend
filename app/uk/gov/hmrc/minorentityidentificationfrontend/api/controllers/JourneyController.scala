@@ -28,7 +28,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustController
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.services._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.UrlHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -63,7 +63,8 @@ class JourneyController @Inject()(val authConnector: AuthConnector,
         accessibilityUrl <- (json \ accessibilityUrlKey).validate[String]
         businessVerificationCheck <- (json \ businessVerificationCheckKey).validateOpt[Boolean]
         regime <- (json \ regimeKey).validate[String]
-      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity, businessVerificationCheck.getOrElse(true), regime)
+        labels <- (json \ labelsKey).validateOpt[JourneyLabels]
+      } yield JourneyConfig(continueUrl, PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl, labels), businessEntity, businessVerificationCheck.getOrElse(true), regime)
   }) {
     implicit req =>
       authorised().retrieve(internalId) {
@@ -122,4 +123,5 @@ object JourneyController {
   val businessVerificationCheckKey = "businessVerificationCheck"
   val regimeKey = "regime"
   val journeyStartUrl = "journeyStartUrl"
+  val labelsKey = "labels"
 }

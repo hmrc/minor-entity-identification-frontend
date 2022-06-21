@@ -33,6 +33,8 @@ object TestCreateJourneyForm {
   val accessibilityUrl = "accessibilityUrl"
   val businessVerificationCheck = "businessVerificationCheck"
   val regime = "regime"
+  val labels = "labels"
+  val welshServiceName = "welshServiceName"
 
   def continueUrlEmpty: Constraint[String] = Constraint("continue_url.not_entered")(
     continueUr => validate(
@@ -77,9 +79,10 @@ object TestCreateJourneyForm {
       signOutUrl -> text.verifying(signOutUrlEmpty),
       accessibilityUrl -> text.verifying(accessibilityUrlEmpty),
       businessVerificationCheck -> boolean,
-      regime -> text.verifying(regimeEmpty)
-    )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, businessVerificationCheck, regime) =>
-      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, signOutUrl, accessibilityUrl), businessEntity, businessVerificationCheck, regime)
+      regime -> text.verifying(regimeEmpty),
+      welshServiceName -> optText
+    )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, businessVerificationCheck, regime, welshServiceName) =>
+      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, welshServiceName, signOutUrl, accessibilityUrl), businessEntity, businessVerificationCheck, regime)
     )(journeyConfig =>
       Some(journeyConfig.continueUrl,
         journeyConfig.pageConfig.optServiceName,
@@ -87,7 +90,8 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.signOutUrl,
         journeyConfig.pageConfig.accessibilityUrl,
         journeyConfig.businessVerificationCheck,
-        journeyConfig.regime
+        journeyConfig.regime,
+        journeyConfig.pageConfig.labels.map(_.welshServiceName)
       )
     ))
   }

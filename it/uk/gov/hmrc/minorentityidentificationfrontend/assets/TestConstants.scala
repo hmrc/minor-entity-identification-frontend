@@ -58,6 +58,7 @@ object TestConstants {
   val testUAJourneyConfig: JourneyConfig = testTrustsJourneyConfig.copy(businessEntity = UnincorporatedAssociation)
   val testUAJourneyConfigWithCallingService: JourneyConfig = testTrustsJourneyConfigWithCallingService.copy(businessEntity = UnincorporatedAssociation)
   val testDefaultServiceName: String = "Entity Validation Service"
+  val testWelshServiceName: String = "Welsh Service Name"
   val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=vrs"
 
   def testJourneyConfig(serviceName: Option[String] = None,
@@ -66,7 +67,7 @@ object TestConstants {
                         regime: String): JourneyConfig =
     JourneyConfig(
       testContinueUrl,
-      PageConfig(serviceName, testDeskProServiceId, testSignOutUrl, testAccessibilityUrl),
+      PageConfig(serviceName, testDeskProServiceId, testSignOutUrl, testAccessibilityUrl, None),
       businessEntity,
       businessVerificationCheck,
       regime
@@ -317,6 +318,16 @@ object TestConstants {
       "formBundleNo" -> "000001230962"
     )
   )
+
+  val optLabelsAsJson: JsObject = Json.obj({
+    "labels" -> Json.obj (
+      "cy" -> Json.obj (
+      "optServiceName" -> s"$testWelshServiceName"
+      )
+    )
+  })
+
+  val optLabels: JourneyLabels = JourneyLabels(testWelshServiceName)
 
   val testIdentifiersMatchSuccessfulMatchJson: JsObject = Json.obj("identifiersMatch" -> "SuccessfulMatch")
   val testIdentifiersMatchDetailsMismatchJson: JsObject = Json.obj("identifiersMatch" -> "DetailsMismatch")

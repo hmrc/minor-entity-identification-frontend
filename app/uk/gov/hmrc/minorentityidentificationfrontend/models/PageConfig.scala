@@ -18,9 +18,25 @@ package uk.gov.hmrc.minorentityidentificationfrontend.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class PageConfig(optServiceName: Option[String], deskProServiceId: String, signOutUrl: String, accessibilityUrl: String)
+case class PageConfig(optServiceName: Option[String],
+                      deskProServiceId: String,
+                      signOutUrl: String,
+                      accessibilityUrl: String,
+                      labels: Option[JourneyLabels] = None)
 
 object PageConfig {
+
+
+  def apply(optServiceName: Option[String],
+            deskProServiceId: String,
+            optWelshServiceName: Option[String],
+            signOutUrl: String,
+            accessibilityUrl: String): PageConfig = {
+
+    val labels: Option[JourneyLabels] = optWelshServiceName.map(welshServiceName => JourneyLabels(welshServiceName))
+    new PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl, labels)
+  }
+
   implicit val format: OFormat[PageConfig] = Json.format[PageConfig]
 }
 
