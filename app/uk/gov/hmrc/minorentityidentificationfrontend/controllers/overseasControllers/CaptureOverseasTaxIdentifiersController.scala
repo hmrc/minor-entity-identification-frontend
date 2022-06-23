@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -24,6 +25,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureOverseasTaxIdentifiersForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_overseas_tax_identifiers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -34,6 +36,7 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
                                                         journeyService: JourneyService,
                                                         storageService: StorageService,
                                                         view: capture_overseas_tax_identifiers_page,
+                                                        messagesHelper: MessagesHelper,
                                                         val authConnector: AuthConnector
                                                        )(implicit val config: AppConfig,
                                                          executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
@@ -44,6 +47,7 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
         case Some(authInternalId) =>
           journeyService.getJourneyConfig(journeyId, authInternalId).map {
             journeyConfig =>
+              implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
               Ok(view(
                 journeyId = journeyId,
                 pageConfig = journeyConfig.pageConfig,
@@ -66,6 +70,7 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
                 journeyConfig =>
+                  implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                   BadRequest(view(
                     journeyId = journeyId,
                     pageConfig = journeyConfig.pageConfig,

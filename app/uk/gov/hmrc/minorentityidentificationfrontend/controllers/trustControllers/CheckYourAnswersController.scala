@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -24,6 +25,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService, SubmissionService, TrustMatchingResultCalculator}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TrustCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -39,7 +41,8 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            rowBuilder: TrustCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
                                            view: check_your_answers_page,
-                                           knownFactsMatchingResultCalculator: TrustMatchingResultCalculator
+                                           knownFactsMatchingResultCalculator: TrustMatchingResultCalculator,
+                                           messagesHelper: MessagesHelper
                                           )(implicit appConfig: AppConfig, ec: ExecutionContext
                                           ) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
@@ -54,11 +57,14 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
               optSaPostcode <- storageService.retrievePostcode(journeyId)
               optCharityHRMCReferenceNumber <- storageService.retrieveCHRN(journeyId)
               summaryRows = rowBuilder.buildSummaryListRows(journeyId, optUtr, optSaPostcode, optCharityHRMCReferenceNumber)
-            } yield Ok(view(
-              pageConfig = journeyConfig.pageConfig,
-              formAction = trustControllers.routes.CheckYourAnswersController.submit(journeyId),
-              summaryRows = summaryRows
-            ))
+            } yield {
+              implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
+              Ok(view(
+                pageConfig = journeyConfig.pageConfig,
+                formAction = trustControllers.routes.CheckYourAnswersController.submit(journeyId),
+                summaryRows = summaryRows
+              ))
+            }
           } else throw new InternalServerException("Trust journey is not enabled")
         case None                 =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")

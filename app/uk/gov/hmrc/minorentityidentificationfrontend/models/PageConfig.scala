@@ -22,7 +22,7 @@ case class PageConfig(optServiceName: Option[String],
                       deskProServiceId: String,
                       signOutUrl: String,
                       accessibilityUrl: String,
-                      labels: Option[JourneyLabels] = None)
+                      optLabels: Option[JourneyLabels] = None)
 
 object PageConfig {
 
@@ -33,8 +33,8 @@ object PageConfig {
             signOutUrl: String,
             accessibilityUrl: String): PageConfig = {
 
-    val labels: Option[JourneyLabels] = optWelshServiceName.map(welshServiceName => JourneyLabels(welshServiceName))
-    new PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl, labels)
+    val optLabels: Option[JourneyLabels] = optWelshServiceName.map(welshServiceName => JourneyLabels(welshServiceName))
+    new PageConfig(optServiceName, deskProServiceId, signOutUrl, accessibilityUrl, optLabels)
   }
 
   implicit val format: OFormat[PageConfig] = Json.format[PageConfig]

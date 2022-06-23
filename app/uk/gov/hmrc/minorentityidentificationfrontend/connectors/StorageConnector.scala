@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
-import play.api.libs.json.{JsObject, Reads, Writes}
+import play.api.libs.json.{Reads, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReadsInstances}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.RetrieveTrustDetailsHttpParser.RetrieveTrustDetailsHttpReads

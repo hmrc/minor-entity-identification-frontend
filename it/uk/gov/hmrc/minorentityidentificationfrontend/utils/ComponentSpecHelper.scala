@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.utils
 
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mongodb.scala.result.InsertOneResult
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -24,7 +26,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Writes}
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.{DefaultWSCookie, WSClient, WSCookie, WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
@@ -84,15 +86,22 @@ trait ComponentSpecHelper extends AnyWordSpec
     super.beforeEach()
   }
 
-  def get[T](uri: String): WSResponse = {
-    await(buildClient(uri).withHttpHeaders().get)
+  val cyLangCookie: WSCookie = DefaultWSCookie("PLAY_LANG", "cy")
+
+  val enLangCookie: WSCookie = DefaultWSCookie("PLAY_LANG", "en")
+
+  def get[T](uri: String, cookie: WSCookie = enLangCookie): WSResponse = {
+    await(buildClient(uri).withHttpHeaders().addCookies(cookie).get)
   }
 
-  def post(uri: String)(form: (String, String)*): WSResponse = {
+  def extractDocumentFrom(aWSResponse: WSResponse): Document = Jsoup.parse(aWSResponse.body)
+
+  def post(uri: String, cookie: WSCookie = enLangCookie)(form: (String, String)*): WSResponse = {
     val formBody = (form map { case (k, v) => (k, Seq(v)) }).toMap
     await(
       buildClient(uri)
         .withHttpHeaders("Csrf-Token" -> "nocheck")
+        .addCookies(cookie)
         .post(formBody)
     )
   }

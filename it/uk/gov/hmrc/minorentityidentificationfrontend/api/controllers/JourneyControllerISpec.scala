@@ -92,7 +92,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
       val expectedJourneyConfig: JourneyConfig = testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         .copy(pageConfig =  testOverseasCompanyJourneyConfig(businessVerificationCheck = true).pageConfig
-          .copy(labels = Some(optLabels))
+          .copy(optLabels = Some(optLabels))
         )
 
       await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
@@ -538,7 +538,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
         val expectedJourneyConfig: JourneyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
           .copy(pageConfig = testTrustsJourneyConfig(businessVerificationCheck = true).pageConfig
-            .copy(labels = Some(optLabels))
+            .copy(optLabels = Some(optLabels))
           )
 
         await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
@@ -555,7 +555,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
         val expectedJourneyConfig: JourneyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
           .copy(pageConfig = testTrustsJourneyConfig(businessVerificationCheck = true).pageConfig
-            .copy(labels = Some(optLabels))
+            .copy(optLabels = Some(optLabels))
           )
 
         await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
@@ -688,7 +688,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
         val expectedJourneyConfig: JourneyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
           .copy(pageConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).pageConfig
-            .copy(labels = Some(optLabels))
+            .copy(optLabels = Some(optLabels))
           )
 
         await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)
@@ -706,7 +706,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
         val expectedJourneyConfig: JourneyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
           .copy(pageConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).pageConfig
-            .copy(labels = Some(optLabels))
+            .copy(optLabels = Some(optLabels))
           )
 
         await(journeyConfigRepository.getJourneyConfig(testJourneyId, testInternalId)) mustBe Some(expectedJourneyConfig)

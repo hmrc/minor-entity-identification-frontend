@@ -91,7 +91,7 @@ object TestCreateJourneyForm {
         journeyConfig.pageConfig.accessibilityUrl,
         journeyConfig.businessVerificationCheck,
         journeyConfig.regime,
-        journeyConfig.pageConfig.labels.map(_.welshServiceName)
+        journeyConfig.pageConfig.optLabels.map(_.welshServiceName)
       )
     ))
   }

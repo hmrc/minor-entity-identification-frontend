@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
+import play.api.i18n.Messages
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -24,6 +25,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms.TrustCaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trustViews.capture_sa_utr_trust_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -35,7 +37,8 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
                                        journeyService: JourneyService,
                                        storageService: StorageService,
                                        mcc: MessagesControllerComponents,
-                                       trustView: capture_sa_utr_trust_page
+                                       trustView: capture_sa_utr_trust_page,
+                                       messagesHelper: MessagesHelper
                                     )(implicit val config: AppConfig,
                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
@@ -46,6 +49,7 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
           if(isEnabled(EnableFullTrustJourney)) {
             journeyService.getJourneyConfig(journeyId, authInternalId).map {
               journeyConfig =>
+                implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                 Ok(trustView(
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
@@ -68,6 +72,7 @@ class CaptureSautrController @Inject()(val authConnector: AuthConnector,
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
                   journeyConfig =>
+                    implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                     BadRequest(trustView(
                       journeyId = journeyId,
                       pageConfig = journeyConfig.pageConfig,

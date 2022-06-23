@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{AuditService, JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.OverseasCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -36,7 +38,8 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            auditService: AuditService,
                                            rowBuilder: OverseasCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
-                                           view: check_your_answers_page
+                                           view: check_your_answers_page,
+                                           messagesHelper: MessagesHelper
                                           )(implicit appConfig: AppConfig, ec: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {
 
   def show(journeyId: String): Action[AnyContent] = Action.async {
@@ -51,11 +54,14 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
               journeyId = journeyId,
               optOverseasTaxId = optOverseasTaxIdentifiers,
               optUtr = utr)
-          } yield Ok(view(
-            pageConfig = journeyConfig.pageConfig,
-            formAction = routes.CheckYourAnswersController.submit(journeyId),
-            summaryRows = summaryRows
-          ))
+          } yield {
+            implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
+            Ok(view(
+              pageConfig = journeyConfig.pageConfig,
+              formAction = routes.CheckYourAnswersController.submit(journeyId),
+              summaryRows = summaryRows
+            ))
+          }
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
