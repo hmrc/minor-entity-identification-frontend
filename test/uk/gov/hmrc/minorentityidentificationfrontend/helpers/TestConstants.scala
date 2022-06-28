@@ -52,16 +52,13 @@ object TestConstants {
 
   def testJourneyConfig(businessEntity: BusinessEntity, businessVerificationCheck: Boolean = true): JourneyConfig = JourneyConfig(
     continueUrl = testContinueUrl,
-    pageConfig = PageConfig(
-      optServiceName = None,
-      deskProServiceId = "vrs",
-      signOutUrl = testSignOutUrl,
-      accessibilityUrl = testAccessibilityUrl
-    ),
+    pageConfig = testDefaultPageConfig,
     businessEntity = businessEntity,
     businessVerificationCheck = businessVerificationCheck,
     testRegime
   )
+
+  val testDefaultPageConfig: PageConfig = PageConfig(None, "vrs", testSignOutUrl, testAccessibilityUrl, optLabels = None)
 
   val testOverseasSAUtrAuditEventJson: JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,

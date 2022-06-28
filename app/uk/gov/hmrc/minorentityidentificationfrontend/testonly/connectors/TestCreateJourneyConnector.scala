@@ -69,7 +69,7 @@ object TestCreateJourneyConnector {
     accessibilityUrlKey -> journeyConfig.pageConfig.accessibilityUrl,
     businessVerificationCheckKey -> journeyConfig.businessVerificationCheck,
     regimeKey -> journeyConfig.regime
-  ) ++ labelsAsOptJsObject(journeyConfig.pageConfig.labels)
+  ) ++ labelsAsOptJsObject(journeyConfig.pageConfig.optLabels)
 
   private def labelsAsOptJsObject(optJourneyLabels: Option[JourneyLabels]): JsObject = {
 

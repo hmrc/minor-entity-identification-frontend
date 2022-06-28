@@ -59,6 +59,7 @@ object TestConstants {
   val testUAJourneyConfigWithCallingService: JourneyConfig = testTrustsJourneyConfigWithCallingService.copy(businessEntity = UnincorporatedAssociation)
   val testDefaultServiceName: String = "Entity Validation Service"
   val testWelshServiceName: String = "Welsh Service Name"
+  val testDefaultWelshServiceName: String = "Gwasanaeth Dilysu Endid"
   val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=vrs"
 
   def testJourneyConfig(serviceName: Option[String] = None,
@@ -72,6 +73,20 @@ object TestConstants {
       businessVerificationCheck,
       regime
     )
+
+  val testDefaultWelshJourneyConfig: JourneyConfig = JourneyConfig(
+    continueUrl = testContinueUrl,
+    pageConfig = PageConfig(
+      optServiceName = None,
+      deskProServiceId = testDeskProServiceId,
+      signOutUrl = testSignOutUrl,
+      accessibilityUrl = testAccessibilityUrl,
+      optLabels = Some(JourneyLabels(welshServiceName = "This is a welsh service name from Journey labels"))
+    ),
+    businessEntity = UnincorporatedAssociation,
+    businessVerificationCheck = true,
+    regime = testRegime
+  )
 
   def testTrustsJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(businessEntity = Trusts, businessVerificationCheck = businessVerificationCheck, regime = testRegime)

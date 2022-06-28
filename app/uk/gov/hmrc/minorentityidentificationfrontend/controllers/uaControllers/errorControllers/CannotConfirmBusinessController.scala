@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -25,6 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CannotConfirmBusinessForm.cannotConfirmBusinessForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.errorViews.cannot_confirm_business
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -36,7 +38,8 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
                                                 journeyService: JourneyService,
                                                 storageService: StorageService,
                                                 view: cannot_confirm_business,
-                                                val authConnector: AuthConnector
+                                                val authConnector: AuthConnector,
+                                                messagesHelper: MessagesHelper
                                                )(implicit val config: AppConfig,
                                                  executionContext: ExecutionContext
                                                ) extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
@@ -48,6 +51,7 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
           if (isEnabled(EnableFullUAJourney)) {
             journeyService.getJourneyConfig(journeyId, authInternalId).map {
               journeyConfig =>
+                implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                 Ok(view(
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CannotConfirmBusinessController.submit(journeyId),
@@ -68,6 +72,7 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
                   journeyConfig =>
+                    implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                     BadRequest(view(
                       pageConfig = journeyConfig.pageConfig,
                       formAction = routes.CannotConfirmBusinessController.submit(journeyId),

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 
+import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -24,6 +25,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.errorControllers.{routes => errorRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService, SubmissionService, UAMatchingResultCalculator}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.UaCheckYourAnswersRowBuilder
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.check_your_answers_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -39,7 +41,8 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
                                            uaMatchingResultCalculator: UAMatchingResultCalculator,
                                            rowBuilder: UaCheckYourAnswersRowBuilder,
                                            mcc: MessagesControllerComponents,
-                                           view: check_your_answers_page
+                                           view: check_your_answers_page,
+                                           messagesHelper: MessagesHelper
                                           )(implicit appConfig: AppConfig, ec: ExecutionContext)
   extends FrontendController(mcc) with AuthorisedFunctions with FeatureSwitching {
 
@@ -54,11 +57,14 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
               optOfficePostcode <- storageService.retrievePostcode(journeyId)
               optCHRN <- storageService.retrieveCHRN(journeyId)
               summaryRows = rowBuilder.buildSummaryListRows(journeyId, optUtr, optOfficePostcode, optCHRN)
-            } yield Ok(view(
-              pageConfig = journeyConfig.pageConfig,
-              formAction = routes.CheckYourAnswersController.submit(journeyId),
-              summaryRows = summaryRows
-            ))
+            } yield {
+              implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
+              Ok(view(
+                pageConfig = journeyConfig.pageConfig,
+                formAction = routes.CheckYourAnswersController.submit(journeyId),
+                summaryRows = summaryRows
+              ))
+            }
           } else throw new InternalServerException("Unincorporated Associated journey is not enabled")
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
