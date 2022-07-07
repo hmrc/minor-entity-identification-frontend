@@ -18,22 +18,22 @@ utr.title                                                   = What is the compan
 utr.line_1                                                  = This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘.
 utr.no_utr_link                                             = The company does not have a UTR
 utr.error_not_entered                                       = Enter the company‘s UK Unique Taxpayer Reference
-utr.error_invalid_characters                                = Enter the UK Unique Taxpayer Reference using numbers only
-utr.error_invalid_length                                    = Enter a UK Unique Taxpayer Reference that is 10 numbers
+utr.error_invalid_characters                                = The company’s Unique Taxpayer Reference must only include numbers
+utr.error_invalid_length                                    = The company’s Unique Taxpayer Reference must be 10 numbers
 utr.trust.title                                             = What is the trust’s Unique Taxpayer Reference?
 utr.trust.line_1                                            = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
 utr.trust.line_1_ending                                     = find a lost UTR number.
 utr.trust.no_utr_link                                       = The trust does not have a Self Assessment UTR
-utr.trust.error_not_entered                                 = Enter your UK Unique Taxpayer Reference
-utr.trust.error_invalid_characters                          = Enter the UK Unique Taxpayer Reference using numbers only
-utr.trust.error_invalid_length                              = Enter a UK Unique Taxpayer Reference that is 10 numbers
+utr.trust.error_not_entered                                 = Enter the trust’s Unique Taxpayer Reference
+utr.trust.error_invalid_characters                          = The trust’s Unique Taxpayer Reference must only include numbers
+utr.trust.error_invalid_length                              = The trust’s Unique Taxpayer Reference must be 10 numbers
 utr.ua.title                                                = What is the association’s Unique Taxpayer Reference?
 utr.ua.line_1                                               = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
 utr.ua.line_1_ending                                        = find a lost UTR number.
 utr.ua.no_utr_link                                          = The association does not have a UTR
-utr.ua.error_not_entered                                    = Enter the association’s UK Unique Taxpayer Reference
-utr.ua.error_invalid_characters                             = Enter the UK Unique Taxpayer Reference using numbers only
-utr.ua.error_invalid_length                                 = Enter a UK Unique Taxpayer Reference that is 10 numbers
+utr.ua.error_not_entered                                    = Enter the association’s Unique Taxpayer Reference
+utr.ua.error_invalid_characters                             = The association’s Unique Taxpayer Reference must only include numbers
+utr.ua.error_invalid_length                                 = The association’s Unique Taxpayer Reference must be 10 numbers
 
 ## Overseas Tax Identifiers Page
 tax-identifiers.title                                        = What is the business’s overseas tax identifier?
@@ -43,54 +43,56 @@ tax-identifiers.field_2                                      = Enter the name of
 tax-identifiers.no_identifier_link                           = I do not want to provide an identifier
 error.no_tax_identifier                                      = Enter a tax identifier
 error.invalid_tax_identifier                                 = Enter a tax identifier that does not contain special characters
-error.invalid_tax_identifier_length                          = Enter a tax identifier that is 60 characters or less
+error.invalid_tax_identifier_length                          = The tax identifier must be 60 characters or fewer
 error.no_tax_identifier_country                              = Enter the name of the country that issued the tax identifier
 
 ## SA Postcode Page
-sa-postcode.title                                            = What is the postcode where the trust is registered for Self Assessment?
+sa-postcode.title                                            = What is the postcode used to register the trust for Self Assessment?
 sa-postcode.hint                                             = For example, AB1 2YZ
 sa-postcode.no.postcodeLink                                  = The trust does not have a Self Assessment postcode
-error.invalid_format_sa-postcode                             = Enter a UK postcode
-error.no_entry_sa-postcode                                   = Enter a postcode
+error.invalid_format_sa-postcode                             = Enter the postcode in the correct format, for example, AB1 2YZ
+error.no_entry_sa-postcode                                   = Enter the postcode where the trust is registered for Self Assessment
 
 ## Office Postcode Page
 office-postcode.title                                        = What is the postcode used to register the association?
 office-postcode.hint                                         = For example, AB1 2YZ
-error.invalid_format_office_postcode                         = Enter a UK postcode
-error.no_entry_office_postcode                               = Enter a postcode
+error.invalid_format_office_postcode                         = Enter the postcode in the correct format, for example, AB1 2YZ
+error.no_entry_office_postcode                               = Enter the postcode where the association is registered for Corporation Tax
 
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers
 check-your-answers.heading                                  = Check your answers
-check-your-answers.utr                                      = Unique taxpayers reference number
-check-your-answers.ua_utr                                   = Unique Taxpayers Reference
+check-your-answers.utr                                      = Unique Taxpayer Reference (UTR)
 check-your-answers.no_utr                                   = The business does not have a UTR
+check-your-answers.no_trust_utr                             = The trust does not have a UTR
+check-your-answers.no_ua_utr                                = The association does not have a UTR
 check-your-answers.tax_identifiers                          = Overseas tax identifier
 check-your-answers.no_tax-identifiers                       = I do not want to provide an identifier
 check-your-answers.charity_hmrc_reference_number            = HMRC reference number
 check-your-answers.no_charity_hmrc_reference_number         = The charity does not have a HMRC reference number
+check-your-answers.no_ua_charity_hmrc_reference_number      = The association does not have a HMRC reference number
 check-your-answers.sa_postcode                              = Self Assessment postcode
-check-your-answers.no_sa_postcode                           = The business does not have a Self Assessment postcode
+check-your-answers.no_sa_postcode                           = The trust does not have a Self Assessment postcode
 check-your-answers.office_postcode                          = Postcode
 
 ## Capture Charity HMRC Reference number
 chrn.title                                                  = What is the charity’s HMRC reference number?
 chrn.inset                                                  = If the charity has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register.
 chrn.label                                                  = HMRC reference number
-chrn.hint                                                   = This could be up to 7 characters and must begin with either one or two letters at the beginning followed by 1-5 numbers. For example, A999 or AB99999
+chrn.hint                                                   = This could be up to 7 characters and must begin with either one or two letters, followed by 1-5 numbers. For example, A999 or AB99999
 chrn.no_chrn_link                                           = The charity does not have a HMRC reference number
 chrn.error_not_entered                                      = Enter the HMRC reference number
 chrn.error_invalid_characters                               = Enter the HMRC reference number in the correct format
-chrn.error_invalid_length                                   = Enter a HMRC reference number that is 7 characters or less
+chrn.error_invalid_length                                   = The HMRC reference number must be 7 characters or fewer
 
 chrn.ua.title                                               = What is the association’s HMRC reference Number?
 chrn.ua.inset                                               = If the association has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register.
-chrn.ua.hint                                                = This could be up to 7 characters and must begin with either one or two letters at the beginning followed by 1-5 numbers. For example, A999 or AB99999
+chrn.ua.hint                                                = This could be up to 7 characters and must begin with either one or two letters, followed by 1-5 numbers. For example, A999 or AB99999
 chrn.ua.label                                               = HMRC reference number
 chrn.ua.no_chrn_link                                        = The association does not have a HMRC reference number
 chrn.ua.error.no_entry                                      = Enter the HMRC reference number
 chrn.ua.error.invalid_format                                = Enter the HMRC reference number in the correct format
-chrn.ua.error.invalid_length                                = Enter a HMRC reference number that is 7 characters or less
+chrn.ua.error.invalid_length                                = The HMRC reference number must be 7 characters or fewer
 
 ## Cannot confirm business
 cannot-confirm-business.title                               = The details you provided do not match records held by HMRC

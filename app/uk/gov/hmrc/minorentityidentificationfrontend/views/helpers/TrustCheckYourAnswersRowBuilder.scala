@@ -35,18 +35,16 @@ class TrustCheckYourAnswersRowBuilder() {
 
     val utrRow: Aliases.SummaryListRow = CheckYourAnswersRowBuilder.utrSummaryRow(
       optUtr = optUtr,
+      noUtrMessageKey = "check-your-answers.no_trust_utr",
       changeValuePageLink = trustControllers.routes.CaptureSautrController.show(journeyId),
       messages = messages
     )
 
-    def charityHMRCReferenceNumberRow(): Aliases.SummaryListRow = CheckYourAnswersRowBuilder.buildSummaryRow(
-      messages(checkYourAnswersMessageKey(keySuffix = "charity_hmrc_reference_number")),
-      optCharityHMRCReferenceNumber match {
-        case Some(charityHMRCReferenceNumber) => charityHMRCReferenceNumber
-        case None                             => messages(checkYourAnswersMessageKey(keySuffix = "no_charity_hmrc_reference_number"))
-      },
-      changeValuePageLink = trustControllers.routes.CaptureCHRNController.show(journeyId),
-      messages = messages
+    val charityHMRCReferenceNumberRow: Aliases.SummaryListRow = CheckYourAnswersRowBuilder.charityHMRCReferenceNumberRow(
+      optCharityHMRCReferenceNumber,
+      noCHRNMessageKey = "check-your-answers.no_charity_hmrc_reference_number",
+      trustControllers.routes.CaptureCHRNController.show(journeyId),
+      messages
     )
 
     def postcodeRow(): Aliases.SummaryListRow = CheckYourAnswersRowBuilder.buildSummaryRow(
@@ -61,7 +59,7 @@ class TrustCheckYourAnswersRowBuilder() {
 
     (optUtr, optPostcode, optCharityHMRCReferenceNumber) match {
       case (Some(_), _, None)    => Seq(utrRow, postcodeRow())
-      case (None, None, _)       => Seq(utrRow, charityHMRCReferenceNumberRow())
+      case (None, None, _)       => Seq(utrRow, charityHMRCReferenceNumberRow)
       case (Some(_), _, Some(_)) => throw new IllegalStateException("User cannot have SAUTR and charity HMRC reference number at the same time")
       case (None, Some(_), _)    => throw new IllegalStateException("User cannot have postcode when they dont have SAUTR")
     }

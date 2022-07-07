@@ -66,7 +66,7 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
 
   val testNoPostcodeRow: SummaryListRow = SummaryListRow(
     key = Key(content = Text("Self Assessment postcode")),
-    value = Value(HtmlContent("The business does not have a Self Assessment postcode")),
+    value = Value(HtmlContent("The trust does not have a Self Assessment postcode")),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = trustControllers.routes.CaptureSaPostcodeController.show(testJourneyId).url,
@@ -75,6 +75,8 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
       )
     )))
   )
+
+  val noUtrMessage: String = "The trust does not have a UTR"
 
   "buildSummaryListRows" should {
     "build a summary list sequence" when {
@@ -120,7 +122,7 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
         )(messages)
 
         actualSummaryList mustBe Seq(
-          testNoUtrRow(changeValuePageLink = trustControllers.routes.CaptureSautrController.show(testJourneyId)),
+          testNoUtrRow(noUtrMessage, changeValuePageLink = trustControllers.routes.CaptureSautrController.show(testJourneyId)),
           testNoCharityHMRCReferenceNumberRow
         )
 
@@ -136,7 +138,7 @@ class TrustCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBui
         )(messages)
 
         actualSummaryList mustBe Seq(
-          testNoUtrRow(changeValuePageLink = trustControllers.routes.CaptureSautrController.show(testJourneyId)),
+          testNoUtrRow(noUtrMessage, changeValuePageLink = trustControllers.routes.CaptureSautrController.show(testJourneyId)),
           testCharityHMRCReferenceNumberRow
         )
 

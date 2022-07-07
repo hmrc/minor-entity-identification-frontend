@@ -32,25 +32,25 @@ abstract class AbstractCheckYourAnswersRowBuilderSpec extends AnyWordSpec with M
   val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   def testUtrRow(changeValuePageLink: Call): SummaryListRow = SummaryListRow(
-    key = Key(content = Text("Unique taxpayers reference number")),
+    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
     value = Value(content = HtmlContent(testSautr)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = changeValuePageLink.url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Unique taxpayers reference number")
+        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
       )
     )))
   )
 
-  def testNoUtrRow(changeValuePageLink: Call): SummaryListRow = SummaryListRow(
-    key = Key(content = Text("Unique taxpayers reference number")),
-    value = Value(content = HtmlContent("The business does not have a UTR")),
+  def testNoUtrRow(noUtrMessage: String, changeValuePageLink: Call): SummaryListRow = SummaryListRow(
+    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
+    value = Value(content = HtmlContent(noUtrMessage)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = changeValuePageLink.url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Unique taxpayers reference number")
+        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
       )
     )))
   )

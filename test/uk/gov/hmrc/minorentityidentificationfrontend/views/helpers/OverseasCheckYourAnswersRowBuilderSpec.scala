@@ -81,7 +81,7 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
         )(messages, mockAppConfig)
 
         actualSummaryList mustBe Seq(
-          testNoUtrRow(changeValuePageLink = overseasControllers.routes.CaptureUtrController.show(testJourneyId)),
+          testNoUtrRow("The business does not have a UTR", changeValuePageLink = overseasControllers.routes.CaptureUtrController.show(testJourneyId)),
           testNoOverseasTaxIdentifiersRow
         )
 

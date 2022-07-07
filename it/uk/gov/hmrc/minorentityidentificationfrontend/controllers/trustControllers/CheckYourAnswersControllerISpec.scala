@@ -98,6 +98,36 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
       }
 
+      "the applicant has a utr, but no post code" should {
+
+        enable(EnableFullTrustJourney)
+
+        lazy val result: WSResponse = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
+          stubRetrievePostcode(testJourneyId)(NOT_FOUND)
+          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+          stubAudit()
+
+          get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
+        }
+
+        "return OK" in {
+          result.status mustBe OK
+        }
+
+        "return a view which" should {
+          testCheckYourAnswersCommonView(result)
+          testTrustWithUtrAndNoPostcodeSummaryListView(result, testJourneyId)
+        }
+      }
+
       "the applicant has a postcode but they don't have utr (this is a impossible scenario)" should {
         enable(EnableFullTrustJourney)
         lazy val result: WSResponse = {

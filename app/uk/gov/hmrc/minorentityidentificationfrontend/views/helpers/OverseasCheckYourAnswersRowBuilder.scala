@@ -34,6 +34,7 @@ class OverseasCheckYourAnswersRowBuilder() {
 
     val utrRow: Aliases.SummaryListRow = CheckYourAnswersRowBuilder.utrSummaryRow(
       optUtr = optUtr,
+      noUtrMessageKey = "check-your-answers.no_utr",
       changeValuePageLink = overseasControllers.routes.CaptureUtrController.show(journeyId),
       messages = messages
     )
