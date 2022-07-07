@@ -37,7 +37,7 @@ class TrustMatchingResultCalculator @Inject()(retrieveTrustKnownFactsConnector: 
         storageService.storeIdentifiersMatch(journeyId, identifiersMatchFailure).map(_ => identifiersMatchFailure)
       case Some(saUtr) =>
         for {
-          knownFactsMatchResult <- retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(saUtr).flatMap {
+          knownFactsMatchResult <- retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(saUtr, journeyId).flatMap {
             case Some(knownFacts) =>
               if (knownFacts.isAbroad && optSaPostcode.isEmpty |
                 postcodeMatches(optSaPostcode, knownFacts.correspondencePostcode, knownFacts.declarationPostcode)) Future.successful(SuccessfulMatch)

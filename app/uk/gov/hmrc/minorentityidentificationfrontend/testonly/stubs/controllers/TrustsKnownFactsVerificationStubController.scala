@@ -16,21 +16,60 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers
 
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.libs.json.{JsObject, JsSuccess, Json, __}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Session}
+import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
+import uk.gov.hmrc.minorentityidentificationfrontend.testonly.models.{AbroadResponse, GBResponse, KnownFactsNotFound}
+import uk.gov.hmrc.minorentityidentificationfrontend.testonly.service.TestStorageService
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.utils.JsonUtils.jsonFromFile
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class TrustsKnownFactsVerificationStubController @Inject()(controllerComponents: ControllerComponents) extends BackendController(controllerComponents) {
+class TrustsKnownFactsVerificationStubController @Inject()(controllerComponents: ControllerComponents,
+                                                           testStorageService: TestStorageService
+                                                          )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) {
 
-  def stubTrustKnownFacts(sautr: String): Action[AnyContent] = Action.async {
-    sautr match {
-      case "1234567891" => Future.successful(Ok(jsonFromFile("resources/TrustsKnownFactsVerificationStub/AbroadResponse.json")))
-      case "1234567892" => Future.successful(NotFound)
-      case _ => Future.successful(Ok(jsonFromFile("resources/TrustsKnownFactsVerificationStub/GBResponse.json")))
-    }
+  def stubTrustKnownFacts(journeyId: String): Action[AnyContent] = Action.async {
+    //    implicit request =>
+    //      request.session.get("stubs").map {
+    //        case "Abroad Response" => Future.successful(Ok(jsonFromFile("resources/TrustsKnownFactsVerificationStub/AbroadResponse.json")))
+    //        case "Not Found" => Future.successful(NotFound)
+    //        case "GBResponse" =>
+    //          val json = jsonFromFile("resources/TrustsKnownFactsVerificationStub/GBResponse.json").as[JsObject]
+    //          val jsonTransformer = (__ \ 'getTrust \ 'declaration \ 'address).json.update(
+    //            __.read[JsObject].map { o => o ++ Json.obj("postCode" -> "QQ1 1QQ") }
+    //          )
+    //          val updated = json.transform(jsonTransformer) match {
+    //            case JsSuccess(value, _) => value
+    //            case _ => throw new InternalServerException("Json update went wrong")
+    //          }
+    //          Future.successful(Ok(updated))
+    //      }.getOrElse(throw new InternalServerException("Session went wrong: " + request))
+    implicit request =>
+      testStorageService.retrieveStubs(journeyId).flatMap {
+        {
+          case Some(testSetup) =>
+            testSetup.knownFactsMatch match {
+              case AbroadResponse => Future.successful(Ok(jsonFromFile("resources/TrustsKnownFactsVerificationStub/AbroadResponse.json")))
+              case KnownFactsNotFound => Future.successful(NotFound)
+              case GBResponse(postcode) =>
+                val json = jsonFromFile("resources/TrustsKnownFactsVerificationStub/GBResponse.json").as[JsObject]
+                val jsonTransformer = (__ \ 'getTrust \ 'declaration \ 'address).json.update(
+                  __.read[JsObject].map { o => o ++ Json.obj("postCode" -> postcode) }
+                )
+                val updated = json.transform(jsonTransformer) match {
+                  case JsSuccess(value, _) => value
+                  case _ => throw new InternalServerException("Json update went wrong")
+                }
+                Future.successful(Ok(updated))
+            }
+          case None => throw new InternalServerException("No data found")
+        }
+      }
+
   }
 
 }

@@ -31,8 +31,9 @@ class RetrieveBusinessVerificationStatusConnector @Inject()(http: HttpClient,
                                                             appConfig: AppConfig
                                                            )(implicit ec: ExecutionContext) {
 
-  def retrieveBusinessVerificationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =
-    http.GET[BusinessVerificationStatus](appConfig.getBusinessVerificationResultUrl(journeyId))(
+  def retrieveBusinessVerificationStatus(businessVerificationJourneyId: String,
+                                         journeyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =
+    http.GET[BusinessVerificationStatus](appConfig.getBusinessVerificationResultUrl(businessVerificationJourneyId, journeyId))(
       RetrieveBusinessVerificationStatusHttpReads,
       hc,
       ec

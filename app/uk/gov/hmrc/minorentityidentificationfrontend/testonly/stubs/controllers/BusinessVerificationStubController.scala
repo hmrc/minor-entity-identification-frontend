@@ -17,14 +17,19 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers
 
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContent, InjectedController}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, InjectedController}
+import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
+import uk.gov.hmrc.minorentityidentificationfrontend.testonly.service.TestStorageService
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.util.UUID
-import javax.inject.Singleton
-import scala.concurrent.Future
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessVerificationStubController extends InjectedController {
+class BusinessVerificationStubController @Inject()(testStorageService: TestStorageService,
+                                                   controllerComponents: ControllerComponents
+                                                  )(implicit ec: ExecutionContext) extends BackendController(controllerComponents) {
 
   private val origin = "vat"
   private val businessVerificationJourneyId = UUID.randomUUID.toString
@@ -40,17 +45,21 @@ class BusinessVerificationStubController extends InjectedController {
       }
   }
 
-  def retrieveVerificationResult(businessVerificationJourneyId: String): Action[AnyContent] = Action.async {
-    Future.successful {
-      Ok(Json.obj(
-        "journeyType" -> "BUSINESS_VERIFICATION",
-        "origin" -> origin,
-        "identifier" -> {
-          "saUtr" -> "1234567890"
-        },
-        "verificationStatus" -> "PASS"
-      ))
-    }
+  def retrieveVerificationResult(businessVerificationJourneyId: String, journeyId: String): Action[AnyContent] = Action.async {
+    implicit request =>
+      testStorageService.retrieveStubs(journeyId).map {
+        {
+          case Some(stubs) =>
+            Ok(Json.obj(
+              "journeyType" -> "BUSINESS_VERIFICATION",
+              "origin" -> origin,
+              "identifier" -> {
+                "saUtr" -> "1234567890"
+              },
+              "verificationStatus" -> stubs.businessVerificationStub.toUpperCase
+            ))
+        }
+      }
   }
 
 }

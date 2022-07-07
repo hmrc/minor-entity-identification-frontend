@@ -40,7 +40,7 @@ abstract class BaseBusinessVerificationController(mcc: MessagesControllerCompone
             case Some(businessVerificationJourneyId) =>
               for {
                 journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-                verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
+                verificationStatus <- businessVerificationService.retrieveBusinessVerificationStatus(businessVerificationJourneyId, journeyId)
                 _ <- storageService.storeBusinessVerificationStatus(journeyId, verificationStatus)
                 optUtr <- storageService.retrieveUtr(journeyId)
                 _ <- registrationOrchestrationService.register(journeyId, optUtr.map(_.value), journeyConfig)

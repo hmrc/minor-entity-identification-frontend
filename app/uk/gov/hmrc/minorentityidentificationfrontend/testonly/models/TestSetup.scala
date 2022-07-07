@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.models
+package uk.gov.hmrc.minorentityidentificationfrontend.testonly.models
 
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
+import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 
-case class JourneyConfig(continueUrl: String,
-                         pageConfig: PageConfig,
-                         businessEntity: BusinessEntity,
-                         businessVerificationCheck: Boolean,
-                         regime: String) {
-  def fullContinueUrl(journeyId: String): String = continueUrl + s"?journeyId=$journeyId"
-}
+case class TestSetup(journeyConfig: JourneyConfig, stubs: Stubs)
+

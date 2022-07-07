@@ -39,13 +39,13 @@ class RegistrationConnector @Inject()(httpClient: HttpClient,
       ec
     )
 
-  def registerTrust(sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
+  def registerTrust(sautr: String, regime: String, journeyId: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
     register(
       jsonBody = Json.obj(
         "sautr" -> sautr.toUpperCase,
         "regime" -> regime
       ),
-      postUrl = appConfig.registerTrustUrl)
+      postUrl = appConfig.registerTrustUrl(journeyId))
 
 
   def registerUA(ctutr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =

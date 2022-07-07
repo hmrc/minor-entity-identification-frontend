@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.forms
 
-import play.api.data.Form
-import play.api.data.Forms.{boolean, mapping, text}
+import play.api.data.Forms.{boolean, mapping, of, text}
+import play.api.data.format.Formatter
 import play.api.data.validation.Constraint
+import play.api.data.{Form, FormError}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.MappingUtil.optText
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.validate
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models._
+import uk.gov.hmrc.minorentityidentificationfrontend.testonly.models._
 
 object TestCreateJourneyForm {
 
@@ -71,6 +73,69 @@ object TestCreateJourneyForm {
     )
   )
 
+  def knownFactsMapping(error: String): Formatter[KnownFactsMatchStub] = new Formatter[KnownFactsMatchStub] {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], KnownFactsMatchStub] = {
+      data.get(key) match {
+        case Some("GBResponse") =>
+          data.get("postcode") match {
+            case Some(postcode) => Right(GBResponse(postcode))
+            case _ => Left(Seq(FormError("postcode", error)))
+          }
+        case Some("Not Found") => Right(KnownFactsNotFound)
+        case Some("Abroad Response") => Right(AbroadResponse)
+        case _ => Left(Seq(FormError(key, error)))
+      }
+    }
+
+    override def unbind(key: String, value: KnownFactsMatchStub): Map[String, String] = {
+      val newValue = value match {
+        case GBResponse(_) => "GBResponse"
+        case KnownFactsNotFound => "Not Found"
+        case AbroadResponse => "Abroad Response"
+      }
+      Map(key -> newValue)
+    }
+  }
+
+  def registrationMapping(error: String): Formatter[RegistrationStatus] = new Formatter[RegistrationStatus] {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], RegistrationStatus] = {
+      data.get(key) match {
+        case Some("Pass") =>
+          data.get("safeID") match {
+            case Some(id) => Right(Registered(id))
+            case _ => Left(Seq(FormError("safeID", error)))
+          }
+        case Some(_) =>
+          Right(RegistrationFailed(
+            Array(
+              Failure("INVALID_PAYLOAD", "Request has not passed validation. Invalid Payload."),
+              Failure("INVALID_REGIME", "Request has not passed validation. Invalid Regime.")
+            )))
+        case _ => Left(Seq(FormError(key, error)))
+      }
+    }
+
+    override def unbind(key: String, value: RegistrationStatus): Map[String, String] = {
+      value match {
+        case Registered(id) => Map(key -> "Pass", "safeID" -> id)
+        case RegistrationFailed(_) => Map(key -> "Fail")
+      }
+    }
+  }
+
+  def stringMapping(error: String): Formatter[String] = new Formatter[String] {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
+      data.get(key) match {
+        case Some(value) => Right(value)
+        case _ => Left(Seq(FormError(key, error)))
+      }
+    }
+
+    override def unbind(key: String, value: String): Map[String, String] = {
+      Map(key -> value)
+    }
+  }
+
   def form(businessEntity: BusinessEntity): Form[JourneyConfig] = {
     Form(mapping(
       continueUrl -> text.verifying(continueUrlEmpty),
@@ -95,5 +160,45 @@ object TestCreateJourneyForm {
       )
     ))
   }
+
+  def newForm(businessEntity: BusinessEntity): Form[TestSetup] = {
+    Form(mapping(
+      continueUrl -> text.verifying(continueUrlEmpty),
+      serviceName -> optText,
+      deskProServiceId -> text.verifying(deskProServiceIdEmpty),
+      signOutUrl -> text.verifying(signOutUrlEmpty),
+      accessibilityUrl -> text.verifying(accessibilityUrlEmpty),
+      businessVerificationCheck -> boolean,
+      regime -> text.verifying(regimeEmpty),
+      welshServiceName -> optText,
+      "knownFactsMatch" -> of(knownFactsMapping("Known Facts Stub not entered")),
+      "businessVerificationStub" -> of(stringMapping("Business Verification Stub Not Entered")),
+      "registrationStub" -> of(registrationMapping("Registration Stub Not Entered"))
+    )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, businessVerificationCheck, regime, welshServiceName, knownFactsStub, businessVerificationStub, registrationStub) =>
+      TestSetup.apply(
+        JourneyConfig.apply(
+          continueUrl,
+          PageConfig(serviceName, deskProServiceId, welshServiceName, signOutUrl, accessibilityUrl),
+          businessEntity,
+          businessVerificationCheck,
+          regime
+        ),
+        Stubs.apply(knownFactsStub, businessVerificationStub, registrationStub))
+    )(testConfig =>
+      Some(testConfig.journeyConfig.continueUrl,
+        testConfig.journeyConfig.pageConfig.optServiceName,
+        testConfig.journeyConfig.pageConfig.deskProServiceId,
+        testConfig.journeyConfig.pageConfig.signOutUrl,
+        testConfig.journeyConfig.pageConfig.accessibilityUrl,
+        testConfig.journeyConfig.businessVerificationCheck,
+        testConfig.journeyConfig.regime,
+        testConfig.journeyConfig.pageConfig.optLabels.map(_.welshServiceName),
+        testConfig.stubs.knownFactsMatch,
+        testConfig.stubs.businessVerificationStub,
+        testConfig.stubs.registrationStub
+      )
+    ))
+  }
+
 
 }

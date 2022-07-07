@@ -29,10 +29,10 @@ class RegistrationOrchestrationService @Inject()(storageService: StorageService,
                                                  registrationConnector: RegistrationConnector,
                                                  auditService: AuditService) {
 
-  private def internalRegister(utr: String, journeyConfig: JourneyConfig)
+  private def internalRegister(utr: String, journeyConfig: JourneyConfig, journeyId: String)
                               (implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
     journeyConfig.businessEntity match {
-      case Trusts => registrationConnector.registerTrust(utr, journeyConfig.regime)
+      case Trusts => registrationConnector.registerTrust(utr, journeyConfig.regime, journeyId)
       case UnincorporatedAssociation => registrationConnector.registerUA(utr, journeyConfig.regime)
       case OverseasCompany => throw new IllegalArgumentException("Overseas Company is not supported for registration.")
     }
@@ -46,8 +46,8 @@ class RegistrationOrchestrationService @Inject()(storageService: StorageService,
       case Trusts | UnincorporatedAssociation =>
         for {
           registrationStatus <- storageService.retrieveBusinessVerificationStatus(journeyId).flatMap {
-            case Some(BusinessVerificationPass) => internalRegister(optUtr.get, journeyConfig)
-            case None if !journeyConfig.businessVerificationCheck && optUtr.isDefined => internalRegister(optUtr.get, journeyConfig)
+            case Some(BusinessVerificationPass) => internalRegister(optUtr.get, journeyConfig, journeyId)
+            case None if !journeyConfig.businessVerificationCheck && optUtr.isDefined => internalRegister(optUtr.get, journeyConfig, journeyId)
             case _ => Future.successful(RegistrationNotCalled)
           }
           _ <- storageService.storeRegistrationStatus(journeyId, registrationStatus)

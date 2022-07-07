@@ -20,12 +20,14 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig, Registered}
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.forms.TestCreateJourneyForm
+import uk.gov.hmrc.minorentityidentificationfrontend.testonly.models.{AbroadResponse, Stubs, TestSetup}
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.views.html.test_create_journey
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -54,11 +56,13 @@ class TestCreateOverseasCompanyJourneyController @Inject()(messagesControllerCom
     regime = "VATC"
   )
 
+  private val testBpSafeId = UUID.randomUUID().toString
+
   val show: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(OverseasCompany).fill(defaultJourneyConfig), routes.TestCreateOverseasCompanyJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.newForm(OverseasCompany).fill(TestSetup(defaultJourneyConfig, Stubs(AbroadResponse, "Pass", Registered(testBpSafeId)))), routes.TestCreateOverseasCompanyJourneyController.submit()))
         )
       }
   }
@@ -66,13 +70,13 @@ class TestCreateOverseasCompanyJourneyController @Inject()(messagesControllerCom
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        TestCreateJourneyForm.form(OverseasCompany).bindFromRequest().fold(
+        TestCreateJourneyForm.newForm(OverseasCompany).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateOverseasCompanyJourneyController.submit()))
             ),
-          journeyConfig =>
-            testCreateJourneyConnector.createOverseasCompanyJourney(journeyConfig).map {
+          testSetup =>
+            testCreateJourneyConnector.createOverseasCompanyJourney(testSetup.journeyConfig).map {
               journeyUrl => SeeOther(journeyUrl)
             }
         )

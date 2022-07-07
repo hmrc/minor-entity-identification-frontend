@@ -63,11 +63,11 @@ class AppConfig @Inject()(config: Configuration,
       s"$businessVerificationUrl/journey"
   }
 
-  def getBusinessVerificationResultUrl(journeyId: String): String = {
+  def getBusinessVerificationResultUrl(bvJourneyId: String, journeyId: String): String = {
     if (isEnabled(BusinessVerificationStub))
-      s"$selfBaseUrl/identify-your-trust/test-only/business-verification/journey/$journeyId/status"
+      s"$selfBaseUrl/identify-your-trust/test-only/business-verification/journey/$bvJourneyId/status/$journeyId"
     else
-      s"$businessVerificationUrl/journey/$journeyId/status"
+      s"$businessVerificationUrl/journey/$bvJourneyId/status"
   }
 
   lazy val accessibilityStatementPath: String = servicesConfig.getString("accessibility-statement.host")
@@ -77,9 +77,9 @@ class AppConfig @Inject()(config: Configuration,
 
   lazy val trustsUrl: String = servicesConfig.baseUrl("trusts")
 
-  def retrieveTrustsKnownFactsUrl(sautr: String): String = {
-    val baseUrl: String = if (isEnabled(TrustVerificationStub)) s"$selfBaseUrl/identify-your-trust/test-only" else trustsUrl
-    baseUrl + s"/trusts/$sautr/refresh"
+  def retrieveTrustsKnownFactsUrl(sautr: String, journeyId: String): String = {
+    if (isEnabled(TrustVerificationStub)) s"$selfBaseUrl/identify-your-trust/test-only/$journeyId/trusts/sautr/refresh"
+    else trustsUrl + s"/trusts/$sautr/refresh"
   }
 
   lazy val validateUnincorporatedAssociationDetailsUrl: String = s"$backendUrl/minor-entity-identification/validate-details"
@@ -131,7 +131,7 @@ class AppConfig @Inject()(config: Configuration,
 
   }
 
-  def registerTrustUrl: String = s"$backendUrl/minor-entity-identification/register-trust"
+  def registerTrustUrl(journeyId: String): String = s"$backendUrl/minor-entity-identification/register-trust/$journeyId"
 
   def registerUAUrl: String = s"$backendUrl/minor-entity-identification/register-ua"
 

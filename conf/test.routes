@@ -23,9 +23,9 @@ GET        /:journey/test-only/api/feature-switches                             
 + nocsrf
 POST       /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches(journey)
 
-GET        /identify-your-trust/test-only/trusts/:sautr/refresh                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.TrustsKnownFactsVerificationStubController.stubTrustKnownFacts(sautr)
+GET        /identify-your-trust/test-only/:journeyId/trusts/sautr/refresh                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.TrustsKnownFactsVerificationStubController.stubTrustKnownFacts(journeyId)
 
-GET         /identify-your-trust/test-only/business-verification/journey/:journeyId/status                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.retrieveVerificationResult(journeyId)
+GET        /identify-your-trust/test-only/business-verification/journey/:bvJourneyId/status/:journeyId                                         uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.retrieveVerificationResult(bvJourneyId, journeyId)
 
 + nocsrf
-POST        /identify-your-trust/test-only/business-verification/journey                                                          uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.createBusinessVerificationJourney
+POST       /identify-your-trust/test-only/business-verification/journey                                                           uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.createBusinessVerificationJourney

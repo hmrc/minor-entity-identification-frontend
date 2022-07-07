@@ -45,7 +45,7 @@ class BusinessVerificationService @Inject()(createBusinessVerificationJourneyCon
         throw new InternalServerException(s"createBusinessVerificationJourney service failed with invalid BV status")
     }
 
-  def retrieveBusinessVerificationStatus(businessVerificationJourneyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =
-    retrieveBusinessVerificationResultConnector.retrieveBusinessVerificationStatus(businessVerificationJourneyId)
+  def retrieveBusinessVerificationStatus(businessVerificationJourneyId: String, journeyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =
+    retrieveBusinessVerificationResultConnector.retrieveBusinessVerificationStatus(businessVerificationJourneyId, journeyId)
 
 }

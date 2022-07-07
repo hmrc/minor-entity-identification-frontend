@@ -16,16 +16,21 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers
 
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.Trusts
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig, Registered}
+import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors.TestCreateJourneyConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.forms.TestCreateJourneyForm
+import uk.gov.hmrc.minorentityidentificationfrontend.testonly.models.{AbroadResponse, Stubs, TestSetup}
+import uk.gov.hmrc.minorentityidentificationfrontend.testonly.service.TestStorageService
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.views.html.test_create_journey
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +38,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class TestCreateTrustsJourneyController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                                   testCreateJourneyConnector: TestCreateJourneyConnector,
                                                   view: test_create_journey,
-                                                  val authConnector: AuthConnector
+                                                  val authConnector: AuthConnector,
+                                                  journeyConfigRepository: JourneyConfigRepository,
+                                                  testStorageService: TestStorageService
                                                  )(implicit ec: ExecutionContext,
                                                    appConfig: AppConfig) extends FrontendController(messagesControllerComponents) with AuthorisedFunctions {
 
@@ -54,26 +61,39 @@ class TestCreateTrustsJourneyController @Inject()(messagesControllerComponents: 
     regime = "VATC"
   )
 
+  private val testBpSafeId = UUID.randomUUID().toString
+
   val show: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(Trusts).fill(defaultJourneyConfig), routes.TestCreateTrustsJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.newForm(Trusts).fill(TestSetup(defaultJourneyConfig, Stubs(AbroadResponse, "Pass", Registered(testBpSafeId)))), routes.TestCreateTrustsJourneyController.submit()))
         )
       }
+  }
+
+  private def extractJourneyId(currentUrl: String) = {
+    val regex = """.*/identify-your-trust/(.*)/.*""".r
+    currentUrl match {
+      case regex(journeyId) => journeyId
+    }
   }
 
   val submit: Action[AnyContent] = Action.async {
     implicit request =>
       authorised() {
-        TestCreateJourneyForm.form(Trusts).bindFromRequest().fold(
+        TestCreateJourneyForm.newForm(Trusts).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
               BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateTrustsJourneyController.submit()))
             ),
-          journeyConfig =>
-            testCreateJourneyConnector.createTrustsJourney(journeyConfig).map {
-              journeyUrl => SeeOther(journeyUrl)
+          testSetup =>
+            testCreateJourneyConnector.createTrustsJourney(testSetup.journeyConfig).flatMap {
+              journeyUrl =>
+                val journeyId = extractJourneyId(journeyUrl)
+                testStorageService.storeStubs(journeyId, testSetup.stubs).map {
+                  _ => SeeOther(journeyUrl)
+                }
             }
         )
       }

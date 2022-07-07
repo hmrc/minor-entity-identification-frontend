@@ -30,8 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RetrieveTrustKnownFactsConnector @Inject()(httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
-  def retrieveTrustKnownFacts(sautr: String)(implicit hc: HeaderCarrier): Future[Option[TrustKnownFacts]] = {
-    httpClient.GET(appConfig.retrieveTrustsKnownFactsUrl(sautr))(
+  def retrieveTrustKnownFacts(sautr: String, journeyId: String)(implicit hc: HeaderCarrier): Future[Option[TrustKnownFacts]] = {
+    httpClient.GET(appConfig.retrieveTrustsKnownFactsUrl(sautr, journeyId))(
       KnownFactsHttpReads,
       hc,
       ec)

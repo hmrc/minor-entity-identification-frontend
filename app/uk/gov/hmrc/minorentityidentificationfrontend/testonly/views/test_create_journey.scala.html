@@ -20,7 +20,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.p
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.{p, h1}
+@import uk.gov.hmrc.minorentityidentificationfrontend.testonly.models.TestSetup
 
 @this(layout: govuk_template,
     govukFieldset: GovukFieldset,
@@ -29,10 +30,12 @@
     formWithCSRF: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukCheckboxes: GovukCheckboxes,
-    p: p
+    p: p,
+    h1: h1,
+    govukRadios: GovukRadios
 )
 
-@(pageConfig: PageConfig, form: Form[JourneyConfig], formAction: Call)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, form: Form[TestSetup], formAction: Call)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, "Enter Minor Entity Identification Journey Config") {
 
@@ -41,11 +44,7 @@
     }
 
     @govukFieldset(Fieldset(
-        legend = Some(Legend(
-            content = Text("Enter Minor Entity Identification Journey Config"),
-            classes = "govuk-fieldset__legend--xl",
-            isPageHeading = true
-            )),
+        legend = None,
         html = html
     ))
 
@@ -53,6 +52,8 @@
 
 @html = {
     @formWithCSRF(action = formAction) {
+
+        @h1("Journey Config")
 
         @p(Html("All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out to Business Verification (rather than stub it) all absolute urls will fail."))
 
@@ -127,10 +128,96 @@
             ).withFormField(form("welshServiceName"))
         )
 
+        @h1("Setup Journey Stubs")
+
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                content = Text("Trust Known Facts Stub response"),
+                classes = "govuk-fieldset__legend--s",
+                isPageHeading = false
+                ))
+            )),
+            items = Seq(
+                RadioItem(
+                content = Text("Abroad Response"),
+                value = Some("Abroad Response")
+                ),
+                RadioItem(
+                content = Text("GB Response"),
+                value = Some("GBResponse"),
+                conditionalHtml = Some(postcodeHtml)
+                ),
+                RadioItem(
+                content = Text("Not Found"),
+                value = Some("Not Found")
+                )
+            )
+        ).withFormField(form("knownFactsMatch")))
+
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+            legend = Some(Legend(
+                content = Text("Business Verification Stub response"),
+                classes = "govuk-fieldset__legend--s",
+                isPageHeading = false
+                ))
+            )),
+            items = Seq(
+                RadioItem(
+                content = Text("Pass"),
+                value = Some("Pass")
+            ),
+            RadioItem(
+                content = Text("Fail"),
+                value = Some("Fail")
+            ),
+        )
+        ).withFormField(form("businessVerificationStub")))
+
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                content = Text("Registration Stub response"),
+                classes = "govuk-fieldset__legend--s",
+                isPageHeading = false
+                ))
+            )),
+            items = Seq(
+                RadioItem(
+                    content = Text("Pass"),
+                    value = Some("Pass"),
+                    conditionalHtml = Some(registrationHtml)
+                    ),
+                RadioItem(
+                    content = Text("Fail"),
+                    value = Some("Fail")
+                    ),
+            )
+        ).withFormField(form("registrationStub")))
+
         @govukButton(Button(
             attributes = Map("id" -> "save-and-continue"),
             classes = "govuk-!-margin-right-1",
             content = Text("Submit")
         ))
     }
+}
+
+@postcodeHtml = {
+    @govukInput(
+    Input(
+        label = Label(content=Text("Postcode"),isPageHeading = false, classes = "govuk-label"),
+        classes = "govuk-input--width-20"
+        ).withFormField(form("postcode"))
+    )
+}
+
+@registrationHtml = {
+    @govukInput(
+    Input(
+        label = Label(content=Text("BP Safe ID"),isPageHeading = false, classes = "govuk-label"),
+        classes = "govuk-input--width-20"
+        ).withFormField(form("safeID"))
+    )
 }
