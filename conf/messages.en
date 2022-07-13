@@ -12,6 +12,7 @@ app.common.yes                                              = Yes
 app.common.no                                               = No
 
 country.select                                              = Select a country
+country.noResult                                            = No results found
 
 ## Capture UTR page
 utr.title                                                   = What is the company’s UK Unique Taxpayer Reference?

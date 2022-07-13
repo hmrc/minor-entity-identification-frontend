@@ -81,6 +81,7 @@
                 selectElement: document.getElementById("country"),
                 name: 'countryAutocomplete',
                 defaultValue: '',
+                tNoResults: () => '@messages("country.noResult")',
                 onConfirm: () => {
                     const matchingOption = Array.from(document.querySelectorAll("#country-select > option")).find(function(c) {
                             return c.text === document.getElementById("country").value;
