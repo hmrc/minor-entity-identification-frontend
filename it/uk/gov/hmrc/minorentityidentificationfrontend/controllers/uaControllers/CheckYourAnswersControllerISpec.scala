@@ -186,12 +186,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> true))
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-          val expectedBVJson = testCreateBusinessVerificationUAJourneyJson(
-            testCtutr,
-            testJourneyId,
-            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
-
-          stubCreateBusinessVerificationJourney(expectedBVJson)(CREATED, testBVRedirectURIJson(testBusinessVerificationRedirectUrl))
+          stubCreateBusinessVerificationJourney(expectedBvUAJson)(CREATED, testBVRedirectURIJson(testBusinessVerificationRedirectUrl))
 
           stubAudit()
 
@@ -203,7 +198,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expectedBVJson)
+          verifyCreateBusinessVerificationJourney(expectedBvUAJson)
 
           verifyAudit()
         }
@@ -228,12 +223,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           stubRetrieveEntityDetails(testJourneyId)(OK, testThisIsADummyJson)
 
-          val expectedBVJson = testCreateBusinessVerificationUAJourneyJson(
-            testCtutr,
-            testJourneyId,
-            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
-
-          stubCreateBusinessVerificationJourney(expectedBVJson)(FORBIDDEN)
+          stubCreateBusinessVerificationJourney(expectedBvUAJson)(FORBIDDEN)
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))(OK)
 
           stubAudit()
@@ -246,7 +236,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expectedBVJson)
+          verifyCreateBusinessVerificationJourney(expectedBvUAJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
           verifyAudit()
@@ -268,12 +258,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> true))
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-          val expectedBVJson = testCreateBusinessVerificationUAJourneyJson(
-            testCtutr,
-            testJourneyId,
-            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true))
-
-          stubCreateBusinessVerificationJourney(expectedBVJson)(NOT_FOUND)
+          stubCreateBusinessVerificationJourney(expectedBvUAJson)(NOT_FOUND)
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))(OK)
 
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
@@ -289,7 +274,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expectedBVJson)
+          verifyCreateBusinessVerificationJourney(expectedBvUAJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
           verifyAudit()

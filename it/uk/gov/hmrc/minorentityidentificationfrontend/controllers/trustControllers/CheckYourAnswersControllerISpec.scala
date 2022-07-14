@@ -186,9 +186,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveTrustKnownFacts(testSautr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-          stubCreateBusinessVerificationJourney(
-            expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true))
-          )(status = CREATED, body = testBVRedirectURIJson(redirectUrl = testBusinessVerificationRedirectUrl))
+          stubCreateBusinessVerificationJourney(expectedBVTrustsJson)(status = CREATED, body = testBVRedirectURIJson(redirectUrl = testBusinessVerificationRedirectUrl))
 
           stubRetrieveEntityDetails(testJourneyId)(OK, testTrustJourneyDataJson)
           stubAudit()
@@ -201,7 +199,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
+          verifyCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)
           verifyAudit()
         }
       }
@@ -225,7 +223,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveTrustKnownFacts(testSautr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(NOT_FOUND)
+          stubCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)(NOT_FOUND)
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))(OK)
 
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
@@ -243,7 +241,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))
-          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
+          verifyCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
           verifyAudit()
@@ -270,7 +268,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubRetrieveTrustKnownFacts(testSautr)(OK, testKnownFactsJson(correspondencePostcode = testSaPostcode, declarationPostcode = testSaPostcode))
           stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-          stubCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))(FORBIDDEN)
+          stubCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)(FORBIDDEN)
           stubStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))(OK)
 
           stubStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)(OK)
@@ -287,7 +285,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expBody = testCreateBusinessVerificationTrustJourneyJson(testSautr, testJourneyId, testTrustsJourneyConfig(businessVerificationCheck = true)))
+          verifyCreateBusinessVerificationJourney(expectedBVTrustsJson)
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
           verifyAudit()

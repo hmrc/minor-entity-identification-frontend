@@ -22,7 +22,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustController
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult.{DetailsMismatchKey, DetailsNotFoundKey, SuccessfulMatchKey, UnMatchableKey}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 
@@ -427,6 +427,17 @@ object TestConstants {
     "registeredBusinessPartnerId" -> safeId)
 
   private def registrationJson(content: JsObject): JsObject = Json.obj("registration" -> content)
+
+  val expectedBVTrustsJson = testCreateBusinessVerificationTrustJourneyJson(
+    testSautr,
+    testJourneyId,
+    testTrustsJourneyConfig(businessVerificationCheck = true).copy(regime = testRegime.toLowerCase))
+
+  val expectedBvUAJson = testCreateBusinessVerificationUAJourneyJson(
+    testCtutr,
+    testJourneyId,
+    testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).copy(regime = testRegime.toLowerCase))
+
 
 
 }

@@ -46,7 +46,7 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
     val jsonBody: JsObject =
       Json.obj(
         "continueUrl" -> continueUrlJsonValue.url,
-        "origin" -> journeyConfig.regime,
+        "origin" -> journeyConfig.regime.toLowerCase,
         "deskproServiceName" -> journeyConfig.pageConfig.deskProServiceId,
         "accessibilityStatementUrl" -> journeyConfig.pageConfig.accessibilityUrl,
         "pageTitle" -> callingService,
