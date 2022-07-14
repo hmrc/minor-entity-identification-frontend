@@ -60,6 +60,13 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
+  def stubStoreOverseasTaxIdentifiersCountry(journeyId: String, taxIdentifiersCountry: String)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/country", body = Json.toJson(taxIdentifiersCountry)
+    ).thenReturn(
+      status = status
+    )
+
   def stubRetrieveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/overseas"

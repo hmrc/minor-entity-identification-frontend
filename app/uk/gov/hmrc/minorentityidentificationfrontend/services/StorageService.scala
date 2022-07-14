@@ -41,6 +41,9 @@ class StorageService @Inject()(connector: StorageConnector) {
   def storeOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField[Overseas](journeyId, OverseasKey, taxIdentifiers)
 
+  def storeOverseasTaxIdentifiersCountry(journeyId: String, taxIdentifiersCountry: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
+    connector.storeDataField (journeyId, OverseasCountryKey, taxIdentifiersCountry)
+
   def removeOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, OverseasKey)
 
@@ -131,6 +134,7 @@ class StorageService @Inject()(connector: StorageConnector) {
 object StorageService {
   val UtrKey = "utr"
   val OverseasKey: String = "overseas"
+  val OverseasCountryKey: String = "country"
   val postcodeKey: String = "postcode"
   val ChrnKey = "chrn"
   val RegistrationKey: String = "registration"

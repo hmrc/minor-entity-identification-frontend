@@ -47,6 +47,10 @@ error.invalid_tax_identifier                        = Nodwch ddynodydd treth nad
 error.invalid_tax_identifier_length                 = Nodwch ddynodydd treth sy’n 60 o gymeriadau neu lai
 error.no_tax_identifier_country                     = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth
 
+## Overseas Tax Identifiers Country Page
+tax-identifiers-country.title                       = Ym mha wlad y cyhoeddwyd y dynodydd treth tramor?
+error.no_entry_tax_identifier_country               = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth dramor
+
 ## SA Postcode Page
 sa-postcode.title                                   = Beth yw’r cod post lle mae’r ymddiriedolaeth wedi’i chofrestru ar gyfer Hunanasesiad?
 sa-postcode.hint                                    = Er enghraifft, AB1 2YZ

@@ -97,6 +97,15 @@ object MessageLookup {
     }
   }
 
+  object CaptureOverseasTaxIdentifiersCountry {
+
+    val title = "Which country issued the overseas tax identifier?"
+
+    object Error {
+      val no_input_country = "Enter the name of the country that issued the overseas tax identifier"
+    }
+  }
+
   object CaptureSaPostcode {
 
     val title = "What is the postcode where the trust is registered for Self Assessment?"
