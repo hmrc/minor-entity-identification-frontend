@@ -12,6 +12,7 @@ app.common.yes                                      = Iawn
 app.common.no                                       = Na
 
 country.select                                      = Dewiswch wlad
+country.noResult                                    = Dim canlyniadau wedi’u darganfod
 
 ## Capture UTR page
 utr.title                                           = Beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer y cwmni?
