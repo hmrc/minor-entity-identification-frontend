@@ -21,7 +21,7 @@ import play.api.libs.json.JsObject
 import play.api.test.Helpers.{CREATED, NOT_FOUND, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector.{BusinessVerificationJourneyCreated, NotEnoughEvidence, UserLockedOut}
+import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
@@ -50,22 +50,22 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
     val expectedUABVCallJson = testCreateBusinessVerificationUAJourneyJson(
       utrJson = testBVCtUtrJson(testCtutr),
       continueUrlForBVCall = uaRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
-      journeyConfig = testUAJourneyConfig)
+      journeyConfig = testUAJourneyConfig.copy(regime = testRegime.toLowerCase))
 
     val expectedUABVCallJsonWithCallingService = testCreateBusinessVerificationUAJourneyJson(
       utrJson = testBVCtUtrJson(testCtutr),
       continueUrlForBVCall = uaRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
-      journeyConfig = testUAJourneyConfigWithCallingService)
+      journeyConfig = testUAJourneyConfigWithCallingService.copy(regime = testRegime.toLowerCase))
 
     val expectedTrustBVCallJson: JsObject = testCreateBusinessVerificationTrustJourneyJson(
       utrJson = testBVSaUtrJson(testSautr),
       continueUrlForBVCall = trustRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
-      journeyConfig = testTrustsJourneyConfig)
+      journeyConfig = testTrustsJourneyConfig.copy(regime = testRegime.toLowerCase))
 
     val expectedTrustBVCallJsonWithCallingService: JsObject = testCreateBusinessVerificationTrustJourneyJson(
       utrJson = testBVSaUtrJson(testSautr),
       continueUrlForBVCall = trustRoutes.BusinessVerificationController.retrieveBusinessVerificationResult(testJourneyId),
-      journeyConfig = testTrustsJourneyConfigWithCallingService)
+      journeyConfig = testTrustsJourneyConfigWithCallingService.copy(regime = testRegime.toLowerCase))
 
     s"the $BusinessVerificationStub feature switch is enabled (we will invoke the test backend)" when {
       "the journey creation has been successful" when {
