@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
+import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
@@ -24,6 +25,7 @@ import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureOverseasTaxIdentifiersForm
+import uk.gov.hmrc.minorentityidentificationfrontend.models.OverseasTaxIdentifier
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_overseas_tax_identifiers_page
@@ -45,16 +47,23 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          journeyService.getJourneyConfig(journeyId, authInternalId).map {
+          journeyService.getJourneyConfig(journeyId, authInternalId).flatMap {
             journeyConfig =>
-              implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
-              Ok(view(
-                journeyId = journeyId,
-                pageConfig = journeyConfig.pageConfig,
-                formAction = overseasControllerRoutes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
-                form = CaptureOverseasTaxIdentifiersForm.form,
-                countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
-              ))
+              storageService.retrieveOverseasTaxIdentifier(journeyId).map {
+                optOverseasTaxIdentifier =>
+                  val overseasTaxIdentifierForm: Form[OverseasTaxIdentifier] = optOverseasTaxIdentifier match {
+                    case Some(overseasTaxIdentifier: OverseasTaxIdentifier) => CaptureOverseasTaxIdentifiersForm.form.fill(overseasTaxIdentifier)
+                    case None => CaptureOverseasTaxIdentifiersForm.form
+                  }
+                implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
+                Ok(view(
+                  journeyId = journeyId,
+                  pageConfig = journeyConfig.pageConfig,
+                  formAction = overseasControllerRoutes.CaptureOverseasTaxIdentifiersController.submit(journeyId),
+                  form = overseasTaxIdentifierForm,
+                  countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
+                ))
+              }
           }
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
@@ -79,23 +88,14 @@ class CaptureOverseasTaxIdentifiersController @Inject()(mcc: MessagesControllerC
                     countries = config.getOrderedCountryListByLanguage(request.messages.lang.code)
                   ))
               },
-            taxIdentifiers =>
-              storageService.storeOverseasTaxIdentifiers(journeyId, taxIdentifiers).map {
-                _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
-              }
+            overseasTaxIdentifier =>
+                storageService.storeOverseasTaxIdentifier(journeyId, overseasTaxIdentifier).map {
+                  _ => Redirect (routes.CheckYourAnswersController.show (journeyId) ) // TODO Navigate to country page
+                }
           )
         case None =>
           throw new InternalServerException("Internal ID could not be retrieved from Auth")
       }
   }
 
-
-  def noOverseasTaxIdentifiers(journeyId: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised() {
-        storageService.removeOverseasTaxIdentifiers(journeyId).map {
-          _ => Redirect(routes.CheckYourAnswersController.show(journeyId))
-        }
-      }
-  }
 }

@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLegend
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
@@ -25,6 +26,7 @@
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 @import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.routes
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.Country
+@import uk.gov.hmrc.minorentityidentificationfrontend.models.enumerations.YesNo
 
 @this(layout: govuk_template,
         h1: h1,
@@ -34,7 +36,8 @@
         govukErrorSummary: GovukErrorSummary,
         p: p,
         link: link,
-        select: GovukSelect
+        govukRadios: GovukRadios,
+        govukSelect: GovukSelect
 )
 
 @(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_], countries: Seq[Country])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
@@ -45,56 +48,39 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
     }
 
-    @h1(messages("tax-identifiers.title"))
-
-    <p class="govuk-hint">@messages("tax-identifiers.line_1")</p>
-
     @formWithCSRF(action = formAction) {
-        @govukInput(
-            Input(
-                id = "tax-identifier",
-                name = "tax-identifier",
-                label =  Label(content = HtmlContent(messages("tax-identifiers.field_1")), classes = "govuk-label govuk-!-font-weight-bold"),
-                classes = "govuk-input--width-20"
-            ).withFormField(form("tax-identifier"))
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(legend = Some(HmrcPageHeadingLegend(
+                                                                         content = Text(messages("tax-identifiers.title")),
+                                                                     )))),
+            hint = Some(Hint(content = Text(messages("tax-identifiers.line_1")))),
+            name = "tax-identifier-radio",
+            items = Seq(
+              RadioItem(
+                content = Text(messages("app.common.yes")),
+                value = Some(YesNo.Yes),
+                conditionalHtml = Some(govukInput(
+                                       Input(
+                                               id = "tax-identifier",
+                                               name = "tax-identifier",
+                                               label =  Label(
+                                                               content = HtmlContent(messages("tax-identifiers.field_1")),
+                                                               classes = "govuk-label govuk-!-font-weight-bold"
+                                                              ),
+                                                classes = "govuk-input--width-20"
+                    ).withFormField(form("tax-identifier"))
+                  )
+                ),
+                checked = form("tax-identifier-radio").value.contains(YesNo.Yes.toString)
+              ),
+              RadioItem(
+                content = Text(messages("app.common.no")),
+                value = Some(YesNo.No),
+                checked = form("tax-identifier-radio").value.contains(YesNo.No.toString)
+              )
+            )
+          )
         )
-
-        @select(components.Select(
-            id = "country",
-            name = "country",
-            label = Label(content = HtmlContent(messages("tax-identifiers.field_2")), classes = "govuk-label govuk-!-font-weight-bold"),
-            errorMessage = form("country").error.map(fe ⇒ ErrorMessage(content = HtmlContent(messages("error.no_tax_identifier_country")))),
-            items = Seq(SelectItem(value = Some(""), text = messages("country.select"))) ++ countries.map {
-                case Country(code, name) ⇒ SelectItem(
-                    value = Some(code),
-                    text = name,
-                    selected = code == form("country").value.getOrElse(""),
-                    attributes = Map("id" → s"country-$code")
-                )
-            },
-            formGroupClasses = "form-field-group"
-        ))
-
-        <script src="@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")" ></script>
-        <script>
-            accessibleAutocomplete.enhanceSelectElement({
-                selectElement: document.getElementById("country"),
-                name: 'countryAutocomplete',
-                defaultValue: '',
-                tNoResults: () => '@messages("country.noResult")',
-                onConfirm: () => {
-                    const matchingOption = Array.from(document.querySelectorAll("#country-select > option")).find(function(c) {
-                            return c.text === document.getElementById("country").value;
-                        });
-                    const country = matchingOption ? matchingOption.value : undefined;
-                    document.getElementById("country-select").value = country;
-                }
-            })
-        </script>
-
-        @p {
-            @link(routes.CaptureOverseasTaxIdentifiersController.noOverseasTaxIdentifiers(journeyId).url, "tax-identifiers.no_identifier_link", Some("no-overseas-tax-identifiers"))
-        }
 
         @govukButton(Button(
             attributes = Map("id" -> "save-and-continue"),
