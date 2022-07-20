@@ -28,25 +28,25 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
   val rowBuilderUnderTest: UaCheckYourAnswersRowBuilder = new UaCheckYourAnswersRowBuilder()
 
   val testCtutrNumberRow: SummaryListRow = SummaryListRow(
-    key = Key(content = Text("Unique Taxpayers Reference")),
+    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
     value = Value(HtmlContent(testCtutr)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = uaControllers.routes.CaptureCtutrController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Unique Taxpayers Reference")
+        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
       )
     )))
   )
 
   val testNoCtutrNumberRow: SummaryListRow = SummaryListRow(
-    key = Key(content = Text("Unique Taxpayers Reference")),
-    value = Value(HtmlContent("The business does not have a UTR")),
+    key = Key(content = Text("Unique Taxpayer Reference (UTR)")),
+    value = Value(HtmlContent("The association does not have a UTR")),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = uaControllers.routes.CaptureCtutrController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Unique Taxpayers Reference")
+        visuallyHiddenText = Some("Unique Taxpayer Reference (UTR)")
       )
     )))
   )
@@ -65,7 +65,7 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
 
   val testNoCharityHMRCReferenceNumberRow: SummaryListRow = SummaryListRow(
     key = Key(content = Text("HMRC reference number")),
-    value = Value(HtmlContent("The charity does not have a HMRC reference number")),
+    value = Value(HtmlContent("The association does not have a HMRC reference number")),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = uaControllers.routes.CaptureCHRNController.show(testJourneyId).url,

@@ -26,25 +26,30 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
 object CheckYourAnswersRowBuilder {
 
-  def utrSummaryRow(optUtr: Option[Utr], changeValuePageLink: Call, messages: Messages): Aliases.SummaryListRow = buildSummaryRow(
+  def utrSummaryRow(optUtr: Option[Utr], noUtrMessageKey: String, changeValuePageLink: Call, messages: Messages): Aliases.SummaryListRow = buildSummaryRow(
     messages("check-your-answers.utr"),
     optUtr match {
       case Some(utr) => utr.value
-      case None      => messages("check-your-answers.no_utr")
+      case None      => messages(noUtrMessageKey)
     },
     changeValuePageLink,
     messages
   )
 
-  def uaUtrSummaryRow(optUtr: Option[Utr], changeValuePageLink: Call, messages: Messages): Aliases.SummaryListRow = buildSummaryRow(
-    messages("check-your-answers.ua_utr"),
-    optUtr match {
-      case Some(utr) => utr.value
-      case None      => messages("check-your-answers.no_utr")
-    },
-    changeValuePageLink,
-    messages
-  )
+  def charityHMRCReferenceNumberRow(optCharityHMRCReferenceNumber: Option[String],
+                                    noCHRNMessageKey: String,
+                                    changeValuePageLink: Call,
+                                    messages: Messages): Aliases.SummaryListRow = {
+    buildSummaryRow(
+      messages("check-your-answers.charity_hmrc_reference_number"),
+      optCharityHMRCReferenceNumber match {
+        case Some(charityHMRCReferenceNumber) => charityHMRCReferenceNumber
+        case None => messages(noCHRNMessageKey)
+      },
+      changeValuePageLink,
+      messages
+    )
+  }
 
   def buildSummaryRow(key: String, value: String, changeValuePageLink: Call, messages: Messages): SummaryListRow = SummaryListRow(
     key = Key(content = Text(key)),

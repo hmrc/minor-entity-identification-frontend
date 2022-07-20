@@ -74,7 +74,7 @@ trait TrustCheckYourAnswersSpecificViewTests {
         val utrRow = summaryListRows.head
 
         utrRow.getSummaryListQuestion mustBe messages.utr
-        utrRow.getSummaryListAnswer mustBe messages.noUtr
+        utrRow.getSummaryListAnswer mustBe messages.noTrustUtr
         utrRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSautrController.show(testJourneyId).url
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }
@@ -83,9 +83,40 @@ trait TrustCheckYourAnswersSpecificViewTests {
         val charityHRMCReferenceNumberRow = summaryListRows.last
 
         charityHRMCReferenceNumberRow.getSummaryListQuestion mustBe messages.charityHRMCReferenceNumber
-        charityHRMCReferenceNumberRow.getSummaryListAnswer mustBe messages.charityHRMCReferenceNumberNotProvided
+        charityHRMCReferenceNumberRow.getSummaryListAnswer mustBe messages.charityHMRCReferenceNumberNotProvided
         charityHRMCReferenceNumberRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureCHRNController.show(journeyId).url
         charityHRMCReferenceNumberRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.charityHRMCReferenceNumber}"
+      }
+    }
+
+  }
+
+  def testTrustWithUtrAndNoPostcodeSummaryListView(response: => WSResponse, journeyId: String): Unit = {
+
+    lazy val summaryListRows: List[Element] = extractSummaryListRows(response)
+
+    "have a summary list which" should {
+
+      "have 2 rows" in {
+        summaryListRows.size mustBe 2
+      }
+
+      "have a utr row" in {
+        val utrRow = summaryListRows.head
+
+        utrRow.getSummaryListQuestion mustBe messages.utr
+        utrRow.getSummaryListAnswer mustBe testSautr
+        utrRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSautrController.show(testJourneyId).url
+        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
+      }
+
+      "have an sa post code row indicating no post code has been provided" in {
+        val postcodeRow = summaryListRows(1)
+
+        postcodeRow.getSummaryListQuestion mustBe messages.postcode
+        postcodeRow.getSummaryListAnswer mustBe messages.noPostCode
+        postcodeRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSaPostcodeController.show(journeyId).url
+        postcodeRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.postcode}"
       }
     }
 

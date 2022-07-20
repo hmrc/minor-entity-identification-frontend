@@ -43,10 +43,10 @@ trait UaCheckYourAnswersSpecificViewTests {
       "have a utr row" in {
         val utrRow = summaryListRows.head
 
-        utrRow.getSummaryListQuestion mustBe messages.uaUtr
+        utrRow.getSummaryListQuestion mustBe messages.utr
         utrRow.getSummaryListAnswer mustBe testCtutr
         utrRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCtutrController.show(testJourneyId).url
-        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaUtr}"
+        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }
 
       "have an registered office postcode row" in {
@@ -73,17 +73,17 @@ trait UaCheckYourAnswersSpecificViewTests {
       "have a Ctutr row saying utr not provided" in {
         val utrRow = summaryListRows.head
 
-        utrRow.getSummaryListQuestion mustBe messages.uaUtr
-        utrRow.getSummaryListAnswer mustBe messages.noUtr
+        utrRow.getSummaryListQuestion mustBe messages.utr
+        utrRow.getSummaryListAnswer mustBe messages.noUaUtr
         utrRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCtutrController.show(testJourneyId).url
-        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaUtr}"
+        utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }
 
       "have an charity HRMC reference number row saying charity HRMC reference number not provided" in {
         val charityHRMCReferenceNumberRow = summaryListRows.last
 
         charityHRMCReferenceNumberRow.getSummaryListQuestion mustBe messages.charityHRMCReferenceNumber
-        charityHRMCReferenceNumberRow.getSummaryListAnswer mustBe messages.charityHRMCReferenceNumberNotProvided
+        charityHRMCReferenceNumberRow.getSummaryListAnswer mustBe messages.uaCharityHRMCReferenceNumberNotProvided
         charityHRMCReferenceNumberRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureCHRNController.show(journeyId).url
         charityHRMCReferenceNumberRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.charityHRMCReferenceNumber}"
       }
