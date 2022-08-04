@@ -60,6 +60,19 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
+  def stubStoreOverseasTaxIdentifiersCountry(journeyId: String, taxIdentifiersCountry: String)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/country", body = JsString(taxIdentifiersCountry)
+    ).thenReturn(
+      status = status
+    )
+
+  def verifyStoreOverseasTaxIdentifierCountry(journeyId: String, overseasTaxIdentifierCountry: String): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/minor-entity-identification/journey/$journeyId/country",
+      optBody = Some(JsString(overseasTaxIdentifierCountry).toString())
+    )
+
   def stubRetrieveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
     when(method = GET,
       uri = s"/minor-entity-identification/journey/$journeyId/overseas"
