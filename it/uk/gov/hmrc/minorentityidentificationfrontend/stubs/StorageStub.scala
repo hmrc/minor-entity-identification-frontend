@@ -68,6 +68,22 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
+  def stubStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(status: Int): Unit =
+    when(method = PUT,
+      uri = s"/minor-entity-identification/journey/$journeyId/overseasTaxIdentifier",
+      body = JsString(overseasTaxIdentifier)
+    ).thenReturn(
+      status = status
+    )
+
+  def stubRetrieveOverseasTaxIdentifier(journeyId: String)(status: Int, overseasTaxIdentifier: String = "") : Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/overseasTaxIdentifier"
+    ).thenReturn(
+      status = status,
+      body = JsString(overseasTaxIdentifier)
+    )
+
   def stubRemoveOverseasTaxIdentifiers(journeyId: String)(status: Int, body: String = ""): Unit =
     when(method = DELETE,
       uri = s"/minor-entity-identification/journey/$journeyId/overseas"
@@ -75,6 +91,15 @@ trait StorageStub extends WiremockMethods {
       status = status,
       body = body
     )
+
+  def stubRemoveOverseasTaxIdentifier(journeyId: String)(status: Int, body: String = ""): Unit =
+    when(method = DELETE,
+      uri = s"/minor-entity-identification/journey/$journeyId/overseasTaxIdentifier"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
 
   def stubStorePostcode(journeyId: String, saPostcode: String)(status: Int): Unit =
     when(method = PUT,
@@ -228,4 +253,12 @@ trait StorageStub extends WiremockMethods {
   def stubRetrieveEntityDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
     when(method = GET, uri =  s"/minor-entity-identification/journey/$journeyId").thenReturn(status = status, body = body)
 
+  def verifyStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String): Unit =
+    WiremockHelper.verifyPut(
+      uri = s"/minor-entity-identification/journey/$journeyId/overseasTaxIdentifier",
+      optBody = Some(JsString(overseasTaxIdentifier).toString())
+    )
+
+  def verifyRemoveOverseasTaxIdentifier(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/overseasTaxIdentifier")
 }

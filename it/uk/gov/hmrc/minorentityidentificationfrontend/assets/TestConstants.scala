@@ -33,6 +33,7 @@ object TestConstants {
   val testJourneyId: String = UUID.randomUUID().toString
   val testInternalId: String = UUID.randomUUID().toString
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
+  val testOverseasTaxIdentifier: String = "134124532"
   val testSautr: String = "1234567890"
   val testCtutr: String = "1000000001"
   val testSaPostcode: String = "AA00 0AA"
@@ -428,16 +429,13 @@ object TestConstants {
 
   private def registrationJson(content: JsObject): JsObject = Json.obj("registration" -> content)
 
-  val expectedBVTrustsJson = testCreateBusinessVerificationTrustJourneyJson(
+  val expectedBVTrustsJson: JsObject = testCreateBusinessVerificationTrustJourneyJson(
     testSautr,
     testJourneyId,
     testTrustsJourneyConfig(businessVerificationCheck = true).copy(regime = testRegime.toLowerCase))
 
-  val expectedBvUAJson = testCreateBusinessVerificationUAJourneyJson(
+  val expectedBvUAJson: JsObject = testCreateBusinessVerificationUAJourneyJson(
     testCtutr,
     testJourneyId,
     testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).copy(regime = testRegime.toLowerCase))
-
-
-
 }
