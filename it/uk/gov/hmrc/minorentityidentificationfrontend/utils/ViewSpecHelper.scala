@@ -87,6 +87,8 @@ object ViewSpecHelper {
     lazy val getTechnicalHelpLinkText: String = element.getElementsByClass("hmrc-report-technical-issue").text
 
     lazy val getBackLinks: Elements = element.getElementsByClass("govuk-back-link")
+
+    lazy val getHints: Elements = element.getElementsByClass("govuk-hint")
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =
@@ -96,5 +98,19 @@ object ViewSpecHelper {
       text,
       element.text()
     )
+
+  def findElementByAttrValue(elements: Elements, index: Int, attr: String, value: String): Option[Element] = {
+
+    if(index < elements.size() - 1){
+      val element: Element = elements.get(index)
+      if(element.attr(attr) == value) {
+        Some(element)
+      } else {
+        findElementByAttrValue(elements, index + 1, attr, value)
+      }
+    } else {
+      None
+    }
+  }
 
 }

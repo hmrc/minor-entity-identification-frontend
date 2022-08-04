@@ -36,15 +36,16 @@ utr.ua.error_not_entered                            = Nodwch Gyfeirnod Unigryw y
 utr.ua.error_invalid_characters                     = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas gynnwys rhifau yn unig
 utr.ua.error_invalid_length                         = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr  ar gyfer y gymdeithas fod yn 10 rhif
 
-## Overseas Tax Identifiers Page
-tax-identifiers.title                               = Beth yw dynodydd treth tramor y busnes?
+## Overseas Tax Identifier Page
+tax-identifiers.title                               = Oes gan y busnes ddynodydd treth tramor?
 tax-identifiers.line_1                              = Efallai y byddwn yn defnyddio’r rhif hwn i’n helpu i ddod o hyd i’ch busnes. Gallai’r dynodydd treth fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio er mwyn gwirio manylion eich busnes.
-tax-identifiers.field_1                             = Nodwch ddynodydd treth
+tax-identifiers.field_1                             = Dynodydd treth tramor
 tax-identifiers.field_2                             = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth
 tax-identifiers.no_identifier_link                  = Dydw i ddim am ddarparu dynodydd treth
-error.no_tax_identifier                             = Nodwch ddynodydd treth
+error.no_tax_identifier_selection                   = Dewiswch ‘Iawn’ os oes gan y busnes ddynodydd treth tramor
+error.no_tax_identifier                             = Nodwch y dynodydd treth tramor
 error.invalid_tax_identifier                        = Nodwch ddynodydd treth nad yw’n cynnwys cymeriadau arbennig
-error.invalid_tax_identifier_length                 = Mae’n rhaid i’r dynodydd treth fod yn 60 o gymeriadau neu lai
+error.invalid_tax_identifier_length                 = Mae’n rhaid i’r dynodydd treth tramor fod yn 60 o gymeriadau neu lai
 error.no_tax_identifier_country                     = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth
 
 ## SA Postcode Page

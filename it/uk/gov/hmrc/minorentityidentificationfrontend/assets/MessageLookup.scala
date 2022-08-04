@@ -83,18 +83,33 @@ object MessageLookup {
 
   object CaptureOverseasTaxIdentifiers {
 
-    val title = "What is the business’s overseas tax identifier?"
+    val title = "Does the business have an overseas tax identifier?"
     val hint = "We may use this number to help us identify your business. The tax identifier could be VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
-    val form_field_1 = "Enter a tax identifier"
+    val form_field_1 = "Overseas tax identifier"
     val form_field_2 = "Enter the name of the country that issued the tax identifier"
     val no_identifierLink = "I do not want to provide an identifier"
 
     object Error {
       val invalid_tax_identifier = "Enter a tax identifier that does not contain special characters"
-      val no_entry_tax_identifier = "Enter a tax identifier"
-      val invalid_length_tax_identifier = "The tax identifier must be 60 characters or fewer"
+      val no_entry_tax_identifier = "Enter the overseas tax identifier"
+      val invalid_length_tax_identifier = "The overseas tax identifier must be 60 characters or fewer"
       val no_entry_country = "Enter the name of the country that issued the tax identifier"
     }
+  }
+
+  object CaptureOverseasTaxIdentifier {
+
+    val title = "Does the business have an overseas tax identifier?"
+    val hint = "We may use this number to help us identify your business. The tax identifier could be VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify your business details."
+    val form_field_1 = "Overseas tax identifier"
+
+    object Error {
+      val no_tax_identifier_selection = "Select yes if the business has an overseas tax identifier"
+      val no_entry_tax_identifier = "Enter the overseas tax identifier"
+      val invalid_tax_identifier = "Enter a tax identifier that does not contain special characters"
+      val invalid_length_tax_identifier = "The overseas tax identifier must be 60 characters or fewer"
+    }
+
   }
 
   object CaptureSaPostcode {
