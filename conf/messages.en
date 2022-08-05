@@ -48,6 +48,10 @@ error.invalid_tax_identifier                                 = Enter a tax ident
 error.invalid_tax_identifier_length                          = The overseas tax identifier must be 60 characters or fewer
 error.no_tax_identifier_country                              = Enter the name of the country that issued the tax identifier
 
+## Overseas Tax Identifiers Country Page
+tax-identifiers-country.title                                = Which country issued the overseas tax identifier?
+error.no_entry_tax_identifier_country                        = Enter the name of the country that issued the overseas tax identifier
+
 ## SA Postcode Page
 sa-postcode.title                                            = What is the postcode used to register the trust for Self Assessment?
 sa-postcode.hint                                             = For example, AB1 2YZ
