@@ -35,6 +35,7 @@ object TestConstants {
   val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
   val testOverseasTaxIdentifier: String = "134124532"
   val testOverseasTaxIdentifiersCountry: String = "AL"
+  val testOverseasTaxIdentifiersCountryFullName: String = "Albania"
   val testSautr: String = "1234567890"
   val testCtutr: String = "1000000001"
   val testSaPostcode: String = "AA00 0AA"
@@ -212,14 +213,16 @@ object TestConstants {
 
   def testOverseasJourneyDataJson(utrBlock: JsObject): JsObject = Json.obj(
     "utr" -> utrBlock,
-    "identifiersMatch" -> UnMatchableKey,
-    "businessVerification" -> Json.obj(
-      "verificationStatus" -> "UNCHALLENGED"
-    ),
-    "registration" -> Json.obj(
-      "registrationStatus" -> "REGISTRATION_NOT_CALLED"
-    ),
-    "overseas" -> testOverseasTaxIdentifiersJson
+    "overseasTaxIdentifier" -> testOverseasTaxIdentifier,
+    "country" -> testOverseasTaxIdentifiersCountry
+  )
+
+  def testOverseasJourneyWithGroupedTaxIdentifiersDataJson(utrBlock: JsObject): JsObject = Json.obj(
+    "utr" -> utrBlock,
+    "overseas" -> Json.obj(
+      "taxIdentifier" -> testOverseasTaxIdentifier,
+      "country" -> testOverseasTaxIdentifiersCountry
+    )
   )
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testPostcode), Some(testSaPostcode), isAbroad = false)

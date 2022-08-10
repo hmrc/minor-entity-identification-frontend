@@ -19,7 +19,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testOverseasTaxIdentifiers, testSautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testJourneyId, testSautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testOverseasTaxIdentifier, testOverseasTaxIdentifiersCountryFullName}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, CheckYourAnswers => messages}
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
@@ -32,12 +33,15 @@ trait OverseasCheckYourAnswersSpecificViewTests {
   this: ComponentSpecHelper =>
 
   def testOverseasSummaryViewWithUtrAndOverseasTaxIdentifier(result: => WSResponse, journeyId: String): Unit = {
+
+    val changeOverseasTaxIdentifierPageLink: String = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(journeyId).url
+
     lazy val summaryListRows: List[Element] = extractSummaryListRows(result)
 
     "have a summary list which" should {
 
-      "have 2 rows" in {
-        summaryListRows.size mustBe 2
+      "have 3 rows" in {
+        summaryListRows.size mustBe 3
       }
 
       "have a utr row" in {
@@ -49,13 +53,22 @@ trait OverseasCheckYourAnswersSpecificViewTests {
         utrRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.utr}"
       }
 
-      "have an overseas tax identifiers row" in {
-        val taxIdentifierRow = summaryListRows.last
+      "have an overseas tax identifier row" in {
+        val taxIdentifierRow = summaryListRows(1)
 
         taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
-        taxIdentifierRow.getSummaryListAnswer mustBe s"${testOverseasTaxIdentifiers.taxIdentifier} Albania"
-        taxIdentifierRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
+        taxIdentifierRow.getSummaryListAnswer mustBe s"Yes, $testOverseasTaxIdentifier"
+        taxIdentifierRow.getSummaryListChangeLink mustBe changeOverseasTaxIdentifierPageLink
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
+      }
+
+      "have an overseas tax identifier country row" in {
+        val taxIdentifierCountryRow = summaryListRows.last
+
+        taxIdentifierCountryRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifierCountry
+        taxIdentifierCountryRow.getSummaryListAnswer mustBe testOverseasTaxIdentifiersCountryFullName
+        taxIdentifierCountryRow.getSummaryListChangeLink mustBe changeOverseasTaxIdentifierPageLink
+        taxIdentifierCountryRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifierCountry}"
       }
     }
 
@@ -83,8 +96,8 @@ trait OverseasCheckYourAnswersSpecificViewTests {
         val taxIdentifierRow = summaryListRows(1)
 
         taxIdentifierRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifier
-        taxIdentifierRow.getSummaryListAnswer mustBe messages.overseasTaxIdentifierNotProvided
-        taxIdentifierRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(journeyId).url
+        taxIdentifierRow.getSummaryListAnswer mustBe Base.no
+        taxIdentifierRow.getSummaryListChangeLink mustBe overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(journeyId).url
         taxIdentifierRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifier}"
       }
     }

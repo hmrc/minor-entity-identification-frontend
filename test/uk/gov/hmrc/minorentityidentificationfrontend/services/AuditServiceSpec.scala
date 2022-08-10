@@ -47,15 +47,25 @@ class AuditServiceSpec
 
   "auditJourney" should {
     "send an event" when {
-      "the entity is an OverseasCompany" in {
+      "the entity is an OverseasCompany with an SA UTR" in {
         mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
-        mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()) returns Future.successful(testOverseasSautrDataJson)
+        mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()) returns Future.successful(testOverseasSautrAuditDataJson)
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
         result.mustBe(())
 
         mockAuditConnector.sendExplicitAudit("OverseasCompanyRegistration", testOverseasSAUtrAuditEventJson) was called
+      }
+      "the entity is an OverseasCompany with an overseas tax identifier" in {
+        mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
+        mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()) returns Future.successful(testOverseasTaxIdentifierDataJson)
+
+        val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
+
+        result.mustBe(())
+
+        mockAuditConnector.sendExplicitAudit("OverseasCompanyRegistration", testOverseasTaxIdentifierAuditEventJson) was called
       }
 
       "the entity is a Unincorporated Association" in {

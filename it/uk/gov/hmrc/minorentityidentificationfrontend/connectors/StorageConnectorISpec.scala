@@ -227,4 +227,25 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
     }
   }
 
+  "retrieveOverseasCompanyDetails" should {
+    "return a defined instance of OverseasCompanyDetails when data values exist" in {
+      stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyDataJson(testCtutrJson))
+
+      val result = await(storageConnector.retrieveOverseasDetails(testJourneyId))
+
+      result.get mustBe OverseasCompanyDetails(
+        optUtr = Some(Ctutr(testCtutr)),
+        optOverseasTaxIdentifier = Some(testOverseasTaxIdentifier),
+        optOverseasTaxIdentifierCountry = Some(testOverseasTaxIdentifiersCountry)
+      )
+    }
+    "return None when no overseas company details have been provided" in {
+      stubRetrieveEntityDetails(testJourneyId)(NOT_FOUND)
+
+      val result = await(storageConnector.retrieveOverseasDetails(testJourneyId))
+
+      result mustBe None
+    }
+  }
+
 }

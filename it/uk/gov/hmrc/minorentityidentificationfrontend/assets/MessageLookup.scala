@@ -190,6 +190,7 @@ object MessageLookup {
     val uaCharityHRMCReferenceNumberNotProvided = "The association does not have a HMRC reference number"
 
     val overseasTaxIdentifier = "Overseas tax identifier"
+    val overseasTaxIdentifierCountry = "Country of overseas tax identifier"
     val overseasTaxIdentifierNotProvided = "I do not want to provide an identifier"
   }
 
