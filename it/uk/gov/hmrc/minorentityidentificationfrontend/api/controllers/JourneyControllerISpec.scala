@@ -372,7 +372,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
     }
     "the business entity is an Overseas Company" should {
       "return the correct json" when {
-        "the user has a ctutr" in {
+        "the user has a ctutr and the overseas tax identifiers are defined separately" in {
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
@@ -393,6 +393,34 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
           stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyDataJson(testCtutrJson))
+          stubAudit()
+
+          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
+
+          result.status mustBe OK
+          result.json mustBe testDetailsJson
+        }
+        "the user has a ctutr and the overseas tax identifiers are grouped together" in { // TODO - Remove after implementation of two page route
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          val testDetailsJson = Json.obj(
+            "ctutr" -> testCtutr,
+            "identifiersMatch" -> false,
+            "businessVerification" -> Json.obj(
+              "verificationStatus" -> "UNCHALLENGED"
+            ),
+            "registration" -> Json.obj(
+              "registrationStatus" -> "REGISTRATION_NOT_CALLED"
+            ),
+            "overseas" -> testOverseasTaxIdentifiersJson
+          )
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyWithGroupedTaxIdentifiersDataJson(testCtutrJson))
           stubAudit()
 
           lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")

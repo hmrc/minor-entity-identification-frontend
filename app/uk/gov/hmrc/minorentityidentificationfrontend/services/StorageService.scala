@@ -50,8 +50,11 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, OverseasKey)
 
-  def removeOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type ] =
+  def removeOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, OverseasTaxIdentifierKey)
+
+  def removeOverseasTaxIdentifiersCountry(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
+    connector.removeDataField(journeyId, OverseasCountryKey)
 
   def storePostcode(journeyId: String, postcode: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField(journeyId, postcodeKey, postcode)
@@ -80,9 +83,9 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeAllData(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeAllData(journeyId)
 
-  def retrieveOverseasCompanyDetails(journeyId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
+  def retrieveOverseasCompanyDetails(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] =
     connector.retrieveOverseasDetails(journeyId).map {
-      case Some(overseasDetails) => Json.toJsObject(overseasDetails)
+      case Some(overseasDetails) => OverseasCompanyDetails.writesForJourneyEnd(overseasDetails, journeyConfig)
       case None => throw new InternalServerException("No Overseas Company data stored for journeyId: " + journeyId)
     }
 
@@ -115,7 +118,7 @@ class StorageService @Inject()(connector: StorageConnector) {
 
   def retrieveAllData(journeyId: String, journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsObject] = {
     journeyConfig.businessEntity match {
-      case OverseasCompany => retrieveOverseasCompanyDetails(journeyId)
+      case OverseasCompany => retrieveOverseasCompanyDetails(journeyId, journeyConfig)
       case Trusts => retrieveTrustsDetails(journeyId, journeyConfig)
       case UnincorporatedAssociation => retrieveUADetails(journeyId, journeyConfig)
     }
@@ -130,6 +133,9 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, OverseasTaxIdentifierKey)
 
+  def retrieveOverseasTaxIdentifiersCountry(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
+    connector.retrieveDataField[String](journeyId, OverseasCountryKey)
+
   def storeBusinessVerificationStatus(journeyId: String,
                                       businessVerification: BusinessVerificationStatus
                                      )(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
@@ -138,6 +144,31 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveBusinessVerificationStatus(journeyId: String
                                         )(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
     connector.retrieveDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey)
+
+  // Temporary methods for use during transition between single page and double page OTI input
+  def retrieveOTIIdentifier(journeyId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[String]] = {
+
+    retrieveOverseasTaxIdentifier(journeyId).flatMap {
+      case Some(overseasTaxIdentifier) => Future.successful(Some(overseasTaxIdentifier))
+      case None => retrieveOverseasTaxIdentifiers(journeyId).map {
+        case Some(overseas) => Some(overseas.taxIdentifier)
+        case None => None
+      }
+    }
+
+  }
+
+  def retrieveOTICountry(journeyId: String)(implicit ec: ExecutionContext, hc:HeaderCarrier): Future[Option[String]] = {
+
+    retrieveOverseasTaxIdentifiersCountry(journeyId).flatMap {
+      case Some(country) => Future.successful(Some(country))
+      case None => retrieveOverseasTaxIdentifiers(journeyId).map {
+        case Some(overseas) => Some(overseas.country)
+        case None => None
+      }
+    }
+
+  }
 }
 
 object StorageService {

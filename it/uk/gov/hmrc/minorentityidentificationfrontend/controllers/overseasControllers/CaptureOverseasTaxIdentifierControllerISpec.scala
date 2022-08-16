@@ -30,7 +30,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
   with StorageStub
   with CaptureOverseasTaxIdentifierTests {
 
-  "GET /overseas-tax-identifier" when {
+  "GET /overseas-identifier" when {
 
     "displayed" should {
 
@@ -41,7 +41,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
           testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        get(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier")
+        get(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier")
       }
 
       "return OK" in {
@@ -59,12 +59,12 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
       "redirect the user to the sign on page" in {
         stubAuthFailure()
-        lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier")
+        lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier")
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Foverseas-tax-identifier" +
+            s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Foverseas-identifier" +
             "&origin=minor-entity-identification-frontend"
           )
         )
@@ -73,11 +73,11 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
   }
 
-  "POST /overseas-tax-identifier" when {
+  "POST /overseas-identifier" when {
 
     "the user selects 'Yes' and the tax identifier is correctly formatted" should {
 
-      "redirect to Check Your Answers" in { // TODO - After implementation of country page controller should redirect to country page
+      "redirect to overseas tax identifier country page" in {
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
@@ -86,13 +86,13 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)(OK)
 
-        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
+        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
         "tax-identifier" -> testOverseasTaxIdentifier)
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(overseasControllers.routes.CheckYourAnswersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifiersCountryController.show(testJourneyId).url)
         )
 
         verifyStoreOverseasTaxIdentifier(testJourneyId, testOverseasTaxIdentifier)
@@ -111,8 +111,9 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRemoveOverseasTaxIdentifier(testJourneyId)(NO_CONTENT)
+        stubRemoveOverseasTaxIdentifiersCountry(testJourneyId)(NO_CONTENT)
 
-        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
+        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "No",
           "tax-identifier" -> "")
 
@@ -122,6 +123,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         )
 
         verifyRemoveOverseasTaxIdentifier(testJourneyId)
+        verifyRemoveOverseasTaxIdentifiers(testJourneyId)
       }
 
     }
@@ -137,7 +139,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-        post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier")("tax-identifier-radio" -> "", "tax-identifier" -> "")
+        post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier")("tax-identifier-radio" -> "", "tax-identifier" -> "")
       }
 
       "return a bad request" in {
@@ -157,7 +159,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
+        post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> "")
       }
@@ -179,7 +181,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
+        post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> "134124532$$$")
       }
@@ -201,7 +203,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         ))
 
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
+        post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> "0123456789012345678901234567890123456789012345678901234567890")
       }
@@ -219,14 +221,14 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
 
         stubAuthFailure()
 
-        lazy val result: WSResponse = post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
+        lazy val result: WSResponse = post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
         )("tax-identifier-radio" -> "Yes",
           "tax-identifier" -> testOverseasTaxIdentifier)
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Foverseas-tax-identifier" +
+            s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Foverseas-identifier" +
             "&origin=minor-entity-identification-frontend"
           )
         )

@@ -42,7 +42,8 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
         stubAudit()
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifiersCountry(testJourneyId)(OK, testOverseasTaxIdentifiersCountry)
 
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
       }
@@ -67,6 +68,8 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(NOT_FOUND)
+        stubRetrieveOverseasTaxIdentifiersCountry(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
         stubAudit()
 
@@ -101,6 +104,19 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
       }
     }
 
+    "the internal authorization identifier is undefined" should {
+      "raise an internal server exception" in {
+        lazy val result: WSResponse = {
+          stubAuth(OK, successfulAuthResponse(None))
+          stubAudit()
+
+          get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
+        }
+
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+
   }
 
   "POST /check-your-answers-business" should {
@@ -123,6 +139,19 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
       }
       verifyAudit()
+    }
+
+    "raise an internal server exception" when {
+      "the internal authorization identifier is undefined" in {
+        lazy val result: WSResponse = {
+          stubAuth(OK, successfulAuthResponse(None))
+          stubAudit()
+
+          post(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")()
+        }
+
+        result.status mustBe INTERNAL_SERVER_ERROR
+      }
     }
   }
 

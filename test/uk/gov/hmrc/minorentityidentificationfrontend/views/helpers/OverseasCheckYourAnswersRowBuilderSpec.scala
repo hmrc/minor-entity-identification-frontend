@@ -21,10 +21,12 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Actions, Key, SummaryListRow, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
-import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testOverseas, testSautr}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Overseas, Sautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testJourneyId, testSautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.{testOverseasTaxIdentifier, testOverseasTaxIdentifierCountry}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Sautr
 
 class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilderSpec {
 
@@ -32,24 +34,36 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
 
   val rowBuilderUnderTest = new OverseasCheckYourAnswersRowBuilder()
 
-  val testOverseasTaxIdentifiersRow = SummaryListRow(
+  val testOverseasTaxIdentifierRow = SummaryListRow(
     key = Key(content = Text("Overseas tax identifier")),
-    value = Value(HtmlContent(s"${testOverseas.taxIdentifier}<br>${mockAppConfig.getCountryName(testOverseas.country)}")),
+    value = Value(HtmlContent(s"Yes, $testOverseasTaxIdentifier")),
     actions = Some(Actions(items = Seq(
       ActionItem(
-        href = overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url,
+        href = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
         content = Text("Change"),
         visuallyHiddenText = Some("Overseas tax identifier")
       )
     )))
   )
 
-  val testNoOverseasTaxIdentifiersRow = SummaryListRow(
-    key = Key(content = Text("Overseas tax identifier")),
-    value = Value(HtmlContent("I do not want to provide an identifier")),
+  val testOverseasTaxIdentifierCountryRow = SummaryListRow(
+    key = Key(content = Text("Country of overseas tax identifier")),
+    value = Value(HtmlContent(mockAppConfig.getCountryName(testOverseasTaxIdentifierCountry))),
     actions = Some(Actions(items = Seq(
       ActionItem(
-        href = overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url,
+        href = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
+        content = Text("Change"),
+        visuallyHiddenText = Some("Country of overseas tax identifier")
+      )
+    )))
+  )
+
+  val testNoOverseasTaxIdentifiersRow = SummaryListRow(
+    key = Key(content = Text("Overseas tax identifier")),
+    value = Value(HtmlContent("No")),
+    actions = Some(Actions(items = Seq(
+      ActionItem(
+        href = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
         content = Text("Change"),
         visuallyHiddenText = Some("Overseas tax identifier")
       )
@@ -62,13 +76,15 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
 
         val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
           journeyId = testJourneyId,
-          optOverseasTaxId = Some(testOverseas),
+          optOverseasTaxIdentifier = Some(testOverseasTaxIdentifier),
+          optOverseasTaxIdentifiersCountry = Some(testOverseasTaxIdentifierCountry),
           optUtr = Some(Sautr(testSautr))
         )(messages, mockAppConfig)
 
         actualSummaryList mustBe Seq(
           testUtrRow(changeValuePageLink = overseasControllers.routes.CaptureUtrController.show(testJourneyId)),
-          testOverseasTaxIdentifiersRow
+          testOverseasTaxIdentifierRow,
+          testOverseasTaxIdentifierCountryRow
         )
 
       }
@@ -76,7 +92,8 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
 
         val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
           journeyId = testJourneyId,
-          optOverseasTaxId = None,
+          optOverseasTaxIdentifier = None,
+          optOverseasTaxIdentifiersCountry = None,
           optUtr = None
         )(messages, mockAppConfig)
 
@@ -88,6 +105,19 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
       }
     }
 
+    "raise an internal server exception" when {
+      "the overseas tax identifier is defined, but the associated country is not" in {
+        intercept[InternalServerException](
+          rowBuilderUnderTest.buildSummaryListRows(
+            journeyId = testJourneyId,
+            optOverseasTaxIdentifier = Some(testOverseasTaxIdentifier),
+            optOverseasTaxIdentifiersCountry = None,
+            optUtr = Some(Sautr(testSautr))
+          )(messages, mockAppConfig)
+        )
+      }
+    }
+
     "build a summary list sequence containing cy translation" when {
       "there is a cookie specifying cy language" in {
         val incomingRequest = FakeRequest().withCookies(Cookie("PLAY_LANG","cy"))
@@ -95,21 +125,36 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
 
         val actualSummaryList: Seq[SummaryListRow] = rowBuilderUnderTest.buildSummaryListRows(
           journeyId = testJourneyId,
-          optOverseasTaxId = Some(Overseas(taxIdentifier = "134124532", country = "AF")),
+          optOverseasTaxIdentifier = Some(testOverseasTaxIdentifier),
+          optOverseasTaxIdentifiersCountry = Some("AF"),
           optUtr = Some(Sautr(testSautr))
         )(messagesInWelsh, mockAppConfig)
 
-        actualSummaryList.size must  be(2)
+        actualSummaryList.size must  be(3)
 
         actualSummaryList(1) must be(
           SummaryListRow(
             key = Key(content = Text("Dynodydd treth tramor")),
-            value = Value(HtmlContent(s"${testOverseas.taxIdentifier}<br>Affganistan")),
+            value = Value(HtmlContent(s"Iawn, $testOverseasTaxIdentifier")),
             actions = Some(Actions(items = Seq(
               ActionItem(
-                href = overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url,
+                href = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
                 content = Text("Newid"),
                 visuallyHiddenText = Some("Dynodydd treth tramor")
+              )
+            )))
+          )
+        )
+
+        actualSummaryList(2) must be(
+          SummaryListRow(
+            key = Key(content = Text("Y wlad a gyhoeddodd y dynodydd treth tramor")),
+            value = Value(HtmlContent("Affganistan")),
+            actions = Some(Actions(items = Seq(
+              ActionItem(
+                href = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
+                content = Text("Newid"),
+                visuallyHiddenText = Some("Y wlad a gyhoeddodd y dynodydd treth tramor")
               )
             )))
           )

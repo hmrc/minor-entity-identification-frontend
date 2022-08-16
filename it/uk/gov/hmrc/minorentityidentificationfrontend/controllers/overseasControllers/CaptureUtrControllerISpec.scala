@@ -64,7 +64,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
 
   "POST /non-uk-company-utr" when {
     "the utr is correctly formatted" should {
-      "redirect to check your answers" in {
+      "redirect to capture overseas tax identifier" in {
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
@@ -77,13 +77,13 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url)
         )
       }
     }
 
     "the utr is a ctutr" should {
-      "redirect to check your answers" in {
+      "redirect to capture overseas tax identifier" in {
         val testCtutr = "1234529999"
 
         await(insertJourneyConfig(
@@ -98,13 +98,13 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url)
         )
       }
     }
 
     "the utr is an sautr" should {
-      "redirect to check your answers" in {
+      "redirect to capture overseas tax identifier" in {
         val testSautr = "1234530000"
 
         await(insertJourneyConfig(
@@ -119,7 +119,7 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
 
         result must have(
           httpStatus(SEE_OTHER),
-          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(testJourneyId).url)
+          redirectUri(overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url)
         )
       }
     }

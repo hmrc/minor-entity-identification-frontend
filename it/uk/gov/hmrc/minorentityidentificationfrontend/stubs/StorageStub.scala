@@ -67,6 +67,22 @@ trait StorageStub extends WiremockMethods {
       status = status
     )
 
+  def stubRetrieveOverseasTaxIdentifiersCountry(journeyId: String)(status: Int, country: String = "") : Unit =
+    when(method = GET,
+      uri = s"/minor-entity-identification/journey/$journeyId/country"
+    ).thenReturn(
+      status = status,
+      body = JsString(country)
+    )
+
+  def stubRemoveOverseasTaxIdentifiersCountry(journeyId: String)(status: Int, body: String = ""): Unit =
+    when(method = DELETE,
+      uri = s"/minor-entity-identification/journey/$journeyId/country"
+    ).thenReturn(
+      status = status,
+      body = body
+    )
+
   def verifyStoreOverseasTaxIdentifierCountry(journeyId: String, overseasTaxIdentifierCountry: String): Unit =
     WiremockHelper.verifyPut(
       uri = s"/minor-entity-identification/journey/$journeyId/country",
@@ -274,4 +290,7 @@ trait StorageStub extends WiremockMethods {
 
   def verifyRemoveOverseasTaxIdentifier(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/overseasTaxIdentifier")
+
+  def verifyRemoveOverseasTaxIdentifiers(journeyId: String): Unit =
+    WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/country")
 }

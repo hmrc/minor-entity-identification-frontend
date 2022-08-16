@@ -34,6 +34,8 @@ object TestConstants {
 
   val testSautr: String = "1234599999"
   val testCtutr: String = "1234500000"
+  val testOverseasTaxIdentifier: String = "134124532"
+  val testOverseasTaxIdentifierCountry: String = "AL"
   val testOverseas: Overseas = Overseas("134124532", "AL")
   val testSaPostcode = "AA1 1AA"
   val testOfficePostcode = "AA2 2AA"
@@ -67,6 +69,15 @@ object TestConstants {
     "RegisterApiStatus" -> "not called",
     "isMatch" -> "unmatchable",
     "userSAUTR" -> testSautr)
+
+  val testOverseasTaxIdentifierAuditEventJson: JsObject = Json.obj(
+    "callingService" -> testDefaultServiceName,
+    "businessType" -> "Overseas Company",
+    "VerificationStatus" -> "Not Enough Information to call BV",
+    "RegisterApiStatus" -> "not called",
+    "isMatch" -> "unmatchable",
+    "overseasTaxIdentifier" -> testOverseasTaxIdentifier,
+    "overseasTaxIdentifierCountry" -> testOverseasTaxIdentifierCountry)
 
   val testUnincorporatedAssociationAuditEventJson: JsObject = Json.obj(
     "callingService" -> testDefaultServiceName,
@@ -122,8 +133,15 @@ object TestConstants {
   )
 
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
-    "overseasTaxIdentifier" -> testOverseas.taxIdentifier,
-    "overseasTaxIdentifierCountry" -> testOverseas.country
+    "overseasTaxIdentifier" -> testOverseasTaxIdentifier,
+    "overseasTaxIdentifierCountry" -> testOverseasTaxIdentifierCountry
+  )
+
+  val testOverseasJson: JsObject = Json.obj(
+    "overseas" -> Json.obj(
+      "taxIdentifier" -> testOverseasTaxIdentifier,
+      "country" -> testOverseasTaxIdentifierCountry
+    )
   )
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testSaPostcode), Some(testSaPostcode), isAbroad = false)
@@ -131,11 +149,38 @@ object TestConstants {
   val testBusinessVerificationRedirectUrl = "/business-verification-start"
   val testCannotConfirmErrorPageUrl = "/bla/bla/someErrorPageUrl"
 
-  val testOverseasSautrDataJson: JsObject = Json.obj(
+  val testOverseasSautrAuditDataJson: JsObject = Json.obj(
     "VerificationStatus" -> "Not Enough Information to call BV",
     "RegisterApiStatus" -> "not called",
     "isMatch" -> "unmatchable",
     "userSAUTR" -> testSautr
+  )
+
+  def testOverseasSautrDataJson(businessVerificationStatus: Option[String] = None): JsObject = {
+    val businessVerificationBlock: JsObject = businessVerificationStatus match {
+      case Some(status) => Json.obj("businessVerification" -> Json.obj(
+        "verificationStatus" -> status
+      ))
+      case None => Json.obj()
+    }
+
+    val sautrBlock: JsObject = Json.obj(
+      "registration" -> Json.obj(
+        "registrationStatus" -> "REGISTRATION_NOT_CALLED"
+      ),
+      "identifiersMatch" -> false,
+      "sautr" -> testSautr
+    )
+
+    sautrBlock ++ businessVerificationBlock
+  }
+
+  val testOverseasTaxIdentifierDataJson: JsObject = Json.obj(
+    "VerificationStatus" -> "Not Enough Information to call BV",
+    "RegisterApiStatus" -> "not called",
+    "isMatch" -> "unmatchable",
+    "overseasTaxIdentifier" -> testOverseasTaxIdentifier,
+    "overseasTaxIdentifierCountry" -> testOverseasTaxIdentifierCountry
   )
 
   val testOverseasCtutrDataJson: JsObject = Json.obj(

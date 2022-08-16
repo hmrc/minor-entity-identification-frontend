@@ -46,13 +46,21 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
+
+          val journeyConfigFuture = journeyService.getJourneyConfig(journeyId, authInternalId)
+          val utrFuture = storageService.retrieveUtr(journeyId)
+          val overseasTaxIdentifierFuture = storageService.retrieveOTIIdentifier(journeyId)
+          val overseasTaxIdentifierCountryFuture = storageService.retrieveOTICountry(journeyId)
+
           for {
-            journeyConfig <- journeyService.getJourneyConfig(journeyId, authInternalId)
-            utr <- storageService.retrieveUtr(journeyId)
-            optOverseasTaxIdentifiers <- storageService.retrieveOverseasTaxIdentifiers(journeyId)
+            journeyConfig <- journeyConfigFuture
+            utr <- utrFuture
+            overseasTaxIdentifier <- overseasTaxIdentifierFuture
+            overseasTaxIdentifierCountry <- overseasTaxIdentifierCountryFuture
             summaryRows = rowBuilder.buildSummaryListRows(
               journeyId = journeyId,
-              optOverseasTaxId = optOverseasTaxIdentifiers,
+              optOverseasTaxIdentifier = overseasTaxIdentifier,
+              optOverseasTaxIdentifiersCountry = overseasTaxIdentifierCountry,
               optUtr = utr)
           } yield {
             implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)

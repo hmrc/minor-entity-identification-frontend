@@ -81,7 +81,7 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
               },
             utr =>
               storageService.storeUtr(journeyId, utr).map {
-                _ => Redirect(overseasControllerRoutes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+                _ => Redirect(overseasControllerRoutes.CaptureOverseasTaxIdentifierController.show(journeyId))
               }
           )
         case None =>
@@ -93,7 +93,7 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised() {
         storageService.removeUtr(journeyId).map {
-          _ => Redirect(routes.CaptureOverseasTaxIdentifiersController.show(journeyId))
+          _ => Redirect(routes.CaptureOverseasTaxIdentifierController.show(journeyId))
         }
       }
   }

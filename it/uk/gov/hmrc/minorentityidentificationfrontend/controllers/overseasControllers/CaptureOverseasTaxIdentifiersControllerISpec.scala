@@ -31,7 +31,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
   with StorageStub
   with CaptureOverseasTaxIdentifiersTests {
 
-  "GET /overseas-identifier" should {
+  "GET /overseas-tax-identifier" should {
     lazy val result = {
       await(insertJourneyConfig(
         journeyId = testJourneyId,
@@ -39,7 +39,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      get(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier")
+      get(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier")
     }
 
     "return OK" in {
@@ -53,12 +53,12 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
     "redirect to sign in page" when {
       "the user is UNAUTHORISED" in {
         stubAuthFailure()
-        lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier")
+        lazy val result: WSResponse = get(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier")
 
         result must have(
           httpStatus(SEE_OTHER),
           redirectUri("/bas-gateway/sign-in" +
-            s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Foverseas-identifier" +
+            s"?continue_url=%2Fidentify-your-overseas-business%2F$testJourneyId%2Foverseas-tax-identifier" +
             "&origin=minor-entity-identification-frontend"
           )
         )
@@ -66,7 +66,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
     }
   }
 
-  "POST /overseas-identifier" when {
+  "POST /overseas-tax-identifier" when {
     "the tax identifiers are correctly formatted" should {
       "redirect to Check Your Answers" in {
         await(insertJourneyConfig(
@@ -77,7 +77,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubStoreOverseasTaxIdentifiers(testJourneyId, testOverseasTaxIdentifiers)(OK)
 
-        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
+        lazy val result = post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
         )("tax-identifier" -> "134124532",
           "country" -> "AL")
 
@@ -95,7 +95,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
           testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
+        post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
         )("tax-identifier" -> "",
           "country" -> "")
       }
@@ -115,7 +115,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
           testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
+        post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
         )("tax-identifier" -> "134124532$$$",
           "country" -> "AL")
       }
@@ -135,7 +135,7 @@ class CaptureOverseasTaxIdentifiersControllerISpec extends ComponentSpecHelper
           testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-        post(s"/identify-your-overseas-business/$testJourneyId/overseas-identifier"
+        post(s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier"
         )("tax-identifier" -> "13412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453134124531341245313412453",
           "country" -> "AL")
       }

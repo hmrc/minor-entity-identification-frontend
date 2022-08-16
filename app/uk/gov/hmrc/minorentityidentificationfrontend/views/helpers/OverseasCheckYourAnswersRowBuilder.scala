@@ -19,9 +19,10 @@ package uk.gov.hmrc.minorentityidentificationfrontend.views.helpers
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Overseas, Utr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
 import javax.inject.Singleton
 
@@ -29,7 +30,8 @@ import javax.inject.Singleton
 class OverseasCheckYourAnswersRowBuilder() {
 
   def buildSummaryListRows(journeyId: String,
-                           optOverseasTaxId: Option[Overseas],
+                           optOverseasTaxIdentifier: Option[String],
+                           optOverseasTaxIdentifiersCountry: Option[String],
                            optUtr: Option[Utr])(implicit messages: Messages, config: AppConfig): Seq[SummaryListRow] = {
 
     val utrRow: Aliases.SummaryListRow = CheckYourAnswersRowBuilder.utrSummaryRow(
@@ -39,19 +41,47 @@ class OverseasCheckYourAnswersRowBuilder() {
       messages = messages
     )
 
-    val overseasTaxIdentifiersRow: Aliases.SummaryListRow = CheckYourAnswersRowBuilder.buildSummaryRow(
-      messages("check-your-answers.tax_identifiers"),
-      optOverseasTaxId match {
-        case Some(overseasTaxId) => Seq(overseasTaxId.taxIdentifier, config.getCountryName(overseasTaxId.country, messages.lang.code)).mkString("<br>")
-        case None                => messages("check-your-answers.no_tax-identifiers")
-      },
-      changeValuePageLink = overseasControllers.routes.CaptureOverseasTaxIdentifiersController.show(journeyId),
-      messages = messages
+    val overseasTaxIdentifierRows: Seq[Aliases.SummaryListRow] = (optOverseasTaxIdentifier, optOverseasTaxIdentifiersCountry) match {
+      case (Some(identifier), Some(country)) => Seq(
+            createOverseasTaxIdentifierRow(journeyId, identifier), createOverseasTaxIdentifierCountryRow(journeyId, country)
+          )
+      case (None, None) => Seq(createOverseasTaxIdentifierNotProvidedRow(journeyId))
+      case _ => throw new InternalServerException("Error: Unexpected combination of tax identifier and country for an overseas business journey")
+    }
+
+    Seq(utrRow) ++ overseasTaxIdentifierRows
+  }
+
+  private def createOverseasTaxIdentifierRow(journeyId: String, overseasTaxIdentifier: String)
+                                            (implicit messages: Messages): Aliases.SummaryListRow =
+      buildSummaryRow(
+        key = messages("check-your-answers.tax_identifier"),
+        value = messages("check-your-answers.tax_identifier_yes", overseasTaxIdentifier),
+        journeyId = journeyId
+      )
+
+  private def createOverseasTaxIdentifierCountryRow(journeyId: String, country: String)
+                                                   (implicit messages: Messages, appConfig: AppConfig): Aliases.SummaryListRow =
+    buildSummaryRow(
+      key = messages("check-your-answers.tax_identifier_country"),
+      value = appConfig.getCountryName(country, messages.lang.code),
+      journeyId = journeyId
     )
 
-    Seq(utrRow, overseasTaxIdentifiersRow)
+  private def createOverseasTaxIdentifierNotProvidedRow(journeyId: String)(implicit messages: Messages): Aliases.SummaryListRow =
+    buildSummaryRow(
+      key = messages("check-your-answers.tax_identifier"),
+      value = messages("app.common.no"),
+      journeyId = journeyId
+    )
 
-  }
+  private def buildSummaryRow(key: String, value: String, journeyId: String)(implicit messages: Messages): Aliases.SummaryListRow =
+    CheckYourAnswersRowBuilder.buildSummaryRow(
+      key = key,
+      value = value,
+      changeValuePageLink = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(journeyId),
+      messages = messages
+    )
 
 }
 
