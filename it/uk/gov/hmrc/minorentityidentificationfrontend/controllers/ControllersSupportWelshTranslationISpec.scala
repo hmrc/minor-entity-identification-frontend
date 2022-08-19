@@ -19,7 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 import org.jsoup.nodes.Document
 import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.prop.{TableFor1, TableFor2, Tables}
-import play.api.test.Helpers.{OK, await, defaultAwaitTimeout}
+import play.api.test.Helpers.{NOT_FOUND, OK, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config._
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
@@ -41,21 +41,20 @@ class ControllersSupportWelshTranslationISpec
 
       object TestPrecondition {
         type TestPrecondition = () => Any
-        val checkYourAnswers: TestPrecondition = () => stubRetrieveEntityDetails(testJourneyId)(OK, body = testTrustJourneyDataJson)
         val confirmSautr: TestPrecondition = () => stubRetrieveUtr(testJourneyId)(status = OK, body = testSautrJson)
-        val confirmChrn: TestPrecondition = () => stubRetrieveCHRN(testJourneyId)(status = OK, optCharityHMRCReferenceNumber = testCHRN)
+        val confirmNoChrn: TestPrecondition = () => stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
         val confirmSaPostcode: TestPrecondition = () => stubRetrievePostcode(testJourneyId)(status = OK, postcode = testSaPostcode)
-        val cannotConfirmBusiness: TestPrecondition = () => ()
       }
 
-      val allGETUrlsToBeTested: TableFor2[String, TestPrecondition.TestPrecondition] =
+      val allGETUrlsToBeTested: TableFor2[String, Seq[TestPrecondition.TestPrecondition]] =
         Tables.Table(
           ("urlToBeTested", "doThisToCreateTestPrecondition"),
-          (s"$trustsBaseUrl/$testJourneyId/check-your-answers-business", TestPrecondition.checkYourAnswers),
-          (s"$trustsBaseUrl/$testJourneyId/sa-utr", TestPrecondition.confirmSautr),
-          (s"$trustsBaseUrl/$testJourneyId/chrn", TestPrecondition.confirmChrn),
-          (s"$trustsBaseUrl/$testJourneyId/self-assessment-postcode", TestPrecondition.confirmSaPostcode),
-          (s"$trustsBaseUrl/$testJourneyId/cannot-confirm-business", TestPrecondition.cannotConfirmBusiness)
+          (s"$trustsBaseUrl/$testJourneyId/check-your-answers-business",
+            Seq(TestPrecondition.confirmSautr, TestPrecondition.confirmSaPostcode, TestPrecondition.confirmNoChrn)),
+          (s"$trustsBaseUrl/$testJourneyId/sa-utr", Nil),
+          (s"$trustsBaseUrl/$testJourneyId/chrn", Nil),
+          (s"$trustsBaseUrl/$testJourneyId/self-assessment-postcode", Nil),
+          (s"$trustsBaseUrl/$testJourneyId/cannot-confirm-business", Nil)
         )
 
       "display welsh translation when cy cookie is specified" in {
@@ -72,7 +71,7 @@ class ControllersSupportWelshTranslationISpec
         forAll(allGETUrlsToBeTested) { (getUrlToBeTested, doThisToCreateTestPrecondition) =>
 
           lazy val actualDocFromResponse: Document = {
-            doThisToCreateTestPrecondition()
+            doThisToCreateTestPrecondition.map(f => f())
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
@@ -94,7 +93,7 @@ class ControllersSupportWelshTranslationISpec
         forAll(allGETUrlsToBeTested) { (getUrlToBeTested, doThisToCreateTestPrecondition) =>
 
           lazy val actualDocFromResponse: Document = {
-            doThisToCreateTestPrecondition()
+            doThisToCreateTestPrecondition.map(f => f())
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
@@ -107,17 +106,20 @@ class ControllersSupportWelshTranslationISpec
 
       object TestPrecondition {
         type TestPrecondition = () => Any
-        val checkYourAnswers: TestPrecondition = () => stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyDataJson(testSautrJson))
         val confirmSautr: TestPrecondition = () => stubRetrieveUtr(testJourneyId)(status = OK, body = testSautrJson)
-        val confirmOverseasTaxIdentifiers: TestPrecondition = () => stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
+        val confirmOverseasTaxIdentifier: TestPrecondition = () => stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        val confirmOverseasTaxIdentifiersCountry: TestPrecondition =
+          () => stubRetrieveOverseasTaxIdentifiersCountry(testJourneyId)(OK, testOverseasTaxIdentifiersCountry)
       }
 
-      val allGETUrlsToBeTested: TableFor2[String, TestPrecondition.TestPrecondition] =
+      val allGETUrlsToBeTested: TableFor2[String, Seq[TestPrecondition.TestPrecondition]] =
         Tables.Table(
           ("urlToBeTested", "doThisToCreateTestPrecondition"),
-          (s"$overseasBaseUrl/$testJourneyId/check-your-answers-business", TestPrecondition.checkYourAnswers),
-          (s"$overseasBaseUrl/$testJourneyId/non-uk-company-utr", TestPrecondition.confirmSautr),
-          (s"$overseasBaseUrl/$testJourneyId/overseas-identifier", TestPrecondition.confirmOverseasTaxIdentifiers)
+          (s"$overseasBaseUrl/$testJourneyId/check-your-answers-business",
+            Seq(TestPrecondition.confirmSautr, TestPrecondition.confirmOverseasTaxIdentifier, TestPrecondition.confirmOverseasTaxIdentifiersCountry)),
+          (s"$overseasBaseUrl/$testJourneyId/non-uk-company-utr", Nil),
+          (s"$overseasBaseUrl/$testJourneyId/overseas-identifier", Nil),
+          (s"$overseasBaseUrl/$testJourneyId/overseas-tax-identifier-country", Nil)
         )
 
       "display welsh translation when cy cookie is specified" in {
@@ -133,7 +135,7 @@ class ControllersSupportWelshTranslationISpec
         forAll(allGETUrlsToBeTested) { (getUrlToBeTested, doThisToCreateTestPrecondition) =>
 
           lazy val actualDocFromResponse: Document = {
-            doThisToCreateTestPrecondition()
+            doThisToCreateTestPrecondition.map(f => f())
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
@@ -154,7 +156,7 @@ class ControllersSupportWelshTranslationISpec
         forAll(allGETUrlsToBeTested) { (getUrlToBeTested, doThisToCreateTestPrecondition) =>
 
           lazy val actualDocFromResponse: Document = {
-            doThisToCreateTestPrecondition()
+            doThisToCreateTestPrecondition.map(f => f())
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
@@ -167,21 +169,20 @@ class ControllersSupportWelshTranslationISpec
 
       object TestPrecondition {
         type TestPrecondition = () => Any
-        val checkYourAnswers: TestPrecondition = () => stubRetrieveEntityDetails(testJourneyId)(OK, testUAJourneyDataJson)
         val confirmCtutr: TestPrecondition = () => stubRetrieveUtr(testJourneyId)(status = OK, body = testCtutrJson)
-        val confirmChrn: TestPrecondition = () => stubRetrieveCHRN(testJourneyId)(status = OK, testCHRN)
+        val confirmNoChrn: TestPrecondition = () => stubRetrieveCHRN(testJourneyId)(status = NOT_FOUND)
         val confirmRegisteredOfficePostcode: TestPrecondition = () => stubRetrievePostcode(testJourneyId)(status = OK, testOfficePostcode)
-        val cannotConfirmBusiness: TestPrecondition = () => ()
       }
 
-      val allGETUrlsToBeTested: TableFor2[String, TestPrecondition.TestPrecondition] =
+      val allGETUrlsToBeTested: TableFor2[String, Seq[TestPrecondition.TestPrecondition]] =
         Tables.Table(
           ("urlToBeTested", "doThisToCreateTestPrecondition"),
-          (s"$uaBaseUrl/$testJourneyId/check-your-answers-business", TestPrecondition.checkYourAnswers),
-          (s"$uaBaseUrl/$testJourneyId/ct-utr", TestPrecondition.confirmCtutr),
-          (s"$uaBaseUrl/$testJourneyId/chrn", TestPrecondition.confirmChrn),
-          (s"$uaBaseUrl/$testJourneyId/registered-office-postcode", TestPrecondition.confirmRegisteredOfficePostcode),
-          (s"$uaBaseUrl/$testJourneyId/cannot-confirm-business", TestPrecondition.cannotConfirmBusiness)
+          (s"$uaBaseUrl/$testJourneyId/check-your-answers-business",
+            Seq(TestPrecondition.confirmCtutr, TestPrecondition.confirmRegisteredOfficePostcode, TestPrecondition.confirmNoChrn)),
+          (s"$uaBaseUrl/$testJourneyId/ct-utr", Nil),
+          (s"$uaBaseUrl/$testJourneyId/chrn", Nil),
+          (s"$uaBaseUrl/$testJourneyId/registered-office-postcode", Nil),
+          (s"$uaBaseUrl/$testJourneyId/cannot-confirm-business", Nil)
         )
 
       "display welsh translation when cy cookie is specified" in {
@@ -198,7 +199,7 @@ class ControllersSupportWelshTranslationISpec
         forAll(allGETUrlsToBeTested) { (getUrlToBeTested, doThisToCreateTestPrecondition) =>
 
           lazy val actualDocFromResponse: Document = {
-            doThisToCreateTestPrecondition()
+            doThisToCreateTestPrecondition.map(f => f())
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
@@ -220,7 +221,7 @@ class ControllersSupportWelshTranslationISpec
         forAll(allGETUrlsToBeTested) { (getUrlToBeTested, doThisToCreateTestPrecondition) =>
 
           lazy val actualDocFromResponse: Document = {
-            doThisToCreateTestPrecondition()
+            doThisToCreateTestPrecondition.map(f => f())
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
@@ -295,7 +296,8 @@ class ControllersSupportWelshTranslationISpec
         Tables.Table(
           "urlToBeTested",
           s"$overseasBaseUrl/$testJourneyId/non-uk-company-utr",
-          s"$overseasBaseUrl/$testJourneyId/overseas-identifier"
+          s"$overseasBaseUrl/$testJourneyId/overseas-identifier",
+          s"$overseasBaseUrl/$testJourneyId/overseas-tax-identifier-country"
         )
 
       "display welsh translation when cy cookie is specified" in {

@@ -32,7 +32,7 @@ object TestConstants {
 
   val testJourneyId: String = UUID.randomUUID().toString
   val testInternalId: String = UUID.randomUUID().toString
-  val testOverseasTaxIdentifiers: Overseas = Overseas("134124532", "AL")
+
   val testOverseasTaxIdentifier: String = "134124532"
   val testOverseasTaxIdentifiersCountry: String = "AL"
   val testOverseasTaxIdentifiersCountryFullName: String = "Albania"
@@ -52,8 +52,8 @@ object TestConstants {
   val testRegime: String = "VATC"
   val testServiceName: String = "TestService"
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
-    "taxIdentifier" -> testOverseasTaxIdentifiers.taxIdentifier,
-    "country" -> testOverseasTaxIdentifiers.country
+    "taxIdentifier" -> testOverseasTaxIdentifier,
+    "country" -> testOverseasTaxIdentifiersCountry
   )
   val testSafeId: String = UUID.randomUUID().toString
   val testTrustsJourneyConfig: JourneyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
@@ -215,14 +215,6 @@ object TestConstants {
     "utr" -> utrBlock,
     "overseasTaxIdentifier" -> testOverseasTaxIdentifier,
     "country" -> testOverseasTaxIdentifiersCountry
-  )
-
-  def testOverseasJourneyWithGroupedTaxIdentifiersDataJson(utrBlock: JsObject): JsObject = Json.obj(
-    "utr" -> utrBlock,
-    "overseas" -> Json.obj(
-      "taxIdentifier" -> testOverseasTaxIdentifier,
-      "country" -> testOverseasTaxIdentifiersCountry
-    )
   )
 
   val testTrustKnownFactsResponse: TrustKnownFacts = TrustKnownFacts(Some(testPostcode), Some(testSaPostcode), isAbroad = false)

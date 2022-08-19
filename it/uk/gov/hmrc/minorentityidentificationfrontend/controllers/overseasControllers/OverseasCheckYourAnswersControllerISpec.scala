@@ -70,7 +70,6 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         stubRetrieveUtr(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifier(testJourneyId)(NOT_FOUND)
         stubRetrieveOverseasTaxIdentifiersCountry(testJourneyId)(NOT_FOUND)
-        stubRetrieveOverseasTaxIdentifiers(testJourneyId)(NOT_FOUND)
         stubAudit()
 
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
@@ -127,8 +126,6 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
       ))
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
-      stubRetrieveOverseasTaxIdentifiers(testJourneyId)(OK, testOverseasTaxIdentifiersJson)
       stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyDataJson(testSautrJson))
       stubAudit()
 
@@ -139,6 +136,7 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
       }
       verifyAudit()
+      verifyRetrieveEntityDetails(testJourneyId)
     }
 
     "raise an internal server exception" when {

@@ -8,10 +8,6 @@ GET         /:journeyId/no-utr                                      uk.gov.hmrc.
 GET         /:journeyId/overseas-tax-identifier-country             uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.CaptureOverseasTaxIdentifiersCountryController.show(journeyId)
 POST        /:journeyId/overseas-tax-identifier-country             uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.CaptureOverseasTaxIdentifiersCountryController.submit(journeyId)
 
-GET         /:journeyId/overseas-tax-identifier                     uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.CaptureOverseasTaxIdentifiersController.show(journeyId)
-POST        /:journeyId/overseas-tax-identifier                     uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.CaptureOverseasTaxIdentifiersController.submit(journeyId)
-GET         /:journeyId/no-overseas-identifier                      uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.CaptureOverseasTaxIdentifiersController.noOverseasTaxIdentifiers(journeyId)
-
 GET         /:journeyId/overseas-identifier                         uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.CaptureOverseasTaxIdentifierController.show(journeyId)
 POST        /:journeyId/overseas-identifier                         uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.CaptureOverseasTaxIdentifierController.submit(journeyId)
 

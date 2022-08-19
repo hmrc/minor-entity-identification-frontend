@@ -49,8 +49,8 @@ class CheckYourAnswersController @Inject()(val authConnector: AuthConnector,
 
           val journeyConfigFuture = journeyService.getJourneyConfig(journeyId, authInternalId)
           val utrFuture = storageService.retrieveUtr(journeyId)
-          val overseasTaxIdentifierFuture = storageService.retrieveOTIIdentifier(journeyId)
-          val overseasTaxIdentifierCountryFuture = storageService.retrieveOTICountry(journeyId)
+          val overseasTaxIdentifierFuture = storageService.retrieveOverseasTaxIdentifier(journeyId)
+          val overseasTaxIdentifierCountryFuture = storageService.retrieveOverseasTaxIdentifiersCountry(journeyId)
 
           for {
             journeyConfig <- journeyConfigFuture

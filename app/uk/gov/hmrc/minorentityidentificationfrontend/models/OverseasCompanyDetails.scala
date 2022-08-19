@@ -57,17 +57,15 @@ object OverseasCompanyDetails {
         optUtrType <- (json \ "utr" \ "type").validateOpt[String]
         optOverseasTaxIdentifier <- (json \ "overseasTaxIdentifier").validateOpt[String]
         optOverseasTaxIdentifierCountry <- (json \ "country").validateOpt[String]
-        optOverseas <- (json \ "overseas").validateOpt[Overseas]
       } yield {
         val utr = optUtrType match {
           case Some("sautr") if optUtr.isDefined => Some(Sautr(optUtr.get))
           case Some("ctutr") if optUtr.isDefined => Some(Ctutr(optUtr.get))
           case _ => None
         }
-        val (overseasTaxIdentifier, overseasTaxIdentifierCountry) = determineOverseasTaxIdentifierDetails(
+        val (overseasTaxIdentifier, overseasTaxIdentifierCountry) = validateOverseasTaxIdentifierDetails(
           optOverseasTaxIdentifier,
-          optOverseasTaxIdentifierCountry,
-          optOverseas
+          optOverseasTaxIdentifierCountry
         )
         OverseasCompanyDetails(utr, overseasTaxIdentifier, overseasTaxIdentifierCountry)
       }
@@ -133,18 +131,13 @@ object OverseasCompanyDetails {
     ) ++ utrBlock ++ overseasBlock ++ businessVerificationBlock
   }
 
-  private def determineOverseasTaxIdentifierDetails(optOverseasTaxIdentifier: Option[String],
-                                                   optOverseasTaxIdentifierCountry: Option[String],
-                                                   optOverseas: Option[Overseas]): (Option[String], Option[String]) =
+  private def validateOverseasTaxIdentifierDetails(optOverseasTaxIdentifier: Option[String],
+                                                    optOverseasTaxIdentifierCountry: Option[String]): (Option[String], Option[String]) =
     (optOverseasTaxIdentifier, optOverseasTaxIdentifierCountry) match {
       case (Some(identifier), Some(country)) => (Some(identifier), Some(country))
-      case (None, None) => optOverseas match { // TODO - Remove after code has been running for a while
-        case Some(overseas) => (Some(overseas.taxIdentifier), Some(overseas.country))
-        case None => (None, None)
-      }
+      case (None, None) => (None, None)
       case _ => throw new InternalServerException("Error: Unexpected combination of tax identifier and country for an overseas business journey")
     }
-
 
   private def checkVerificationStatus(businessVerificationCheck: Boolean): String = {
     if (businessVerificationCheck) {
