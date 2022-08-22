@@ -24,7 +24,6 @@ import uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks.MockStorag
 import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.BusinessVerificationUnchallengedKey
-import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService.{OverseasTaxIdentifierKey, OverseasCountryKey, OverseasKey}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -396,86 +395,6 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
       }
     }
 
-  }
-
-  // Tests for temporary methods for over seas tax identifiers // TODO - Remove after successful implementation of two page journey
-  "retrieveOTIIdentifier" should {
-    "return the overseas tax identifier" when {
-      "the tax identifier is defined in the separate tax identifier property" in {
-        mockStorageConnector.retrieveDataField[String](testJourneyId, OverseasTaxIdentifierKey) returns
-          Future.successful(Some(testOverseasTaxIdentifier))
-
-        val result = await(TestStorageService.retrieveOTIIdentifier(testJourneyId))
-
-        result mustBe Some(testOverseasTaxIdentifier)
-      }
-    }
-    "return the identifier from an instance of overseas" when {
-      "the tax identifier is not defined, but an instance of Overseas is defined" in {
-        mockStorageConnector.retrieveDataField[String](testJourneyId, OverseasTaxIdentifierKey) returns
-          Future.successful(None)
-
-        mockStorageConnector.retrieveDataField[Overseas](testJourneyId, OverseasKey) returns
-          Future.successful(Some(Overseas("200", "AF")))
-
-        val result = await(TestStorageService.retrieveOTIIdentifier(testJourneyId))
-
-        result mustBe Some("200")
-      }
-
-    }
-    "return undefined" when {
-      "neither the tax identifier nor the instance of Overseas are defined" in {
-        mockStorageConnector.retrieveDataField[String](testJourneyId, OverseasTaxIdentifierKey) returns
-          Future.successful(None)
-
-        mockStorageConnector.retrieveDataField[Overseas](testJourneyId, OverseasKey) returns
-          Future.successful(None)
-
-        val result = await(TestStorageService.retrieveOTIIdentifier(testJourneyId))
-
-        result mustBe None
-      }
-    }
-  }
-
-  "retrieveOTICountry" should {
-    "retrieve the overseas tax identifier country" when {
-      "the country is stored in the separate country property" in {
-        mockStorageConnector.retrieveDataField[String](testJourneyId, OverseasCountryKey) returns
-          Future.successful(Some(testOverseasTaxIdentifierCountry))
-
-        val result = await(TestStorageService.retrieveOTICountry(testJourneyId))
-
-        result mustBe Some(testOverseasTaxIdentifierCountry)
-      }
-    }
-    "retrieve the overseas tax identifier country from an instance of Overseas" when {
-      "the separate country property is not defined, but an instance of Overseas is" in {
-        mockStorageConnector.retrieveDataField[String](testJourneyId, OverseasCountryKey) returns
-          Future.successful(None)
-
-        mockStorageConnector.retrieveDataField[Overseas](testJourneyId, OverseasKey) returns
-          Future.successful(Some(Overseas("200", "AF")))
-
-        val result = await(TestStorageService.retrieveOTICountry(testJourneyId))
-
-        result mustBe Some("AF")
-      }
-    }
-    "return undefined" when {
-      "neither the separate country property nor an instance of Overseas is defined" in {
-        mockStorageConnector.retrieveDataField[String](testJourneyId, OverseasCountryKey) returns
-          Future.successful(None)
-
-        mockStorageConnector.retrieveDataField[Overseas](testJourneyId, OverseasKey) returns
-          Future.successful(None)
-
-        val result = await(TestStorageService.retrieveOTICountry(testJourneyId))
-
-        result mustBe None
-      }
-    }
   }
 
 }

@@ -38,17 +38,11 @@ class StorageService @Inject()(connector: StorageConnector) {
   def removeUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, UtrKey)
 
-  def storeOverseasTaxIdentifiers(journeyId: String, taxIdentifiers: Overseas)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
-    connector.storeDataField[Overseas](journeyId, OverseasKey, taxIdentifiers)
-
   def storeOverseasTaxIdentifiersCountry(journeyId: String, taxIdentifiersCountry: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField (journeyId, OverseasCountryKey, taxIdentifiersCountry)
 
   def storeOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String)(implicit hc: HeaderCarrier): Future[SuccessfullyStored.type] =
     connector.storeDataField(journeyId, OverseasTaxIdentifierKey, overseasTaxIdentifier)
-
-  def removeOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
-    connector.removeDataField(journeyId, OverseasKey)
 
   def removeOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[SuccessfullyRemoved.type] =
     connector.removeDataField(journeyId, OverseasTaxIdentifierKey)
@@ -127,9 +121,6 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveUtr(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Utr]] =
     connector.retrieveDataField[Utr](journeyId, UtrKey)
 
-  def retrieveOverseasTaxIdentifiers(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[Overseas]] =
-    connector.retrieveDataField[Overseas](journeyId, OverseasKey)
-
   def retrieveOverseasTaxIdentifier(journeyId: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
     connector.retrieveDataField[String](journeyId, OverseasTaxIdentifierKey)
 
@@ -144,36 +135,10 @@ class StorageService @Inject()(connector: StorageConnector) {
   def retrieveBusinessVerificationStatus(journeyId: String
                                         )(implicit hc: HeaderCarrier): Future[Option[BusinessVerificationStatus]] =
     connector.retrieveDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey)
-
-  // Temporary methods for use during transition between single page and double page OTI input
-  def retrieveOTIIdentifier(journeyId: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Option[String]] = {
-
-    retrieveOverseasTaxIdentifier(journeyId).flatMap {
-      case Some(overseasTaxIdentifier) => Future.successful(Some(overseasTaxIdentifier))
-      case None => retrieveOverseasTaxIdentifiers(journeyId).map {
-        case Some(overseas) => Some(overseas.taxIdentifier)
-        case None => None
-      }
-    }
-
-  }
-
-  def retrieveOTICountry(journeyId: String)(implicit ec: ExecutionContext, hc:HeaderCarrier): Future[Option[String]] = {
-
-    retrieveOverseasTaxIdentifiersCountry(journeyId).flatMap {
-      case Some(country) => Future.successful(Some(country))
-      case None => retrieveOverseasTaxIdentifiers(journeyId).map {
-        case Some(overseas) => Some(overseas.country)
-        case None => None
-      }
-    }
-
-  }
 }
 
 object StorageService {
   val UtrKey = "utr"
-  val OverseasKey: String = "overseas"
   val OverseasTaxIdentifierKey: String = "overseasTaxIdentifier"
   val OverseasCountryKey: String = "country"
   val postcodeKey: String = "postcode"

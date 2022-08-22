@@ -123,7 +123,7 @@ class CaptureOverseasTaxIdentifierControllerISpec extends ComponentSpecHelper
         )
 
         verifyRemoveOverseasTaxIdentifier(testJourneyId)
-        verifyRemoveOverseasTaxIdentifiers(testJourneyId)
+        verifyRemoveOverseasTaxIdentifiersCountry(testJourneyId)
       }
 
     }

@@ -400,34 +400,6 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
           result.status mustBe OK
           result.json mustBe testDetailsJson
         }
-        "the user has a ctutr and the overseas tax identifiers are grouped together" in { // TODO - Remove after implementation of two page route
-          await(insertJourneyConfig(
-            journeyId = testJourneyId,
-            internalId = testInternalId,
-            testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
-          ))
-
-          val testDetailsJson = Json.obj(
-            "ctutr" -> testCtutr,
-            "identifiersMatch" -> false,
-            "businessVerification" -> Json.obj(
-              "verificationStatus" -> "UNCHALLENGED"
-            ),
-            "registration" -> Json.obj(
-              "registrationStatus" -> "REGISTRATION_NOT_CALLED"
-            ),
-            "overseas" -> testOverseasTaxIdentifiersJson
-          )
-
-          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-          stubRetrieveEntityDetails(testJourneyId)(OK, testOverseasJourneyWithGroupedTaxIdentifiersDataJson(testCtutrJson))
-          stubAudit()
-
-          lazy val result = get(s"/minor-entity-identification/api/journey/$testJourneyId")
-
-          result.status mustBe OK
-          result.json mustBe testDetailsJson
-        }
         "the user has a sautr" in {
           await(insertJourneyConfig(
             journeyId = testJourneyId,
@@ -575,6 +547,7 @@ class JourneyControllerISpec extends AuditEnabledSpecHelper with JourneyStub wit
         disable(EnableFullTrustJourney)
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         stubCreateJourney(CREATED, Json.obj("journeyId" -> testJourneyId))
+        stubRetrieveEntityDetails(testJourneyId)(NOT_FOUND)
         stubAudit()
 
         lazy val result = post("/minor-entity-identification/api/trusts-journey", testJourneyConfigJson ++ optLabelsAsJson)
