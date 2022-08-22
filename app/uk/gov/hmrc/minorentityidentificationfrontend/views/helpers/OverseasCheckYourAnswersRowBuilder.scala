@@ -62,10 +62,11 @@ class OverseasCheckYourAnswersRowBuilder() {
 
   private def createOverseasTaxIdentifierCountryRow(journeyId: String, country: String)
                                                    (implicit messages: Messages, appConfig: AppConfig): Aliases.SummaryListRow =
-    buildSummaryRow(
+    CheckYourAnswersRowBuilder.buildSummaryRow(
       key = messages("check-your-answers.tax_identifier_country"),
       value = appConfig.getCountryName(country, messages.lang.code),
-      journeyId = journeyId
+      changeValuePageLink = overseasControllers.routes.CaptureOverseasTaxIdentifiersCountryController.show(journeyId),
+      messages = messages
     )
 
   private def createOverseasTaxIdentifierNotProvidedRow(journeyId: String)(implicit messages: Messages): Aliases.SummaryListRow =

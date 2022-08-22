@@ -35,6 +35,7 @@ trait OverseasCheckYourAnswersSpecificViewTests {
   def testOverseasSummaryViewWithUtrAndOverseasTaxIdentifier(result: => WSResponse, journeyId: String): Unit = {
 
     val changeOverseasTaxIdentifierPageLink: String = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(journeyId).url
+    val changeOverseasTaxIdentifiersCountryPageLink: String = overseasControllers.routes.CaptureOverseasTaxIdentifiersCountryController.show(journeyId).url
 
     lazy val summaryListRows: List[Element] = extractSummaryListRows(result)
 
@@ -67,7 +68,7 @@ trait OverseasCheckYourAnswersSpecificViewTests {
 
         taxIdentifierCountryRow.getSummaryListQuestion mustBe messages.overseasTaxIdentifierCountry
         taxIdentifierCountryRow.getSummaryListAnswer mustBe testOverseasTaxIdentifiersCountryFullName
-        taxIdentifierCountryRow.getSummaryListChangeLink mustBe changeOverseasTaxIdentifierPageLink
+        taxIdentifierCountryRow.getSummaryListChangeLink mustBe changeOverseasTaxIdentifiersCountryPageLink
         taxIdentifierCountryRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.overseasTaxIdentifierCountry}"
       }
     }
