@@ -51,7 +51,7 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
     value = Value(HtmlContent(mockAppConfig.getCountryName(testOverseasTaxIdentifierCountry))),
     actions = Some(Actions(items = Seq(
       ActionItem(
-        href = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
+        href = overseasControllers.routes.CaptureOverseasTaxIdentifiersCountryController.show(testJourneyId).url,
         content = Text("Change"),
         visuallyHiddenText = Some("Country of overseas tax identifier")
       )
@@ -152,7 +152,7 @@ class OverseasCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRow
             value = Value(HtmlContent("Affganistan")),
             actions = Some(Actions(items = Seq(
               ActionItem(
-                href = overseasControllers.routes.CaptureOverseasTaxIdentifierController.show(testJourneyId).url,
+                href = overseasControllers.routes.CaptureOverseasTaxIdentifiersCountryController.show(testJourneyId).url,
                 content = Text("Newid"),
                 visuallyHiddenText = Some("Y wlad a gyhoeddodd y dynodydd treth tramor")
               )
