@@ -27,9 +27,14 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Writes}
 import play.api.libs.ws.{DefaultWSCookie, WSClient, WSCookie, WSRequest, WSResponse}
+import play.api.mvc.{Cookie, Session, SessionCookieBaker}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import play.api.test.Injecting
+import uk.gov.hmrc.crypto.PlainText
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
+import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
 
 import scala.concurrent.Future
 
@@ -39,7 +44,8 @@ trait ComponentSpecHelper extends AnyWordSpec
   with WiremockHelper
   with BeforeAndAfterAll
   with BeforeAndAfterEach
-  with GuiceOneServerPerSuite {
+  with GuiceOneServerPerSuite
+  with Injecting {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config ++ extraConfig())
@@ -68,6 +74,7 @@ trait ComponentSpecHelper extends AnyWordSpec
     "microservice.services.business-verification.url" -> s"$mockUrl/business-verification"
 
   )
+
   implicit val ws: WSClient = app.injector.instanceOf[WSClient]
 
   override def beforeAll(): Unit = {
@@ -91,7 +98,7 @@ trait ComponentSpecHelper extends AnyWordSpec
   val enLangCookie: WSCookie = DefaultWSCookie("PLAY_LANG", "en")
 
   def get[T](uri: String, cookie: WSCookie = enLangCookie): WSResponse = {
-    await(buildClient(uri).withHttpHeaders().addCookies(cookie).get)
+    await(buildClient(uri).withHttpHeaders("Authorization" -> "Bearer123").withCookies(cookie, mockSessionCookie).get)
   }
 
   def extractDocumentFrom(aWSResponse: WSResponse): Document = Jsoup.parse(aWSResponse.body)
@@ -100,8 +107,8 @@ trait ComponentSpecHelper extends AnyWordSpec
     val formBody = (form map { case (k, v) => (k, Seq(v)) }).toMap
     await(
       buildClient(uri)
-        .withHttpHeaders("Csrf-Token" -> "nocheck")
-        .addCookies(cookie)
+        .withHttpHeaders("Csrf-Token" -> "nocheck", "Authorization" -> "Bearer123")
+        .withCookies(cookie, mockSessionCookie)
         .post(formBody)
     )
   }
@@ -109,7 +116,8 @@ trait ComponentSpecHelper extends AnyWordSpec
   def post(uri: String, json: JsValue): WSResponse = {
     await(
       buildClient(uri)
-        .withHttpHeaders("Content-Type" -> "application/json")
+        .withHttpHeaders("Content-Type" -> "application/json", "Authorization" -> "Bearer123")
+        .withCookies(mockSessionCookie)
         .post(json.toString())
     )
   }
@@ -117,7 +125,8 @@ trait ComponentSpecHelper extends AnyWordSpec
   def put[T](uri: String)(body: T)(implicit writes: Writes[T]): WSResponse = {
     await(
       buildClient(uri)
-        .withHttpHeaders("Content-Type" -> "application/json")
+        .withHttpHeaders("Content-Type" -> "application/json", "Authorization" -> "Bearer123")
+        .withCookies(mockSessionCookie)
         .put(writes.writes(body).toString())
     )
   }
@@ -133,5 +142,40 @@ trait ComponentSpecHelper extends AnyWordSpec
     journeyConfigRepository.insertJourneyConfig(journeyId, internalId, journeyConfig)
 
   def extraConfig(): Map[String, String] = Map()
+
+  def mockSessionCookie: WSCookie = {
+
+    def makeSessionCookie(session: Session): Cookie = {
+      val cookieCrypto = inject[SessionCookieCrypto]
+      val cookieBaker = inject[SessionCookieBaker]
+      val sessionCookie = cookieBaker.encodeAsCookie(session)
+      val encryptedValue = cookieCrypto.crypto.encrypt(PlainText(sessionCookie.value))
+      sessionCookie.copy(value = encryptedValue.value)
+    }
+
+    val mockSession = Session(Map(
+      SessionKeys.lastRequestTimestamp -> System.currentTimeMillis().toString,
+      SessionKeys.authToken -> "mock-bearer-token",
+      SessionKeys.sessionId -> "mock-sessionid"
+    ))
+
+    val cookie = makeSessionCookie(mockSession)
+
+    new WSCookie() {
+      override def name: String = cookie.name
+
+      override def value: String = cookie.value
+
+      override def domain: Option[String] = cookie.domain
+
+      override def path: Option[String] = Some(cookie.path)
+
+      override def maxAge: Option[Long] = cookie.maxAge.map(_.toLong)
+
+      override def secure: Boolean = cookie.secure
+
+      override def httpOnly: Boolean = cookie.httpOnly
+    }
+  }
 
 }
