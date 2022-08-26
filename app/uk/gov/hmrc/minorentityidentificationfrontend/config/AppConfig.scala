@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.config
 
-import org.apache.commons.io.IOUtils
 import play.api.{Configuration, Environment}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.InternalServerException
-import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.BusinessVerificationStub
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Country
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{FeatureSwitching, TrustVerificationStub}
@@ -120,7 +119,7 @@ class AppConfig @Inject()(config: Configuration,
           Json.parse(countriesStream).as[Map[String, Country]]
         } finally {
           try {
-            IOUtils.close(countriesStream)
+            countriesStream.close()
           } catch {
             case ex : IOException =>
               throw new InternalServerException(s"I/O exception raised on closing file $fileName : ${ex.getMessage}")
