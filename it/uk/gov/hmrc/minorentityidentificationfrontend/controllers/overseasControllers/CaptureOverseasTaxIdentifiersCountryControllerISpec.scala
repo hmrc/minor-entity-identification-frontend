@@ -105,5 +105,24 @@ class CaptureOverseasTaxIdentifiersCountryControllerISpec extends ComponentSpecH
 
       testCaptureOverseasTaxIdentifiersCountryErrorMessages(result)
     }
+    "the country name submitted is invalid" should {
+      lazy val result: WSResponse = {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        post(uri = s"/identify-your-overseas-business/$testJourneyId/overseas-tax-identifier-country"
+        )("countryAutocomplete" -> "unknown") // If the country is not recognised the user's input will be submitted with the key "countryAutocomplete"
+      }
+
+      "return a bad request" in {
+        result.status mustBe BAD_REQUEST
+      }
+
+      testCaptureOverseasTaxIdentifiersCountryErrorMessages(result)
+    }
   }
 }
