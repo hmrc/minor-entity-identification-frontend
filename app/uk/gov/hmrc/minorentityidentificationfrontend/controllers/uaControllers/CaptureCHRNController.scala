@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.uaForms.CaptureCHRNForm
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.uaForms.UaCaptureCHRNForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.uaViews.capture_chrn_page
@@ -54,7 +54,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureCHRNController.submit(journeyId),
-                  form = CaptureCHRNForm.form
+                  form = UaCaptureCHRNForm.form
                 ))
             }
           } else throw new InternalServerException("UA journey is not enabled")
@@ -68,7 +68,7 @@ class CaptureCHRNController @Inject()(val authConnector: AuthConnector,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           if (isEnabled(EnableFullUAJourney)) {
-            CaptureCHRNForm.form.bindFromRequest().fold(
+            UaCaptureCHRNForm.form.bindFromRequest().fold(
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
                   journeyConfig =>

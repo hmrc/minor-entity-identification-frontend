@@ -18,23 +18,23 @@ country.noResult                                            = No results found
 utr.title                                                   = What is the company’s UK Unique Taxpayer Reference?
 utr.line_1                                                  = This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘.
 utr.no_utr_link                                             = The company does not have a UTR
-utr.error_not_entered                                       = Enter the company‘s UK Unique Taxpayer Reference
-utr.error_invalid_characters                                = The company’s Unique Taxpayer Reference must only include numbers
-utr.error_invalid_length                                    = The company’s Unique Taxpayer Reference must be 10 numbers
+utr.error_not_entered                                       = Enter the company’s UK Unique Taxpayer Reference
+utr.error_invalid_characters                                = Enter the company’s UK Unique Taxpayer Reference in the correct format
+utr.error_invalid_length                                    = Enter the company’s UK Unique Taxpayer Reference in the correct format
 utr.trust.title                                             = What is the trust’s Unique Taxpayer Reference?
 utr.trust.line_1                                            = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
 utr.trust.line_1_ending                                     = find a lost UTR number.
 utr.trust.no_utr_link                                       = The trust does not have a Self Assessment UTR
 utr.trust.error_not_entered                                 = Enter the trust’s Unique Taxpayer Reference
-utr.trust.error_invalid_characters                          = The trust’s Unique Taxpayer Reference must only include numbers
-utr.trust.error_invalid_length                              = The trust’s Unique Taxpayer Reference must be 10 numbers
+utr.trust.error_invalid_characters                          = Enter the trust’s Unique Taxpayer Reference in the correct format
+utr.trust.error_invalid_length                              = Enter the trust’s Unique Taxpayer Reference in the correct format
 utr.ua.title                                                = What is the association’s Unique Taxpayer Reference?
 utr.ua.line_1                                               = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
 utr.ua.line_1_ending                                        = find a lost UTR number.
 utr.ua.no_utr_link                                          = The association does not have a UTR
 utr.ua.error_not_entered                                    = Enter the association’s Unique Taxpayer Reference
-utr.ua.error_invalid_characters                             = The association’s Unique Taxpayer Reference must only include numbers
-utr.ua.error_invalid_length                                 = The association’s Unique Taxpayer Reference must be 10 numbers
+utr.ua.error_invalid_characters                             = Enter the association’s Unique Taxpayer Reference in the correct format
+utr.ua.error_invalid_length                                 = Enter the association’s Unique Taxpayer Reference in the correct format
 
 ## Overseas Tax Identifier Page
 tax-identifiers.title                                        = Does the business have an overseas tax identifier?
@@ -49,18 +49,18 @@ error.invalid_tax_identifier_length                          = The overseas tax 
 tax-identifiers-country.title                                = Which country issued the overseas tax identifier?
 error.no_entry_tax_identifier_country                        = Enter the name of the country that issued the overseas tax identifier
 
-## SA Postcode Page
+## Trust SA Postcode Page
 sa-postcode.title                                            = What is the postcode used to register the trust for Self Assessment?
 sa-postcode.hint                                             = For example, AB1 2YZ
 sa-postcode.no.postcodeLink                                  = The trust does not have a Self Assessment postcode
-error.invalid_format_sa-postcode                             = Enter the postcode in the correct format, for example, AB1 2YZ
-error.no_entry_sa-postcode                                   = Enter the postcode where the trust is registered for Self Assessment
+trust.error.invalid_format_sa-postcode                       = Enter the postcode in the correct format
+trust.error.no_entry_sa-postcode                             = Enter the postcode used to register the trust for Self Assessment
 
-## Office Postcode Page
+## UA Office Postcode Page
 office-postcode.title                                        = What is the postcode used to register the association?
 office-postcode.hint                                         = For example, AB1 2YZ
-error.invalid_format_office_postcode                         = Enter the postcode in the correct format, for example, AB1 2YZ
-error.no_entry_office_postcode                               = Enter the postcode where the association is registered for Corporation Tax
+ua.error.invalid_format_office_postcode                      = Enter the postcode in the correct format
+ua.error.no_entry_office_postcode                            = Enter the postcode used to register the association for Corporation Tax
 
 ## Check Your Answers Page
 check-your-answers.title                                    = Check your answers

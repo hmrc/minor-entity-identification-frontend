@@ -32,8 +32,6 @@ object TrustCaptureUtrForm {
   val TrustUtrInvalidCharactersErrorKey = "utr.trust.error_invalid_characters"
   val TrustUtrInvalidLengthErrorKey = "utr.trust.error_invalid_length"
 
-  val utrRegex: Regex = "[0-9]{10}".r
-
   val trustForm: Form[Utr] = Form(
     UtrKey -> of(utrMapping(TrustUtrNotEnteredErrorKey, TrustUtrInvalidCharactersErrorKey, knowUtrType = true))
       .verifying(

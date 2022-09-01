@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureUtrForm
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.overseasForm.OverseasCaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_utr_page
@@ -53,7 +53,7 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
                 journeyId = journeyId,
                 pageConfig = journeyConfig.pageConfig,
                 formAction = routes.CaptureUtrController.submit(journeyId),
-                form = CaptureUtrForm.form
+                form = OverseasCaptureUtrForm.form
               )
               )
           }
@@ -66,7 +66,7 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          CaptureUtrForm.form.bindFromRequest().fold(
+          OverseasCaptureUtrForm.form.bindFromRequest().fold(
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
                 journeyConfig =>

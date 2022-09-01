@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.uaForms
 
 import play.api.data.Form
 import play.api.data.validation.Constraint
@@ -24,26 +24,26 @@ import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelpe
 
 import scala.util.matching.Regex
 
-object CaptureSaPostcodeForm {
+object UaCaptureOfficePostcodeForm {
 
   val postCodeRegex: Regex = """^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$""".r
 
-  val postcodeNotEntered: Constraint[String] = Constraint("sa-postcode.not-entered")(
+  val postcodeNotEntered: Constraint[String] = Constraint("office-postcode.not-entered")(
     country => validate(
       constraint = country.isEmpty,
-      errMsg = "error.no_entry_sa-postcode"
+      errMsg = "ua.error.no_entry_office_postcode"
     )
   )
 
-  val postcodeInvalid: Constraint[String] = Constraint("sa-postcode.invalid-format")(
+  val postcodeInvalid: Constraint[String] = Constraint("office-postcode.invalid-format")(
     postcode => validateNot(
       constraint = postcode.toUpperCase matches postCodeRegex.regex,
-      errMsg = "error.invalid_format_sa-postcode"
+      errMsg = "ua.error.invalid_format_office_postcode"
     )
   )
 
   val form: Form[String] =
     Form(
-      "saPostcode" -> optText.toText.verifying(postcodeNotEntered andThen postcodeInvalid)
+      "officePostcode" -> optText.toText.verifying(postcodeNotEntered andThen postcodeInvalid)
     )
 }

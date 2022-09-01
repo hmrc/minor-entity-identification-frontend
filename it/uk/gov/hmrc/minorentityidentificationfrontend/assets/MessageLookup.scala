@@ -49,9 +49,9 @@ object MessageLookup {
     val no_utr_link = "The company does not have a UTR"
 
     object Error {
-      val error_not_entered = "Enter the company‘s UK Unique Taxpayer Reference"
-      val error_invalid_format = "The company’s Unique Taxpayer Reference must only include numbers"
-      val error_invalid_length = "The company’s Unique Taxpayer Reference must be 10 numbers"
+      val error_not_entered = "Enter the company’s UK Unique Taxpayer Reference"
+      val error_invalid_format = "Enter the company’s UK Unique Taxpayer Reference in the correct format"
+      val error_invalid_length = "Enter the company’s UK Unique Taxpayer Reference in the correct format"
     }
   }
 
@@ -63,8 +63,8 @@ object MessageLookup {
 
     object Error {
       val error_not_entered = "Enter the trust’s Unique Taxpayer Reference"
-      val error_invalid_format = "The trust’s Unique Taxpayer Reference must only include numbers"
-      val error_invalid_length = "The trust’s Unique Taxpayer Reference must be 10 numbers"
+      val error_invalid_format = "Enter the trust’s Unique Taxpayer Reference in the correct format"
+      val error_invalid_length = "Enter the trust’s Unique Taxpayer Reference in the correct format"
     }
   }
 
@@ -76,8 +76,8 @@ object MessageLookup {
 
     object Error {
       val error_not_entered = "Enter the association’s Unique Taxpayer Reference"
-      val error_invalid_format = "The association’s Unique Taxpayer Reference must only include numbers"
-      val error_invalid_length = "The association’s Unique Taxpayer Reference must be 10 numbers"
+      val error_invalid_format = "Enter the association’s Unique Taxpayer Reference in the correct format"
+      val error_invalid_length = "Enter the association’s Unique Taxpayer Reference in the correct format"
     }
   }
 
@@ -112,8 +112,8 @@ object MessageLookup {
     val no_postcodeLink = "The trust does not have a Self Assessment postcode"
 
     object Error {
-      val invalid_sa_postcode = "Enter the postcode in the correct format, for example, AB1 2YZ"
-      val no_entry_sa_postcode = "Enter the postcode where the trust is registered for Self Assessment"
+      val invalid_sa_postcode = "Enter the postcode in the correct format"
+      val no_entry_sa_postcode = "Enter the postcode used to register the trust for Self Assessment"
     }
   }
 
@@ -123,8 +123,8 @@ object MessageLookup {
     val hint = "For example, AB1 2YZ"
 
     object Error {
-      val invalid_format_office_postcode = "Enter the postcode in the correct format, for example, AB1 2YZ"
-      val no_entry_office_postcode = "Enter the postcode where the association is registered for Corporation Tax"
+      val invalid_format_office_postcode = "Enter the postcode in the correct format"
+      val no_entry_office_postcode = "Enter the postcode used to register the association for Corporation Tax"
     }
   }
 
