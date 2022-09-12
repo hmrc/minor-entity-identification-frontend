@@ -24,7 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelpe
 
 import scala.util.matching.Regex
 
-object CaptureCHRNForm {
+object TrustCaptureCHRNForm {
 
   val ChrnKey: String = "chrn"
 

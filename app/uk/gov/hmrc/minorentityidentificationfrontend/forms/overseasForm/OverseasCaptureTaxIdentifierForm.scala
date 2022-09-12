@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.overseasForm
 
-import play.api.data.{Form, FormError}
-import play.api.data.Forms._
+import play.api.data.Forms.{of, single}
 import play.api.data.format.Formatter
+import play.api.data.{Form, FormError}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.enumerations.YesNo
 
 import scala.util.matching.Regex
 
-object CaptureOverseasTaxIdentifierForm {
+object OverseasCaptureTaxIdentifierForm {
 
   val identifiersRegex: Regex = """[A-Za-z0-9]{1,60}""".r
 
@@ -35,17 +35,17 @@ object CaptureOverseasTaxIdentifierForm {
   private val overseasTaxIdentifierTooLongErrorMsg: String = "error.invalid_tax_identifier_length"
   private val overseasTaxIdentifierInvalidCharsErrorMsg: String = "error.invalid_tax_identifier"
 
-  private val overseasTaxIdentifierFormatter: Formatter[Option[String]] = new Formatter[Option[String]]  {
+  private val overseasTaxIdentifierFormatter: Formatter[Option[String]] = new Formatter[Option[String]] {
 
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] = {
 
-      val overseasTaxIdentifierChoiceExists: Boolean = data.getOrElse(key,"").nonEmpty
+      val overseasTaxIdentifierChoiceExists: Boolean = data.getOrElse(key, "").nonEmpty
 
-      if(overseasTaxIdentifierChoiceExists) {
+      if (overseasTaxIdentifierChoiceExists) {
 
         val overseasTaxIdentifierChoice: Option[String] = data.get(key)
 
-        if(overseasTaxIdentifierChoice.get == YesNo.Yes.toString){
+        if (overseasTaxIdentifierChoice.get == YesNo.Yes.toString) {
           handleOverseasTaxIdentifier(data)
         } else {
           Right(None)
@@ -81,11 +81,11 @@ object CaptureOverseasTaxIdentifierForm {
 
     def validateOverseasTaxIdentifier(id: String): Either[Seq[FormError], Option[String]] = {
 
-      if(validateEntered(id)) {
+      if (validateEntered(id)) {
 
-        if(validateLength(id)) {
+        if (validateLength(id)) {
 
-          if(validateCharacters(id)){
+          if (validateCharacters(id)) {
 
             Right(Some(id))
 

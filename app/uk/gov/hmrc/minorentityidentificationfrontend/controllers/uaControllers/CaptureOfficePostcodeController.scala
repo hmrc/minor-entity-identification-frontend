@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.uaForms.CaptureOfficePostcodeForm
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.uaForms.UaCaptureOfficePostcodeForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.uaViews.capture_office_postcode_page
@@ -54,7 +54,7 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureOfficePostcodeController.submit(journeyId),
-                  form = CaptureOfficePostcodeForm.form
+                  form = UaCaptureOfficePostcodeForm.form
                 ))
             }
           } else throw new InternalServerException("Unincorporated association journey is not enabled")
@@ -68,7 +68,7 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           if (isEnabled(EnableFullUAJourney)) {
-            CaptureOfficePostcodeForm.form.bindFromRequest().fold(
+            UaCaptureOfficePostcodeForm.form.bindFromRequest().fold(
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
                   journeyConfig =>

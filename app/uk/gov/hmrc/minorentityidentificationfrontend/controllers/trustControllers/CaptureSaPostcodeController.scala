@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureSaPostcodeForm
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.trustForms.TrustCaptureSaPostcodeForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.trustViews.capture_sa_postcode_page
@@ -54,7 +54,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureSaPostcodeController.submit(journeyId),
-                  form = CaptureSaPostcodeForm.form
+                  form = TrustCaptureSaPostcodeForm.form
                 ))
             }
         }  else throw new InternalServerException("Trust journey is not enabled")
@@ -68,7 +68,7 @@ class CaptureSaPostcodeController @Inject()(mcc: MessagesControllerComponents,
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           if(isEnabled(EnableFullTrustJourney)) {
-            CaptureSaPostcodeForm.form.bindFromRequest().fold(
+            TrustCaptureSaPostcodeForm.form.bindFromRequest().fold(
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
                   journeyConfig =>

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.overseasForm
 
 import play.api.data.Form
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.validate
 
-object CaptureOverseasTaxIdentifiersCountryForm {
+object OverseasCaptureTaxIdentifiersCountryForm {
 
   private val countryNotEntered: Constraint[String] = Constraint("country.not-entered")(
     country => validate(

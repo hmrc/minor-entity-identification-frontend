@@ -19,22 +19,22 @@ utr.title                                           = Beth yw Cyfeirnod Unigryw 
 utr.line_1                                          = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth CThEM a llythyrau eraill ynghylch Treth Gorfforaeth neu Hunanasesiad. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
 utr.no_utr_link                                     = Nid oes UTR gan y cwmni
 utr.error_not_entered                               = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni
-utr.error_invalid_characters                        = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr ar gyfer y cwmni gynnwys rhifau yn unig
-utr.error_invalid_length                            = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr ar gyfer y cwmni fod yn 10 rhif
+utr.error_invalid_characters                        = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni yn y fformat cywir
+utr.error_invalid_length                            = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni yn y fformat cywir
 utr.trust.title                                     = Beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer yr ymddiriedolaeth?
 utr.trust.line_1                                    = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill ynghylch Hunanasesiad. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’. Gallwch
 utr.trust.line_1_ending                             = ddod o hyd i UTR sydd ar goll.
 utr.trust.no_utr_link                               = Nid oes gan yr ymddiriedolaeth UTR Hunanasesiad
 utr.trust.error_not_entered                         = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer yr ymddiriedolaeth
-utr.trust.error_invalid_characters                  = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr ar gyfer yr ymddiriedolaeth gynnwys rhifau yn unig
-utr.trust.error_invalid_length                      = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr ar gyfer yr ymddiriedolaeth fod yn 10 rhif
+utr.trust.error_invalid_characters                  = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer yr ymddiriedolaeth yn y fformat cywir
+utr.trust.error_invalid_length                      = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer yr ymddiriedolaeth yn y fformat cywir
 utr.ua.title                                        = Beth yw Cyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas?
 utr.ua.line_1                                       = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill am Dreth Gorfforaeth. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’. Gallwch
 utr.ua.line_1_ending                                = ddod o hyd i UTR sydd ar goll.
 utr.ua.no_utr_link                                  = Nid oes gan y gymdeithas UTR
 utr.ua.error_not_entered                            = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas
-utr.ua.error_invalid_characters                     = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas gynnwys rhifau yn unig
-utr.ua.error_invalid_length                         = Mae’n rhaid i Gyfeirnod Unigryw y Trethdalwr  ar gyfer y gymdeithas fod yn 10 rhif
+utr.ua.error_invalid_characters                     = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas yn y fformat cywir
+utr.ua.error_invalid_length                         = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas yn y fformat cywir
 
 ## Overseas Tax Identifier Page
 tax-identifiers.title                               = Oes gan y busnes ddynodydd treth tramor?
@@ -49,18 +49,18 @@ error.invalid_tax_identifier_length                 = Mae’n rhaid i’r dynody
 tax-identifiers-country.title                       = Ym mha wlad y cyhoeddwyd y dynodydd treth tramor?
 error.no_entry_tax_identifier_country               = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth tramor
 
-## SA Postcode Page
+## Trust SA Postcode Page
 sa-postcode.title                                   = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad?
 sa-postcode.hint                                    = Er enghraifft, AB1 2YZ
 sa-postcode.no.postcodeLink                         = Does dim cod post Hunanasesiad gan yr ymddiriedolaeth
-error.invalid_format_sa-postcode                    = Nodwch y cod post yn y fformat cywir, er enghraifft, AB1 2YZ
-error.no_entry_sa-postcode                          = Nodwch y cod post lle mae’r ymddiriedolaeth wedi’i chofrestru ar gyfer Hunanasesiad
+trust.error.invalid_format_sa-postcode              = Nodwch y cod post yn y fformat cywir
+trust.error.no_entry_sa-postcode                    = Nodwch y cod post a ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad
 
-## Office Postcode Page
+## UA Office Postcode Page
 office-postcode.title                               = Beth yw’r cod post a ddefnyddir i gofrestru’r gymdeithas?
 office-postcode.hint                                = Er enghraifft, AB1 2YZ
-error.invalid_format_office_postcode                = Nodwch y cod post yn y fformat cywir, er enghraifft, AB1 2YZ
-error.no_entry_office_postcode                      = Nodwch y cod post lle mae’r gymdeithas wedi’i chofrestru ar gyfer Treth Gorfforaeth
+ua.error.invalid_format_office_postcode             = Nodwch y cod post yn y fformat cywir
+ua.error.no_entry_office_postcode                   = Nodwch y cod post a ddefnyddiwyd i gofrestru’r gymdeithas ar gyfer Treth Gorfforaeth
 
 ## Check Your Answers Page
 check-your-answers.title                               = Gwirio’ch atebion

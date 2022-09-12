@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.forms
+package uk.gov.hmrc.minorentityidentificationfrontend.forms.overseasForm
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.of
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrCaptureHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrMapping.utrMapping
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
-object CaptureUtrForm {
+object OverseasCaptureUtrForm {
   val UtrKey = "utr"
 
   val UtrNotEnteredErrorKey = "utr.error_not_entered"

@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.{routes => overseasControllerRoutes}
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.CaptureOverseasTaxIdentifierForm
+import uk.gov.hmrc.minorentityidentificationfrontend.forms.overseasForm.OverseasCaptureTaxIdentifierForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_overseas_tax_identifier_page
@@ -52,7 +52,7 @@ class CaptureOverseasTaxIdentifierController @Inject()(mcc: MessagesControllerCo
                   journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
                   formAction = overseasControllerRoutes.CaptureOverseasTaxIdentifierController.submit(journeyId),
-                  form = CaptureOverseasTaxIdentifierForm.form
+                  form = OverseasCaptureTaxIdentifierForm.form
                 ))
           }
         case None =>
@@ -65,7 +65,7 @@ class CaptureOverseasTaxIdentifierController @Inject()(mcc: MessagesControllerCo
     implicit request =>
       authorised().retrieve(internalId) {
         case Some(authInternalId) =>
-          CaptureOverseasTaxIdentifierForm.form.bindFromRequest().fold(
+          OverseasCaptureTaxIdentifierForm.form.bindFromRequest().fold(
             formWithErrors =>
               journeyService.getJourneyConfig(journeyId, authInternalId).map {
                 journeyConfig =>

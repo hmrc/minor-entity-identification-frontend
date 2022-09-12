@@ -17,33 +17,44 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.forms.uaForms
 
 import play.api.data.Form
+import play.api.data.Forms.text
 import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ConstraintUtil.ConstraintUtil
-import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.MappingUtil.{OTextUtil, optText}
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.{validate, validateNot}
 
 import scala.util.matching.Regex
 
-object CaptureOfficePostcodeForm {
+object UaCaptureCHRNForm {
 
-  val postCodeRegex: Regex = """^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$""".r
+  val ChrnKey: String = "chrn"
 
-  val postcodeNotEntered: Constraint[String] = Constraint("office-postcode.not-entered")(
-    country => validate(
-      constraint = country.isEmpty,
-      errMsg = "error.no_entry_office_postcode"
+  val ChrnNotEnteredErrorKey: String = "chrn.ua.error.no_entry"
+  val ChrnInvalidCharactersErrorKey: String = "chrn.ua.error.invalid_format"
+  val ChrnInvalidLengthErrorKey: String = "chrn.ua.error.invalid_length"
+
+  val ChrnRegex: Regex = "[A-Za-z]{1,2}[0-9]{1,5}".r
+
+  def chrnEmpty: Constraint[String] = Constraint("chrn.not_entered")(
+    chrn => validate(constraint = chrn.isEmpty, errMsg = ChrnNotEnteredErrorKey)
+  )
+
+  def chrnInvalidCharacters: Constraint[String] = Constraint("chrn.invalid_characters")(
+    chrn => validateNot(
+      constraint = chrn matches ChrnRegex.regex,
+      errMsg = ChrnInvalidCharactersErrorKey
     )
   )
 
-  val postcodeInvalid: Constraint[String] = Constraint("office-postcode.invalid-format")(
-    postcode => validateNot(
-      constraint = postcode.toUpperCase matches postCodeRegex.regex,
-      errMsg = "error.invalid_format_office_postcode"
+  def chrnInvalidLength: Constraint[String] = Constraint("chrn.invalid_length")(
+    chrn => validate(
+      constraint = chrn.length > 7,
+      errMsg = ChrnInvalidLengthErrorKey
     )
   )
 
   val form: Form[String] =
     Form(
-      "officePostcode" -> optText.toText.verifying(postcodeNotEntered andThen postcodeInvalid)
+      ChrnKey -> text.verifying(chrnEmpty andThen chrnInvalidLength andThen chrnInvalidCharacters)
     )
+
 }
