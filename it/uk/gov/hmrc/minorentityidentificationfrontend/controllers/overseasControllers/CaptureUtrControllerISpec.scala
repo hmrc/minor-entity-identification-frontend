@@ -20,7 +20,7 @@ import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, Sautr}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, JourneyLabels, PageConfig, Sautr}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews.CaptureUtrViewTests
@@ -38,12 +38,49 @@ class CaptureUtrControllerISpec extends ComponentSpecHelper with AuthStub with S
       get(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")
     }
 
+    lazy val resultWithNoServiceName = {
+      await(insertJourneyConfig(
+        journeyId = testJourneyId,
+        internalId = testInternalId,
+        testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
+      ))
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      get(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")
+    }
+
+    lazy val resultWithServiceNameFromLabels = {
+      await(insertJourneyConfig(
+        journeyId = testJourneyId,
+        internalId = testInternalId,
+        testOverseasCompanyJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+          optServiceName = Some(testCallingServiceName),
+          deskProServiceId = testDeskProServiceId,
+          signOutUrl = testSignOutUrl,
+          accessibilityUrl = testAccessibilityUrl,
+          optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+        ))
+      ))
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      get(s"/identify-your-overseas-business/$testJourneyId/non-uk-company-utr")
+    }
+
     "return OK" in {
       result.status mustBe OK
     }
 
-    "return a view which" should {
-      testCaptureUtrView(result)
+    "return a view" when {
+      "there is no serviceName passed in the journeyConfig" should {
+        testCaptureUtrView(resultWithNoServiceName)
+        testServiceName(testDefaultServiceName, resultWithNoServiceName)
+      }
+      "there is a serviceName passed in the journeyConfig" should {
+        testCaptureUtrView(result)
+        testServiceName(testCallingServiceName, result)
+      }
+      "there is a serviceName passed in the journeyConfig labels object" should {
+        testCaptureUtrView(resultWithServiceNameFromLabels)
+        testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+      }
     }
 
     "redirect to sign in page" when {

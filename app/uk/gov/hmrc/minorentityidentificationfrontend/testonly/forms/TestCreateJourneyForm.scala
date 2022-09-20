@@ -22,7 +22,7 @@ import play.api.data.validation.Constraint
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.MappingUtil.optText
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.ValidationHelper.validate
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.BusinessEntity
-import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, PageConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, JourneyLabels, PageConfig}
 
 object TestCreateJourneyForm {
 
@@ -82,16 +82,21 @@ object TestCreateJourneyForm {
       regime -> text.verifying(regimeEmpty),
       welshServiceName -> optText
     )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, businessVerificationCheck, regime, welshServiceName) =>
-      JourneyConfig.apply(continueUrl, PageConfig(serviceName, deskProServiceId, welshServiceName, signOutUrl, accessibilityUrl), businessEntity, businessVerificationCheck, regime)
+      JourneyConfig.apply(
+        continueUrl,
+        PageConfig(deskProServiceId, signOutUrl, accessibilityUrl, JourneyLabels(welshServiceName, serviceName)),
+        businessEntity,
+        businessVerificationCheck,
+        regime)
     )(journeyConfig =>
       Some(journeyConfig.continueUrl,
-        journeyConfig.pageConfig.optServiceName,
+        journeyConfig.pageConfig.optLabels.flatMap(_.optEnglishServiceName),
         journeyConfig.pageConfig.deskProServiceId,
         journeyConfig.pageConfig.signOutUrl,
         journeyConfig.pageConfig.accessibilityUrl,
         journeyConfig.businessVerificationCheck,
         journeyConfig.regime,
-        journeyConfig.pageConfig.optLabels.map(_.welshServiceName)
+        journeyConfig.pageConfig.optLabels.flatMap(_.optWelshServiceName)
       )
     ))
   }

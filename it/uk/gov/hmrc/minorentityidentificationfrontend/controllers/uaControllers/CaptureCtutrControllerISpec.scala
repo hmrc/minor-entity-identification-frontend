@@ -21,7 +21,7 @@ import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{OK, SEE_OTHER, await, defaultAwaitTimeout}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.Ctutr
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{Ctutr, JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.uaViews.UaCaptureUtrViewTests
@@ -39,7 +39,35 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfigWithCallingService(businessVerificationCheck = true)
+          ))
+          enable(EnableFullUAJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          get(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")
+        }
+
+        lazy val resultWithNoServiceName = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
             testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+          enable(EnableFullUAJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          get(s"/identify-your-unincorporated-association/$testJourneyId/ct-utr")
+        }
+
+        lazy val resultWithServiceNameFromLabels = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+              optServiceName = Some(testCallingServiceName),
+              deskProServiceId = testDeskProServiceId,
+              signOutUrl = testSignOutUrl,
+              accessibilityUrl = testAccessibilityUrl,
+              optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+            ))
           ))
           enable(EnableFullUAJourney)
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -50,8 +78,19 @@ class CaptureCtutrControllerISpec extends ComponentSpecHelper
           result.status mustBe OK
         }
 
-        "return a view which" should {
-          testCaptureUtrView(result)
+        "return a view" when {
+          "there is no serviceName passed in the journeyConfig" should {
+            testCaptureUtrView(resultWithNoServiceName)
+            testServiceName(testDefaultServiceName, resultWithNoServiceName)
+          }
+          "there is a serviceName passed in the journeyConfig" should {
+            testCaptureUtrView(result)
+            testServiceName(testCallingServiceName, result)
+          }
+          "there is a serviceName passed in the journeyConfig labels object" should {
+            testCaptureUtrView(resultWithServiceNameFromLabels)
+            testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+          }
         }
 
         "redirect to sign in page" when {

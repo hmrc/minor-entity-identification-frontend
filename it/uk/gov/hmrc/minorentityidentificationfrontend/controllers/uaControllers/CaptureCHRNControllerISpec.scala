@@ -20,6 +20,7 @@ import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.uaViews.CaptureCHRNumberViewTests
@@ -44,7 +45,37 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
           await(journeyConfigRepository.insertJourneyConfig(
             journeyId = testJourneyId,
             authInternalId = testInternalId,
+            journeyConfig = testUnincorporatedAssociationJourneyConfigWithCallingService(businessVerificationCheck = true)
+          ))
+
+          enable(EnableFullUAJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          get(s"/identify-your-unincorporated-association/$testJourneyId/chrn")
+        }
+
+        lazy val resultWithNoServiceName = {
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
             journeyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          enable(EnableFullUAJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          get(s"/identify-your-unincorporated-association/$testJourneyId/chrn")
+        }
+
+        lazy val resultWithServiceNameFromLabels = {
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+              optServiceName = Some(testCallingServiceName),
+              deskProServiceId = testDeskProServiceId,
+              signOutUrl = testSignOutUrl,
+              accessibilityUrl = testAccessibilityUrl,
+              optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+            ))
           ))
 
           enable(EnableFullUAJourney)
@@ -56,33 +87,43 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
           result.status mustBe OK
         }
 
-        "return a view that" should {
-          testCaptureCHRNView(result)
+        "return a view" when {
+          "there is no serviceName passed in the journeyConfig" should {
+            testCaptureCHRNView(resultWithNoServiceName)
+            testServiceName(testDefaultServiceName, resultWithNoServiceName)
+          }
+          "there is a serviceName passed in the journeyConfig" should {
+            testCaptureCHRNView(result)
+            testServiceName(testCallingServiceName, result)
+          }
+          "there is a serviceName passed in the journeyConfig labels object" should {
+            testCaptureCHRNView(resultWithServiceNameFromLabels)
+            testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+          }
         }
-      }
 
-      "the feature switch is disabled" should {
+        "the feature switch is disabled" should {
 
-        "raise an internal server exception" in {
+          "raise an internal server exception" in {
 
-          lazy val result = {
-            await(journeyConfigRepository.insertJourneyConfig(
-              journeyId = testJourneyId,
-              authInternalId = testInternalId,
-              journeyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
-            ))
+            lazy val result = {
+              await(journeyConfigRepository.insertJourneyConfig(
+                journeyId = testJourneyId,
+                authInternalId = testInternalId,
+                journeyConfig = testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+              ))
 
-            disable(EnableFullUAJourney)
-            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+              disable(EnableFullUAJourney)
+              stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
 
-            get(s"/identify-your-unincorporated-association/$testJourneyId/chrn")
+              get(s"/identify-your-unincorporated-association/$testJourneyId/chrn")
+            }
+
+            result.status mustBe INTERNAL_SERVER_ERROR
           }
 
-          result.status mustBe INTERNAL_SERVER_ERROR
         }
-
       }
-
     }
 
     "the user is not authorized" should {

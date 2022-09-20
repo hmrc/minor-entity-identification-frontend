@@ -16,17 +16,29 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.models
 
+import play.api.libs.functional.syntax.{unlift, _}
 import play.api.libs.json.{JsPath, OFormat, OWrites, Reads}
 
-case class JourneyLabels(welshServiceName: String)
+case class JourneyLabels(optWelshServiceName: Option[String], optEnglishServiceName: Option[String]){
+
+  def nonEmpty: Boolean = this.optWelshServiceName.exists(_.nonEmpty) || this.optEnglishServiceName.exists(_.nonEmpty)
+}
 
 object JourneyLabels {
 
   private val welshLabelsKey: String = "cy"
+  private val englishLabelsKey: String = "en"
   private val optServiceNameKey: String = "optServiceName"
 
-  implicit val reads: Reads[JourneyLabels] = (JsPath \ welshLabelsKey \ optServiceNameKey).read[String].map(JourneyLabels.apply)
-  implicit val writes: OWrites[JourneyLabels] = (JsPath \ welshLabelsKey \ optServiceNameKey).write[String].contramap(_.welshServiceName)
+  implicit val reads: Reads[JourneyLabels] = (
+    (JsPath \ welshLabelsKey \ optServiceNameKey).readNullable[String] and
+      (JsPath \ englishLabelsKey \ optServiceNameKey).readNullable[String]
+  ) (JourneyLabels.apply _)
+
+  implicit val writes: OWrites[JourneyLabels] = (
+    (JsPath \ welshLabelsKey \  optServiceNameKey).writeNullable[String] and
+      (JsPath \ englishLabelsKey \  optServiceNameKey).writeNullable[String]
+    )(unlift(JourneyLabels.unapply))
 
   val format: OFormat[JourneyLabels] = OFormat(reads, writes)
 }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.utils
 import play.api.http.HttpConfiguration
 import play.api.i18n.{DefaultMessagesApi, DefaultMessagesApiProvider, Langs}
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, JourneyLabels}
 
 import javax.inject.{Inject, Singleton}
 
@@ -31,15 +31,20 @@ object MessagesHelper {
                                                journeyConfig: JourneyConfig): Map[String, Map[String, String]] = {
     val extraEnglishTranslations: Map[String, String] = journeyConfig
       .pageConfig
-      .optServiceName
-      .map(serviceName => Map(optServiceNameTranslationKey -> serviceName))
-      .getOrElse(Map.empty)
+      .optLabels match {
+      case Some(JourneyLabels(_, Some(optEnglishServiceName))) => Map(optServiceNameTranslationKey -> optEnglishServiceName)
+      case Some(JourneyLabels(_, None)) | None => journeyConfig.pageConfig.optServiceName
+        .map(serviceName => Map(optServiceNameTranslationKey -> serviceName))
+        .getOrElse(Map.empty)
+      case _ => Map.empty
+    }
 
     val extraWelshTranslations: Map[String, String] = journeyConfig
       .pageConfig
-      .optLabels
-      .map(labels => Map(optServiceNameTranslationKey -> labels.welshServiceName))
-      .getOrElse(Map.empty)
+      .optLabels match {
+      case Some(JourneyLabels(Some(optWelshServiceName), _)) => Map(optServiceNameTranslationKey -> optWelshServiceName)
+      case _ => Map.empty
+    }
 
     initialMessages.map {
       case (lang@"en", oldMessages) => lang -> (oldMessages ++ extraEnglishTranslations)

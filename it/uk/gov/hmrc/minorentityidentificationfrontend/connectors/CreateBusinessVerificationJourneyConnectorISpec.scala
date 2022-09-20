@@ -26,6 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustController
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.OverseasCompany
+import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.BusinessVerificationStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
@@ -90,7 +91,15 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
 
             val result =
               await(createBusinessVerificationJourneyConnector
-                .createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfigWithCallingService))
+                .createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfigWithCallingService
+                  .copy(pageConfig = PageConfig(
+                    optServiceName = Some(testDefaultServiceName),
+                    deskProServiceId = testDeskProServiceId,
+                    signOutUrl = testSignOutUrl,
+                    accessibilityUrl = testAccessibilityUrl
+                  ))
+                )
+              )
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
 
@@ -115,7 +124,14 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             stubCreateBusinessVerificationJourneyFromStub(expBody = expectedUABVCallJsonWithCallingService)(CREATED, body = testBVRedirectURIJson(testContinueUrlToPassToBVCall))
 
             val result = await(createBusinessVerificationJourneyConnector
-              .createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfigWithCallingService))
+              .createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfigWithCallingService
+                .copy(pageConfig = PageConfig(
+                  optServiceName = Some(testDefaultServiceName),
+                  deskProServiceId = testDeskProServiceId,
+                  signOutUrl = testSignOutUrl,
+                  accessibilityUrl = testAccessibilityUrl
+                ))
+              ))
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
 
@@ -192,7 +208,14 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             stubCreateBusinessVerificationJourney(expBody = expectedTrustBVCallJsonWithCallingService)(status = CREATED, body = testBVRedirectURIJson(testContinueUrlToPassToBVCall))
 
             val result = await(createBusinessVerificationJourneyConnector
-              .createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfigWithCallingService))
+              .createBusinessVerificationJourney(testJourneyId, testSautr, testTrustsJourneyConfigWithCallingService
+                .copy(pageConfig = PageConfig(
+                  optServiceName = Some(testDefaultServiceName),
+                  deskProServiceId = testDeskProServiceId,
+                  signOutUrl = testSignOutUrl,
+                  accessibilityUrl = testAccessibilityUrl
+                ))
+              ))
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
 
@@ -216,7 +239,13 @@ class CreateBusinessVerificationJourneyConnectorISpec extends ComponentSpecHelpe
             stubCreateBusinessVerificationJourney(expBody = expectedUABVCallJsonWithCallingService)(CREATED, body = testBVRedirectURIJson(testContinueUrlToPassToBVCall))
 
             val result = await(createBusinessVerificationJourneyConnector
-              .createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfigWithCallingService))
+              .createBusinessVerificationJourney(testJourneyId, testCtutr, testUAJourneyConfigWithCallingService.copy(pageConfig = PageConfig(
+                optServiceName = Some(testDefaultServiceName),
+                deskProServiceId = testDeskProServiceId,
+                signOutUrl = testSignOutUrl,
+                accessibilityUrl = testAccessibilityUrl
+              ))
+              ))
 
             result mustBe Right(BusinessVerificationJourneyCreated(testContinueUrlToPassToBVCall))
 

@@ -24,6 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStu
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.CaptureCHRNumberViewTests
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig}
 
 class CaptureCHRNControllerISpec extends ComponentSpecHelper
   with AuthStub
@@ -45,7 +46,37 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
           await(journeyConfigRepository.insertJourneyConfig(
             journeyId = testJourneyId,
             authInternalId = testInternalId,
+            journeyConfig = testTrustsJourneyConfigWithCallingService
+          ))
+
+          enable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          get(s"/identify-your-trust/$testJourneyId/chrn")
+        }
+
+        lazy val resultWithNoServiceName = {
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
             journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          enable(EnableFullTrustJourney)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          get(s"/identify-your-trust/$testJourneyId/chrn")
+        }
+
+        lazy val resultWithServiceNameFromLabels = {
+          await(journeyConfigRepository.insertJourneyConfig(
+            journeyId = testJourneyId,
+            authInternalId = testInternalId,
+            journeyConfig = testTrustsJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+              optServiceName = Some(testCallingServiceName),
+              deskProServiceId = testDeskProServiceId,
+              signOutUrl = testSignOutUrl,
+              accessibilityUrl = testAccessibilityUrl,
+              optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+            ))
           ))
 
           enable(EnableFullTrustJourney)
@@ -57,9 +88,22 @@ class CaptureCHRNControllerISpec extends ComponentSpecHelper
           result.status mustBe OK
         }
 
-        "return a view that" should {
-          testCaptureCHRNView(result)
+        "return a view" when {
+          "there is no serviceName passed in the journeyConfig" should {
+            testCaptureCHRNView(resultWithNoServiceName)
+            testServiceName(testDefaultServiceName, resultWithNoServiceName)
+          }
+          "there is a serviceName passed in the journeyConfig" should {
+            testCaptureCHRNView(result)
+            testServiceName(testCallingServiceName, result)
+          }
+          "there is a serviceName passed in the journeyConfig labels object" should {
+            testCaptureCHRNView(resultWithServiceNameFromLabels)
+            testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+          }
         }
+
+
       }
 
       "the feature switch is disabled" should {

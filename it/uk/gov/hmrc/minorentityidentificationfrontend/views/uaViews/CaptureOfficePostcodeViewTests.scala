@@ -51,7 +51,7 @@ trait CaptureOfficePostcodeViewTests {
     }
 
     "have the correct title" in {
-      doc.title mustBe s"${messages.title} - $testDefaultServiceName - GOV.UK"
+      doc.title mustBe expectedTitle(doc, messages.title)
     }
 
     "have a back link" in {
@@ -123,6 +123,14 @@ trait CaptureOfficePostcodeViewTests {
     }
     "correctly display the field error" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.no_entry_office_postcode
+    }
+  }
+
+  def testServiceName(serviceName: String, result: => WSResponse): Unit = {
+    lazy val doc: Document = Jsoup.parse(result.body)
+
+    "correctly display the service name" in {
+      doc.getServiceName.text mustBe serviceName
     }
   }
 }
