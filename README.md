@@ -24,10 +24,13 @@ Creates a new journey for an Overseas Company, storing the journeyConfig against
 
 #### Request:
 
-optServiceName will default to `Entity Validation Service` if the field is not provided.
-
-labels enables custom welsh translations for the service name to be supplied by the calling service. If the labels
-object is omitted or present, but the "cy" property is not fully defined, the default values will be used.
+The property labels enables the calling service to define the service name in both english and welsh. If the property is not defined, the
+service name in english will default to the value defined by
+the property optServiceName and the service name in welsh will default to the 
+service default. If "optServiceName" is not defined the service name in english will be the service default
+`Entity Validation Service`. The above behaviour will apply also if the property is
+present, but one or both of the nested properties "en" and "cy" are not
+defined.
 
 The businessVerificationCheck field allows the calling service to bypass the business verification and continue to
 register where a successful match is found. The field will default to true if it is not provided.
@@ -47,6 +50,9 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "regime" : "VATC",    
     "signOutUrl" : "/sign-out",
     "labels" : {
+      "en" : {
+        "optServiceName" : "Service name in english"
+      },
       "cy" : {
          "optServiceName" : "Service name in welsh"
       }
@@ -61,10 +67,13 @@ Creates a new journey for a Trust, storing the journeyConfig against the journey
 
 #### Request:
 
-optServiceName will default to `Entity Validation Service` if the field is not provided.
-
-labels enables custom welsh translations for the service name to be supplied by the calling service. If the labels
-object is omitted or present, but the "cy" property is not fully defined, the default values will be used.
+The property labels enables the calling service to define the service name in both english and welsh. If the property is not defined, the
+service name in english will default to the value defined by
+the property optServiceName and the service name in welsh will default to the
+service default. If "optServiceName" is not defined the service name in english will be the service default
+`Entity Validation Service`. The above behaviour will apply also if the property is
+present, but one or both of the nested properties "en" and "cy" are not
+defined.
 
 The businessVerificationCheck field allows the calling service to bypass the business verification and continue to
 register where a successful match is found. The field will default to true if it is not provided.
@@ -84,6 +93,9 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "regime" : "VATC",    
     "signOutUrl" : "/sign-out",
     "labels" : {
+      "en" : {
+        "optServiceName" : "Service name in english"
+      },
       "cy" : {
          "optServiceName" : "Service name in welsh"
       }
@@ -98,10 +110,13 @@ Creates a new journey for an Unincorporated Association, storing the journeyConf
 
 #### Request:
 
-optServiceName will default to `Entity Validation Service` if the field is not provided.
-
-labels enables custom welsh translations for the service name to be supplied by the calling service. If the labels
-object is omitted or present, but the "cy" property is not fully defined, the default values will be used.
+The property labels enables the calling service to define the service name in both english and welsh. If the property is not defined, the
+service name in english will default to the value defined by
+the property optServiceName and the service name in welsh will default to the
+service default. If "optServiceName" is not defined the service name in english will be the service default
+`Entity Validation Service`. The above behaviour will apply also if the property is
+present, but one or both of the nested properties "en" and "cy" are not
+defined.
 
 The businessVerificationCheck field allows the calling service to bypass the business verification and continue to
 register where a successful match is found. The field will default to true if it is not provided.
@@ -121,6 +136,9 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "regime" : "VATC"    
     "signOutUrl" : "/sign-out",
     "labels" : {
+      "en" : {
+        "optServiceName" : "Service name in english"
+      },
       "cy" : {
          "optServiceName" : "Service name in welsh"
       }
