@@ -21,6 +21,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustControllersRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.CaptureSaPostcodeViewTests
@@ -36,7 +37,35 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
       await(insertJourneyConfig(
         journeyId = testJourneyId,
         internalId = testInternalId,
+        testTrustsJourneyConfigWithCallingService
+      ))
+      enable(EnableFullTrustJourney)
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
+    }
+
+    lazy val resultWithNoServiceName = {
+      await(insertJourneyConfig(
+        journeyId = testJourneyId,
+        internalId = testInternalId,
         testTrustsJourneyConfig(businessVerificationCheck = true)
+      ))
+      enable(EnableFullTrustJourney)
+      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+      get(s"/identify-your-trust/$testJourneyId/self-assessment-postcode")
+    }
+
+    lazy val resultWithServiceNameFromLabels = {
+      await(insertJourneyConfig(
+        journeyId = testJourneyId,
+        internalId = testInternalId,
+        testTrustsJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+          optServiceName = Some(testCallingServiceName),
+          deskProServiceId = testDeskProServiceId,
+          signOutUrl = testSignOutUrl,
+          accessibilityUrl = testAccessibilityUrl,
+          optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+        ))
       ))
       enable(EnableFullTrustJourney)
       stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -47,8 +76,19 @@ class CaptureSaPostcodeControllerISpec extends ComponentSpecHelper
       result.status mustBe OK
     }
 
-    "return a view which" should {
-      testCaptureSaPostcodeView(result)
+    "return a view" when {
+      "there is no serviceName passed in the journeyConfig" should {
+        testCaptureSaPostcodeView(resultWithNoServiceName)
+        testServiceName(testDefaultServiceName, resultWithNoServiceName)
+      }
+      "there is a serviceName passed in the journeyConfig" should {
+        testCaptureSaPostcodeView(result)
+        testServiceName(testCallingServiceName, result)
+      }
+      "there is a serviceName passed in the journeyConfig labels object" should {
+        testCaptureSaPostcodeView(resultWithServiceNameFromLabels)
+        testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+      }
     }
 
     "redirect to sign in page" when {

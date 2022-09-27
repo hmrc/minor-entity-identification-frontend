@@ -18,9 +18,10 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.
 
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT, OK, SEE_OTHER, await, defaultAwaitTimeout}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testContinueUrl, testInternalId, testJourneyId, testUnincorporatedAssociationJourneyConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers.{routes => uaRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CannotConfirmBusinessViewTests
@@ -38,7 +39,17 @@ class CannotConfirmBusinessControllerISpec extends ComponentSpecHelper
       enable(EnableFullUAJourney)
 
       lazy val result = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testUnincorporatedAssociationJourneyConfigWithCallingService(true)
+        ))
 
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        get(s"/identify-your-unincorporated-association/$testJourneyId/cannot-confirm-business")
+      }
+
+      lazy val resultWithNoServiceName = {
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
           authInternalId = testInternalId,
@@ -49,12 +60,41 @@ class CannotConfirmBusinessControllerISpec extends ComponentSpecHelper
         get(s"/identify-your-unincorporated-association/$testJourneyId/cannot-confirm-business")
       }
 
+      lazy val resultWithServiceNameFromLabels = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testUnincorporatedAssociationJourneyConfig(true).copy(pageConfig = PageConfig(
+            optServiceName = Some(testCallingServiceName),
+            deskProServiceId = testDeskProServiceId,
+            signOutUrl = testSignOutUrl,
+            accessibilityUrl = testAccessibilityUrl,
+            optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+          ))
+        ))
+
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        get(s"/identify-your-unincorporated-association/$testJourneyId/cannot-confirm-business")
+      }
+
+
       "return OK" in {
         result.status mustBe OK
       }
 
-      "return a view which" should {
-        testCannotConfirmBusinessView(result)
+      "return a view" when {
+        "there is no serviceName passed in the journeyConfig" should {
+          testCannotConfirmBusinessView(resultWithNoServiceName)
+          testServiceName(testDefaultServiceName, resultWithNoServiceName)
+        }
+        "there is a serviceName passed in the journeyConfig" should {
+          testCannotConfirmBusinessView(result)
+          testServiceName(testCallingServiceName, result)
+        }
+        "there is a serviceName passed in the journeyConfig labels object" should {
+          testCannotConfirmBusinessView(resultWithServiceNameFromLabels)
+          testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+        }
       }
 
       "redirect to sign in page" when {

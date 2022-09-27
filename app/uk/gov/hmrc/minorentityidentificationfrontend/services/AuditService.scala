@@ -43,7 +43,8 @@ class AuditService @Inject()(appConfig: AppConfig,
   private def auditByBusinessType(journeyId: String, journeyConfig: JourneyConfig)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
 
-    val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+    val callingService: String = journeyConfig.pageConfig.optLabels.flatMap(labels => labels.optEnglishServiceName)
+      .getOrElse(journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName))
 
     journeyConfig.businessEntity match {
       case OverseasCompany => auditOverseasCompanyJourney(journeyId, callingService, journeyConfig)

@@ -22,7 +22,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationNotCalled
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig, RegistrationNotCalled}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, BusinessVerificationStub, RetrieveTrustKnownFactsStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
@@ -46,7 +46,45 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
+            testTrustsJourneyConfigWithCallingService
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
+          stubRetrievePostcode(testJourneyId)(OK, testSaPostcode)
+          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+          stubAudit()
+
+          get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
+        }
+
+        lazy val resultWithNoServiceName: WSResponse = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
             testTrustsJourneyConfig(businessVerificationCheck = true)
+          ))
+
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
+          stubRetrievePostcode(testJourneyId)(OK, testSaPostcode)
+          stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+          stubAudit()
+
+          get(s"/identify-your-trust/$testJourneyId/check-your-answers-business")
+        }
+
+        lazy val resultWithServiceNameFromLabels: WSResponse = {
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testTrustsJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+              optServiceName = Some(testCallingServiceName),
+              deskProServiceId = testDeskProServiceId,
+              signOutUrl = testSignOutUrl,
+              accessibilityUrl = testAccessibilityUrl,
+              optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+            ))
           ))
 
           stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -60,6 +98,24 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
         "return OK" in {
           result.status mustBe OK
+        }
+
+        "return a view" when {
+          "there is no serviceName passed in the journeyConfig" should {
+            testCheckYourAnswersCommonView(resultWithNoServiceName)
+            testTrustWithUtrAndPostcodeSummaryListView(resultWithNoServiceName, testJourneyId)
+            testServiceName(testDefaultServiceName, resultWithNoServiceName)
+          }
+          "there is a serviceName passed in the journeyConfig" should {
+            testCheckYourAnswersCommonView(result)
+            testTrustWithUtrAndPostcodeSummaryListView(result, testJourneyId)
+            testServiceName(testCallingServiceName, result)
+          }
+          "there is a serviceName passed in the journeyConfig labels object" should {
+            testCheckYourAnswersCommonView(resultWithServiceNameFromLabels)
+            testTrustWithUtrAndPostcodeSummaryListView(resultWithServiceNameFromLabels, testJourneyId)
+            testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+          }
         }
 
         "return a view which" should {

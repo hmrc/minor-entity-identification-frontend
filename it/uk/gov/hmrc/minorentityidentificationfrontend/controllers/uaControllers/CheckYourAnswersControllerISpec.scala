@@ -22,7 +22,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationNotCalled
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig, RegistrationNotCalled}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
@@ -48,7 +48,45 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
             await(insertJourneyConfig(
               journeyId = testJourneyId,
               internalId = testInternalId,
+              testUnincorporatedAssociationJourneyConfigWithCallingService(businessVerificationCheck = true)
+            ))
+
+            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+            stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
+            stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
+            stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+            stubAudit()
+
+            get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
+          }
+
+          lazy val resultWithNoServiceName: WSResponse = {
+            await(insertJourneyConfig(
+              journeyId = testJourneyId,
+              internalId = testInternalId,
               testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true)
+            ))
+
+            stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+            stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
+            stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
+            stubRetrieveCHRN(testJourneyId)(NOT_FOUND)
+            stubAudit()
+
+            get(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")
+          }
+
+          lazy val resultWithServiceNameFromLabels: WSResponse = {
+            await(insertJourneyConfig(
+              journeyId = testJourneyId,
+              internalId = testInternalId,
+              testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+                optServiceName = Some(testCallingServiceName),
+                deskProServiceId = testDeskProServiceId,
+                signOutUrl = testSignOutUrl,
+                accessibilityUrl = testAccessibilityUrl,
+                optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+              ))
             ))
 
             stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -64,11 +102,23 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
             result.status mustBe OK
           }
 
-          "return a view which" should {
-            testCheckYourAnswersCommonView(result)
-            testUaWithCtutrAndOfficePostcodeSummaryListView(result, testJourneyId)
+          "return a view" when {
+            "there is no serviceName passed in the journeyConfig" should {
+              testCheckYourAnswersCommonView(resultWithNoServiceName)
+              testUaWithCtutrAndOfficePostcodeSummaryListView(resultWithNoServiceName, testJourneyId)
+              testServiceName(testDefaultServiceName, resultWithNoServiceName)
+            }
+            "there is a serviceName passed in the journeyConfig" should {
+              testCheckYourAnswersCommonView(result)
+              testUaWithCtutrAndOfficePostcodeSummaryListView(result, testJourneyId)
+              testServiceName(testCallingServiceName, result)
+            }
+            "there is a serviceName passed in the journeyConfig labels object" should {
+              testCheckYourAnswersCommonView(resultWithServiceNameFromLabels)
+              testUaWithCtutrAndOfficePostcodeSummaryListView(resultWithServiceNameFromLabels, testJourneyId)
+              testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+            }
           }
-
         }
 
         "the applicant has a no Ctutr and a no charity hmrc reference number" should {

@@ -18,9 +18,10 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControlle
 
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT, OK, SEE_OTHER, await, defaultAwaitTimeout}
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testContinueUrl, testInternalId, testJourneyId, testTrustsJourneyConfig}
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.{routes => trustRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullTrustJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CannotConfirmBusinessViewTests
@@ -38,7 +39,33 @@ class CannotConfirmBusinessControllerISpec extends ComponentSpecHelper
         await(journeyConfigRepository.insertJourneyConfig(
           journeyId = testJourneyId,
           authInternalId = testInternalId,
+          journeyConfig = testTrustsJourneyConfigWithCallingService
+        ))
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        get(s"/identify-your-trust/$testJourneyId/cannot-confirm-business")
+      }
+
+      lazy val resultWithNoServiceName = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
           journeyConfig = testTrustsJourneyConfig(true)
+        ))
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        get(s"/identify-your-trust/$testJourneyId/cannot-confirm-business")
+      }
+
+      lazy val resultWithServiceNameFromLabels = {
+        await(journeyConfigRepository.insertJourneyConfig(
+          journeyId = testJourneyId,
+          authInternalId = testInternalId,
+          journeyConfig = testTrustsJourneyConfig(true).copy(pageConfig = PageConfig(
+            optServiceName = Some(testCallingServiceName),
+            deskProServiceId = testDeskProServiceId,
+            signOutUrl = testSignOutUrl,
+            accessibilityUrl = testAccessibilityUrl,
+            optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+          ))
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
         get(s"/identify-your-trust/$testJourneyId/cannot-confirm-business")
@@ -46,6 +73,22 @@ class CannotConfirmBusinessControllerISpec extends ComponentSpecHelper
 
       "return OK" in {
         result.status mustBe OK
+      }
+
+      "return a view" when {
+        "there is no serviceName passed in the journeyConfig" should {
+          testCannotConfirmBusinessView(resultWithNoServiceName)
+          testServiceName(testDefaultServiceName, resultWithNoServiceName)
+        }
+        "there is a serviceName passed in the journeyConfig" should {
+          testCannotConfirmBusinessView(result)
+          testServiceName(testCallingServiceName, result)
+        }
+        "there is a serviceName passed in the journeyConfig labels object" should {
+          testCannotConfirmBusinessView(resultWithServiceNameFromLabels)
+          testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+        }
+
       }
 
       "return a view which" should {

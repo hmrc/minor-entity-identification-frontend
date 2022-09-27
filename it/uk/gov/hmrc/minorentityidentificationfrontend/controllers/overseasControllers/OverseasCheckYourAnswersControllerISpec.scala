@@ -19,6 +19,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasContro
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
@@ -37,6 +38,21 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         await(insertJourneyConfig(
           journeyId = testJourneyId,
           internalId = testInternalId,
+          testOverseasCompanyJourneyConfigWithCallingService(businessVerificationCheck = true)
+        ))
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
+        stubAudit()
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifiersCountry(testJourneyId)(OK, testOverseasTaxIdentifiersCountry)
+
+        get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
+      }
+
+      lazy val resultWithNoServiceName: WSResponse = {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
           testOverseasCompanyJourneyConfig(businessVerificationCheck = true)
         ))
         stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
@@ -48,8 +64,49 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
       }
 
+      lazy val resultWithServiceNameFromLabels: WSResponse = {
+        await(insertJourneyConfig(
+          journeyId = testJourneyId,
+          internalId = testInternalId,
+          testOverseasCompanyJourneyConfig(businessVerificationCheck = true).copy(pageConfig = PageConfig(
+            optServiceName = Some(testCallingServiceName),
+            deskProServiceId = testDeskProServiceId,
+            signOutUrl = testSignOutUrl,
+            accessibilityUrl = testAccessibilityUrl,
+            optLabels = Some(JourneyLabels(None, Some(testCallingServiceNameFromLabels)))
+          ))
+        ))
+        stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+        stubRetrieveUtr(testJourneyId)(OK, testSautrJson)
+        stubAudit()
+        stubRetrieveOverseasTaxIdentifier(testJourneyId)(OK, testOverseasTaxIdentifier)
+        stubRetrieveOverseasTaxIdentifiersCountry(testJourneyId)(OK, testOverseasTaxIdentifiersCountry)
+
+        get(s"/identify-your-overseas-business/$testJourneyId/check-your-answers-business")
+      }
+
+
       "return OK" in {
         result.status mustBe OK
+      }
+
+      "return a view" when {
+        "there is no serviceName passed in the journeyConfig" should {
+          testCheckYourAnswersCommonView(resultWithNoServiceName)
+          testOverseasSummaryViewWithUtrAndOverseasTaxIdentifier(result, testJourneyId)
+          testServiceName(testDefaultServiceName, resultWithNoServiceName)
+        }
+        "there is a serviceName passed in the journeyConfig" should {
+          testCheckYourAnswersCommonView(result)
+          testOverseasSummaryViewWithUtrAndOverseasTaxIdentifier(result, testJourneyId)
+          testServiceName(testCallingServiceName, result)
+        }
+        "there is a serviceName passed in the journeyConfig labels object" should {
+          testCheckYourAnswersCommonView(resultWithServiceNameFromLabels)
+          testOverseasSummaryViewWithUtrAndOverseasTaxIdentifier(resultWithServiceNameFromLabels, testJourneyId)
+          testServiceName(testCallingServiceNameFromLabels, resultWithServiceNameFromLabels)
+        }
+
       }
 
       "return a view which" should {

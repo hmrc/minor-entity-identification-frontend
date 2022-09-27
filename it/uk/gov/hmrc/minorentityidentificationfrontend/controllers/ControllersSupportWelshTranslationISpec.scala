@@ -97,7 +97,7 @@ class ControllersSupportWelshTranslationISpec
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
-          actualDocFromResponse.getServiceName.text mustBe testDefaultWelshJourneyConfig.pageConfig.optLabels.get.welshServiceName
+          actualDocFromResponse.getServiceName.text mustBe optWelshServiceName
         }
       }
 
@@ -160,7 +160,7 @@ class ControllersSupportWelshTranslationISpec
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
-          actualDocFromResponse.getServiceName.text mustBe testDefaultWelshJourneyConfig.pageConfig.optLabels.get.welshServiceName
+          actualDocFromResponse.getServiceName.text mustBe optWelshServiceName
         }
       }
 
@@ -225,7 +225,7 @@ class ControllersSupportWelshTranslationISpec
             extractDocumentFrom(aWSResponse = get(getUrlToBeTested, cookie = cyLangCookie))
           }
 
-          actualDocFromResponse.getServiceName.text mustBe testDefaultWelshJourneyConfig.pageConfig.optLabels.get.welshServiceName
+          actualDocFromResponse.getServiceName.text mustBe optWelshServiceName
         }
       }
 
@@ -284,7 +284,7 @@ class ControllersSupportWelshTranslationISpec
             extractDocumentFrom(aWSResponse = post(urlToBeTested, cookie = cyLangCookie)(anInvalidFormToCauseAnError))
           }
 
-          actualDocFromResponse.getServiceName.text mustBe testDefaultWelshJourneyConfig.pageConfig.optLabels.get.welshServiceName
+          actualDocFromResponse.getServiceName.text mustBe optWelshServiceName
 
         }
       }
@@ -338,7 +338,7 @@ class ControllersSupportWelshTranslationISpec
             extractDocumentFrom(aWSResponse = post(urlToBeTested, cookie = cyLangCookie)(anInvalidFormToCauseAnError))
           }
 
-          actualDocFromResponse.getServiceName.text mustBe testDefaultWelshJourneyConfig.pageConfig.optLabels.get.welshServiceName
+          actualDocFromResponse.getServiceName.text mustBe optWelshServiceName
 
         }
       }
@@ -394,7 +394,7 @@ class ControllersSupportWelshTranslationISpec
             extractDocumentFrom(aWSResponse = post(urlToBeTested, cookie = cyLangCookie)(anInvalidFormToCauseAnError))
           }
 
-          actualDocFromResponse.getServiceName.text mustBe testDefaultWelshJourneyConfig.pageConfig.optLabels.get.welshServiceName
+          actualDocFromResponse.getServiceName.text mustBe optWelshServiceName
 
         }
       }

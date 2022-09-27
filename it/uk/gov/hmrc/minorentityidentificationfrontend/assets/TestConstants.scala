@@ -50,7 +50,7 @@ object TestConstants {
   val testLocalAccessibilityUrl: String = "http://localhost:12346/accessibility-statement/vat-registration"
   val testStagingAccessibilityUrl: String = "https://www.staging.tax.service.gov.uk/accessibility-statement/vat-registration"
   val testRegime: String = "VATC"
-  val testServiceName: String = "TestService"
+  val testCallingServiceName: String = "Test Service"
   val testOverseasTaxIdentifiersJson: JsObject = Json.obj(
     "taxIdentifier" -> testOverseasTaxIdentifier,
     "country" -> testOverseasTaxIdentifiersCountry
@@ -62,7 +62,10 @@ object TestConstants {
   val testUAJourneyConfigWithCallingService: JourneyConfig = testTrustsJourneyConfigWithCallingService.copy(businessEntity = UnincorporatedAssociation)
   val testDefaultServiceName: String = "Entity Validation Service"
   val testWelshServiceName: String = "Welsh Service Name"
+  val testEnglishServiceName: String = "English Service Name"
+  val optWelshServiceName: String = "This is a welsh service name from Journey labels"
   val testDefaultWelshServiceName: String = "Gwasanaeth Dilysu Endid"
+  val testCallingServiceNameFromLabels: String = "Service Name from Labels"
   val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=vrs"
 
   def testJourneyConfig(serviceName: Option[String] = None,
@@ -84,7 +87,7 @@ object TestConstants {
       deskProServiceId = testDeskProServiceId,
       signOutUrl = testSignOutUrl,
       accessibilityUrl = testAccessibilityUrl,
-      optLabels = Some(JourneyLabels(welshServiceName = "This is a welsh service name from Journey labels"))
+      optLabels = Some(JourneyLabels(Some(optWelshServiceName), None))
     ),
     businessEntity = UnincorporatedAssociation,
     businessVerificationCheck = true,
@@ -95,14 +98,14 @@ object TestConstants {
     testJourneyConfig(businessEntity = Trusts, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
   def testTrustJourneyConfigWithCallingService(businessVerificationCheck: Boolean): JourneyConfig =
-    testJourneyConfig(serviceName = Some(testServiceName), businessEntity = Trusts, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
+    testJourneyConfig(serviceName = Some(testCallingServiceName), businessEntity = Trusts, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
   def testUnincorporatedAssociationJourneyConfig(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(businessEntity = UnincorporatedAssociation, businessVerificationCheck = businessVerificationCheck, regime = testRegime)
 
   def testUnincorporatedAssociationJourneyConfigWithCallingService(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(
-      serviceName = Some(testServiceName),
+      serviceName = Some(testCallingServiceName),
       businessEntity = UnincorporatedAssociation,
       businessVerificationCheck = businessVerificationCheck,
       regime = testRegime)
@@ -112,7 +115,7 @@ object TestConstants {
 
   def testOverseasCompanyJourneyConfigWithCallingService(businessVerificationCheck: Boolean): JourneyConfig =
     testJourneyConfig(
-      serviceName = Some(testServiceName),
+      serviceName = Some(testCallingServiceName),
       businessEntity = OverseasCompany,
       businessVerificationCheck = businessVerificationCheck,
       regime = testRegime
@@ -335,11 +338,14 @@ object TestConstants {
     "labels" -> Json.obj (
       "cy" -> Json.obj (
       "optServiceName" -> s"$testWelshServiceName"
+      ),
+      "en" -> Json.obj (
+        "optServiceName" -> s"$testEnglishServiceName"
       )
     )
   })
 
-  val optLabels: JourneyLabels = JourneyLabels(testWelshServiceName)
+  val optLabels: JourneyLabels = JourneyLabels(Some(testWelshServiceName), Some(testEnglishServiceName))
 
   val testIdentifiersMatchSuccessfulMatchJson: JsObject = Json.obj("identifiersMatch" -> "SuccessfulMatch")
   val testIdentifiersMatchDetailsMismatchJson: JsObject = Json.obj("identifiersMatch" -> "DetailsMismatch")
@@ -389,7 +395,7 @@ object TestConstants {
                                                   continueUrlForBVCall: Call,
                                                   journeyConfig: JourneyConfig): JsObject = {
 
-    val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(testDefaultServiceName)
+    val callingService: String = journeyConfig.pageConfig.optLabels.flatMap(_.optEnglishServiceName).getOrElse(testDefaultServiceName)
 
     Json.obj("continueUrl" -> continueUrlForBVCall.url,
       "origin" -> journeyConfig.regime,

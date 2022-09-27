@@ -41,7 +41,8 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
 
     val (identifierJsonKey, continueUrlJsonValue, optEntityTypeJson) = jsonPartsBy(businessEntity = journeyConfig.businessEntity, journeyId = journeyId)
 
-    val callingService: String = journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName)
+    val callingService: String = journeyConfig.pageConfig.optLabels.flatMap(labels => labels.optEnglishServiceName)
+      .getOrElse(journeyConfig.pageConfig.optServiceName.getOrElse(appConfig.defaultServiceName))
 
     val jsonBody: JsObject =
       Json.obj(
@@ -65,11 +66,11 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
   }
 
   private def jsonPartsBy(businessEntity: BusinessEntity, journeyId: String): (String, Call, JsObject) = businessEntity match {
-    case BusinessEntity.Trusts                    =>
+    case BusinessEntity.Trusts =>
       ("saUtr", trustControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId), Json.obj("entityType" -> "TRUST"))
     case BusinessEntity.UnincorporatedAssociation =>
       ("ctUtr", uaControllers.routes.BusinessVerificationController.retrieveBusinessVerificationResult(journeyId), Json.obj())
-    case BusinessEntity.OverseasCompany           =>
+    case BusinessEntity.OverseasCompany =>
       throw new IllegalArgumentException("Only Trusts and UnincorporatedAssociation business entities are supported.")
   }
 
@@ -90,18 +91,18 @@ object CreateBusinessVerificationJourneyConnector {
   implicit object BusinessVerificationHttpReads extends HttpReads[BusinessVerificationJourneyCreationResponse] {
     override def read(method: String, url: String, response: HttpResponse): BusinessVerificationJourneyCreationResponse = {
       response.status match {
-        case CREATED   =>
+        case CREATED =>
           (response.json \ "redirectUri").asOpt[String] match {
             case Some(redirectUri) =>
               Right(BusinessVerificationJourneyCreated(redirectUri))
-            case _                 =>
+            case _ =>
               throw new InternalServerException(s"Business Verification API returned malformed JSON")
           }
         case NOT_FOUND =>
           Left(NotEnoughEvidence)
         case FORBIDDEN =>
           Left(UserLockedOut)
-        case status    =>
+        case status =>
           throw new InternalServerException(s"Business Verification API failed with status: $status")
       }
     }

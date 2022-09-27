@@ -32,8 +32,10 @@ import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import play.api.test.Injecting
 import uk.gov.hmrc.crypto.PlainText
 import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testCallingServiceNameFromLabels, testDefaultServiceName, testCallingServiceName}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
 
 import scala.concurrent.Future
@@ -140,6 +142,18 @@ trait ComponentSpecHelper extends AnyWordSpec
                           internalId: String,
                           journeyConfig: JourneyConfig): Future[InsertOneResult] =
     journeyConfigRepository.insertJourneyConfig(journeyId, internalId, journeyConfig)
+
+  def expectedTitle(doc: Document, titlePart: String, titlePartSpecificForEntity: Option[String] = None): String = {
+    val title = titlePartSpecificForEntity.getOrElse(titlePart)
+    doc.getServiceName.text() match {
+      case serviceName if serviceName.equals(testDefaultServiceName) =>
+        s"$title - $testDefaultServiceName - GOV.UK"
+      case serviceName if serviceName.equals(testCallingServiceNameFromLabels) =>
+        s"$title - $testCallingServiceNameFromLabels - GOV.UK"
+      case _ =>
+        s"$title - $testCallingServiceName - GOV.UK"
+    }
+  }
 
   def extraConfig(): Map[String, String] = Map()
 
