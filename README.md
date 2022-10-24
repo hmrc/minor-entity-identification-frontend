@@ -46,7 +46,7 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "businessVerificationCheck" : true,
     "continueUrl" : "/test",
     "deskProServiceId" : "abc",
-    "optServiceName" : "Service Name",
+    "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "regime" : "VATC",    
     "signOutUrl" : "/sign-out",
     "labels" : {
@@ -89,7 +89,7 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "businessVerificationCheck" : true,
     "continueUrl" : "/test",
     "deskProServiceId" : "abc",
-    "optServiceName" : "Service Name",
+    "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "regime" : "VATC",    
     "signOutUrl" : "/sign-out",
     "labels" : {
@@ -132,7 +132,7 @@ Verification (rather than stub it) all non-relative urls will cause the handover
     "businessVerificationCheck" : true,
     "continueUrl" : "/test",
     "deskProServiceId" : "abc",
-    "optServiceName" : "Service Name",
+    "optServiceName" : "Service Name", // deprecated, use labels.en.optServiceName
     "regime" : "VATC"    
     "signOutUrl" : "/sign-out",
     "labels" : {
