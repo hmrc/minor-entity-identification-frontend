@@ -1113,15 +1113,6 @@
     "name": "Guyana",
     "citizen-names": "Guyanese"
   },
-  "XK": {
-    "entry-number": "99",
-    "entry-timestamp": "2016-04-05T13:23:05Z",
-    "item-hash": "sha-256:fb6dbf64942d56e0f9706693334fabb8fd4cfacaf796ee01522146e0d608ff54",
-    "country": "XK",
-    "official-name": "The Republic of Kosovo",
-    "name": "Kosovo",
-    "citizen-names": "Kosovan"
-  },
   "HN": {
     "entry-number": "80",
     "entry-timestamp": "2016-04-05T13:23:05Z",
@@ -1804,5 +1795,225 @@
     "official-name": "The Republic of Poland",
     "name": "Poland",
     "citizen-names": "Pole"
+  },
+  "AI" : {
+    "country" : "AI",
+    "name" : "Anguilla"
+  },
+  "AQ" : {
+    "country" : "AQ",
+    "name" : "Antarctica"
+  },
+  "AS" : {
+    "country" : "AS",
+    "name" : "American Samoa"
+  },
+  "AW" : {
+    "country" : "AW",
+    "name" : "Aruba"
+  },
+  "AX" : {
+    "country" : "AX",
+    "name" : "Aland Islands"
+  },
+  "BL" : {
+    "country" : "BL",
+    "name" : "Saint Barthelemy"
+  },
+  "BM" : {
+    "country" : "BM",
+    "name" : "Bermuda"
+  },
+  "BQ" : {
+    "country" : "BQ",
+    "name" : "Bonaire, Sint Eustatius and Saba"
+  },
+  "BV" : {
+    "country" : "BV",
+    "name" : "Bouvet Island"
+  },
+  "CC" : {
+    "country" : "CC",
+    "name" : "Cocos (Keeling) Islands (the)"
+  },
+  "CK" : {
+    "country" : "CK",
+    "name" : "Cook Islands (the)"
+  },
+  "CW" : {
+    "country" : "CW",
+    "name" : "Curacao"
+  },
+  "CX" : {
+    "country" : "CX",
+    "name" : "Christmas Island"
+  },
+  "EH" : {
+    "country" : "EH",
+    "name" : "Western Sahara"
+  },
+  "FK" : {
+    "country" : "FK",
+    "name" : "Falkland Islands (the) [Malvinas]"
+  },
+  "FO" : {
+    "country" : "FO",
+    "name" : "Faroe Islands (the)"
+  },
+  "GF" : {
+    "country" : "GF",
+    "name" : "French Guiana"
+  },
+  "GG" : {
+    "country" : "GG",
+    "name" : "Guernsey"
+  },
+  "GI" : {
+    "country" : "GI",
+    "name" : "Gibraltar"
+  },
+  "GL" : {
+    "country" : "GL",
+    "name" : "Greenland"
+  },
+  "GP" : {
+    "country" : "GP",
+    "name" : "Guadeloupe"
+  },
+  "GS" : {
+    "country" : "GS",
+    "name" : "South Georgia and the South Sandwich Islands"
+  },
+  "GU" : {
+    "country" : "GU",
+    "name" : "Guam"
+  },
+  "HK" : {
+    "country" : "HK",
+    "name" : "Hong Kong"
+  },
+  "HM" : {
+    "country" : "HM",
+    "name" : "Heard Island and McDonald Islands"
+  },
+  "IM" : {
+    "country" : "IM",
+    "name" : "Isle of Man"
+  },
+  "IO" : {
+    "country" : "IO",
+    "name" : "British Indian Ocean Territory (the)"
+  },
+  "JE" : {
+    "country" : "JE",
+    "name" : "Jersey"
+  },
+  "KY" : {
+    "country" : "KY",
+    "name" : "Cayman Islands (the)"
+  },
+  "MF" : {
+    "country" : "MF",
+    "name" : "Saint Martin (French part)"
+  },
+  "MO" : {
+    "country" : "MO",
+    "name" : "Macao"
+  },
+  "MP" : {
+    "country" : "MP",
+    "name" : "Northern Mariana Islands (the)"
+  },
+  "MQ" : {
+    "country" : "MQ",
+    "name" : "Martinique"
+  },
+  "MS" : {
+    "country" : "MS",
+    "name" : "Montserrat"
+  },
+  "NC" : {
+    "country" : "NC",
+    "name" : "New Caledonia"
+  },
+  "NF" : {
+    "country" : "NF",
+    "name" : "Norfolk Island"
+  },
+  "NU" : {
+    "country" : "NU",
+    "name" : "Niue"
+  },
+  "PF" : {
+    "country" : "PF",
+    "name" : "French Polynesia"
+  },
+  "PM" : {
+    "country" : "PM",
+    "name" : "Saint Pierre and Miquelon"
+  },
+  "PN" : {
+    "country" : "PN",
+    "name" : "Pitcairn"
+  },
+  "PR" : {
+    "country" : "PR",
+    "name" : "Puerto Rico"
+  },
+  "PS" : {
+    "country" : "PS",
+    "name" : "Palestine, State of"
+  },
+  "RE" : {
+    "country" : "RE",
+    "name" : "Reunion"
+  },
+  "SH" : {
+    "country" : "SH",
+    "name" : "Saint Helena, Ascension and Tristan da Cunha"
+  },
+  "SJ" : {
+    "country" : "SJ",
+    "name" : "Svalbard and Jan Mayen"
+  },
+  "SX" : {
+    "country" : "SX",
+    "name" : "Sint Maarten (Dutch part)"
+  },
+  "TC" : {
+    "country" : "TC",
+    "name" : "Turks and Caicos Islands (the)"
+  },
+  "TF" : {
+    "country" : "TF",
+    "name" : "French Southern Territories (the)"
+  },
+  "TK" : {
+    "country" : "TK",
+    "name" : "Tokelau"
+  },
+  "TW" : {
+    "country" : "TW",
+    "name" : "Taiwan (Province of China)"
+  },
+  "UM" : {
+    "country" : "UM",
+    "name" : "United States Minor Outlying Islands (the)"
+  },
+  "VG" : {
+    "country" : "VG",
+    "name" : "Virgin Islands (British)"
+  },
+  "VI" : {
+    "country" : "VI",
+    "name" : "Virgin Islands (U.S)"
+  },
+  "WF" : {
+    "country" : "WF",
+    "name" : "Wallis and Futuna"
+  },
+  "YT" : {
+    "country" : "YT",
+    "name" : "Mayotte"
   }
 }
