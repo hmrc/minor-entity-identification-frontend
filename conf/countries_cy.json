@@ -1113,15 +1113,6 @@
     "name": "Guyana",
     "citizen-names": "Guyanese"
   },
-  "XK": {
-    "entry-number": "99",
-    "entry-timestamp": "2016-04-05T13:23:05Z",
-    "item-hash": "sha-256:fb6dbf64942d56e0f9706693334fabb8fd4cfacaf796ee01522146e0d608ff54",
-    "country": "XK",
-    "official-name": "The Republic of Kosovo",
-    "name": "Kosovo",
-    "citizen-names": "Kosovan"
-  },
   "HN": {
     "entry-number": "80",
     "entry-timestamp": "2016-04-05T13:23:05Z",
@@ -1804,5 +1795,225 @@
     "official-name": "The Republic of Poland",
     "name": "Gwlad Pwyl",
     "citizen-names": "Pole"
+  },
+  "AI" : {
+    "country" : "AI",
+    "name" : "Anguilla"
+  },
+  "AQ" : {
+    "country" : "AQ",
+    "name" : "Antarctica"
+  },
+  "AS" : {
+    "country" : "AS",
+    "name" : "Samoa Americanaidd"
+  },
+  "AW" : {
+    "country" : "AW",
+    "name" : "Aruba"
+  },
+  "AX" : {
+    "country" : "AX",
+    "name" : "Ynysoedd Aland"
+  },
+  "BL" : {
+    "country" : "BL",
+    "name" : "Saint Barthelemy"
+  },
+  "BM" : {
+    "country" : "BM",
+    "name" : "Bermwda"
+  },
+  "BQ" : {
+    "country" : "BQ",
+    "name" : "Bonaire, Sint Eustatius a Saba"
+  },
+  "BV" : {
+    "country" : "BV",
+    "name" : "Ynys Bouvet"
+  },
+  "CC" : {
+    "country" : "CC",
+    "name" : "Ynysoedd Cocos (Keeling)"
+  },
+  "CK" : {
+    "country" : "CK",
+    "name" : "Ynysoedd Cook"
+  },
+  "CW" : {
+    "country" : "CW",
+    "name" : "Curacao"
+  },
+  "CX" : {
+    "country" : "CX",
+    "name" : "Ynys y Nadolig"
+  },
+  "EH" : {
+    "country" : "EH",
+    "name" : "Gorllewin y Sahara"
+  },
+  "FK" : {
+    "country" : "FK",
+    "name" : "Ynysoedd Falkland [Malvinas]"
+  },
+  "FO" : {
+    "country" : "FO",
+    "name" : "Ynysoedd Ffaröe"
+  },
+  "GF" : {
+    "country" : "GF",
+    "name" : "Guiana Ffrengig"
+  },
+  "GG" : {
+    "country" : "GG",
+    "name" : "Guernsey"
+  },
+  "GI" : {
+    "country" : "GI",
+    "name" : "Gibraltar"
+  },
+  "GL" : {
+    "country" : "GL",
+    "name" : "Yr Ynys Las"
+  },
+  "GP" : {
+    "country" : "GP",
+    "name" : "Guadeloupe"
+  },
+  "GS" : {
+    "country" : "GS",
+    "name" : "Ynysoedd De Georgia a De Sandwich"
+  },
+  "GU" : {
+    "country" : "GU",
+    "name" : "Guam"
+  },
+  "HK" : {
+    "country" : "HK",
+    "name" : "Hong Kong"
+  },
+  "HM" : {
+    "country" : "HM",
+    "name" : "Ynys Heard ac Ynysoedd McDonald"
+  },
+  "IM" : {
+    "country" : "IM",
+    "name" : "Ynys Manaw"
+  },
+  "IO" : {
+    "country" : "IO",
+    "name" : "Tiriogaeth Môr Indiaidd Prydain"
+  },
+  "JE" : {
+    "country" : "JE",
+    "name" : "Jersey"
+  },
+  "KY" : {
+    "country" : "KY",
+    "name" : "Ynysoedd Cayman"
+  },
+  "MF" : {
+    "country" : "MF",
+    "name" : "Saint Martin (rhan Ffrainc)"
+  },
+  "MO" : {
+    "country" : "MO",
+    "name" : "Macao"
+  },
+  "MP" : {
+    "country" : "MP",
+    "name" : "Ynysoedd Gogledd Mariana"
+  },
+  "MQ" : {
+    "country" : "MQ",
+    "name" : "Martinique"
+  },
+  "MS" : {
+    "country" : "MS",
+    "name" : "Montserrat"
+  },
+  "NC" : {
+    "country" : "NC",
+    "name" : "Caledonia Newydd"
+  },
+  "NF" : {
+    "country" : "NF",
+    "name" : "Ynys Norfolk"
+  },
+  "NU" : {
+    "country" : "NU",
+    "name" : "Niue"
+  },
+  "PF" : {
+    "country" : "PF",
+    "name" : "Polynesia Ffrengig"
+  },
+  "PM" : {
+    "country" : "PM",
+    "name" : "Saint Pierre a Miquelon"
+  },
+  "PN" : {
+    "country" : "PN",
+    "name" : "Pitcairn"
+  },
+  "PR" : {
+    "country" : "PR",
+    "name" : "Puerto Rico"
+  },
+  "PS" : {
+    "country" : "PS",
+    "name" : "Gwladwriaeth Palesteina"
+  },
+  "RE" : {
+    "country" : "RE",
+    "name" : "Reunion"
+  },
+  "SH" : {
+    "country" : "SH",
+    "name" : "Saint Helena, Ascension a Tristan da Cunha"
+  },
+  "SJ" : {
+    "country" : "SJ",
+    "name" : "Svalbard a Jan Mayen"
+  },
+  "SX" : {
+    "country" : "SX",
+    "name" : "Sint Maarten (rhan yr Iseldiroedd)"
+  },
+  "TC" : {
+    "country" : "TC",
+    "name" : "Ynysoedd Turks a Caicos"
+  },
+  "TF" : {
+    "country" : "TF",
+    "name" : "Tiriogaethau Deheuol Ffrainc"
+  },
+  "TK" : {
+    "country" : "TK",
+    "name" : "Tokelau"
+  },
+  "TW" : {
+    "country" : "TW",
+    "name" : "Taiwan (Talaith Tsieina)"
+  },
+  "UM" : {
+    "country" : "UM",
+    "name" : "Mân Ynysoedd Pellennig yr Unol Daleithiau"
+  },
+  "VG" : {
+    "country" : "VG",
+    "name" : "Ynysoedd y Wyryf (Prydeinig)"
+  },
+  "VI" : {
+    "country" : "VI",
+    "name" : "Ynysoedd y Wyryf (Unol Daleithiau)"
+  },
+  "WF" : {
+    "country" : "WF",
+    "name" : "Wallis a Futuna"
+  },
+  "YT" : {
+    "country" : "YT",
+    "name" : "Mayotte"
   }
 }
