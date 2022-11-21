@@ -14,17 +14,14 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLabel
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-@import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
+@import uk.gov.hmrc.minorentityidentificationfrontend.models.{Country, PageConfig}
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
-@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
-@import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers.routes
-@import uk.gov.hmrc.minorentityidentificationfrontend.models.Country
-@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLabel
 
 
 @this(layout: govuk_template,
@@ -55,7 +52,7 @@
                     value = Some(code),
                     text = name,
                     selected = code == form("country").value.getOrElse(""),
-                    attributes = Map("id" → s"country-$code")
+                    attributes = Map("id" -> s"country-$code")
                 )
             },
             formGroupClasses = "form-field-group"
@@ -72,8 +69,7 @@
                     const matchingOption = Array.from(document.querySelectorAll("#country-select > option")).find(function(c) {
                             return c.text === document.getElementById("country").value;
                         });
-                    const country = matchingOption ? matchingOption.value : undefined;
-                    document.getElementById("country-select").value = country;
+                    document.getElementById("country-select").value = matchingOption ? matchingOption.value : undefined;
                 }
             })
         </script>

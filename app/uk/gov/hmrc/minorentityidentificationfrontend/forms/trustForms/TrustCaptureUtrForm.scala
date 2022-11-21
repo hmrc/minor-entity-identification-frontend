@@ -23,8 +23,6 @@ import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrCaptureHelpe
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.utils.UtrMapping.utrMapping
 import uk.gov.hmrc.minorentityidentificationfrontend.models.Utr
 
-import scala.util.matching.Regex
-
 object TrustCaptureUtrForm {
   val UtrKey = "utr"
 

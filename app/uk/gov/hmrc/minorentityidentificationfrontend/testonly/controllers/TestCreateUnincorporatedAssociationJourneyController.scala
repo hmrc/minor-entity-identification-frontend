@@ -58,7 +58,7 @@ class TestCreateUnincorporatedAssociationJourneyController @Inject()(messagesCon
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(UnincorporatedAssociation).fill(defaultJourneyConfig), routes.TestCreateUnincorporatedAssociationJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(UnincorporatedAssociation).fill(defaultJourneyConfig), routes.TestCreateUnincorporatedAssociationJourneyController.submit))
         )
       }
   }
@@ -69,7 +69,7 @@ class TestCreateUnincorporatedAssociationJourneyController @Inject()(messagesCon
         TestCreateJourneyForm.form(UnincorporatedAssociation).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateUnincorporatedAssociationJourneyController.submit()))
+              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateUnincorporatedAssociationJourneyController.submit))
             ),
           journeyConfig =>
             testCreateJourneyConnector.createUnincorporatedAssociationJourney(journeyConfig).map {
