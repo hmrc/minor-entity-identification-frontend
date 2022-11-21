@@ -58,7 +58,7 @@ class TestCreateTrustsJourneyController @Inject()(messagesControllerComponents: 
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(Trusts).fill(defaultJourneyConfig), routes.TestCreateTrustsJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(Trusts).fill(defaultJourneyConfig), routes.TestCreateTrustsJourneyController.submit))
         )
       }
   }
@@ -69,7 +69,7 @@ class TestCreateTrustsJourneyController @Inject()(messagesControllerComponents: 
         TestCreateJourneyForm.form(Trusts).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateTrustsJourneyController.submit()))
+              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateTrustsJourneyController.submit))
             ),
           journeyConfig =>
             testCreateJourneyConnector.createTrustsJourney(journeyConfig).map {

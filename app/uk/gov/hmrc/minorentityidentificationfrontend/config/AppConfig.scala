@@ -100,7 +100,7 @@ class AppConfig @Inject()(config: Configuration,
 
   private lazy val orderedCountryListInWelsh: Seq[Country] =  countriesListInWelsh.values.toSeq.sortBy(_.name)
 
-  private def getCountryListByLanguage(code: String = "en"): Map[String, Country] = if(code == "cy") countriesListInWelsh else countriesListInEnglish
+  private def getCountryListByLanguage(code: String): Map[String, Country] = if(code == "cy") countriesListInWelsh else countriesListInEnglish
 
   def getOrderedCountryListByLanguage(code: String = "en"): Seq[Country] = if(code == "cy") orderedCountryListInWelsh else orderedCountryListInEnglish
 

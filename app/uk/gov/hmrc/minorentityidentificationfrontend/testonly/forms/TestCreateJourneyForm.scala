@@ -36,6 +36,35 @@ object TestCreateJourneyForm {
   val labels = "labels"
   val welshServiceName = "welshServiceName"
 
+  def form(businessEntity: BusinessEntity): Form[JourneyConfig] = {
+    Form(mapping(
+      continueUrl -> text.verifying(continueUrlEmpty),
+      serviceName -> optText,
+      deskProServiceId -> text.verifying(deskProServiceIdEmpty),
+      signOutUrl -> text.verifying(signOutUrlEmpty),
+      accessibilityUrl -> text.verifying(accessibilityUrlEmpty),
+      businessVerificationCheck -> boolean,
+      regime -> text.verifying(regimeEmpty),
+      welshServiceName -> optText
+    )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, businessVerificationCheck, regime, welshServiceName) =>
+      JourneyConfig.apply(
+        continueUrl,
+        PageConfig(deskProServiceId, signOutUrl, accessibilityUrl, JourneyLabels(welshServiceName, serviceName)),
+        businessEntity,
+        businessVerificationCheck,
+        regime)
+    )(journeyConfig =>
+      Some((journeyConfig.continueUrl,
+        journeyConfig.pageConfig.optLabels.flatMap(_.optEnglishServiceName),
+        journeyConfig.pageConfig.deskProServiceId,
+        journeyConfig.pageConfig.signOutUrl,
+        journeyConfig.pageConfig.accessibilityUrl,
+        journeyConfig.businessVerificationCheck,
+        journeyConfig.regime,
+        journeyConfig.pageConfig.optLabels.flatMap(_.optWelshServiceName)
+      ))))
+  }
+
   def continueUrlEmpty: Constraint[String] = Constraint("continue_url.not_entered")(
     continueUr => validate(
       constraint = continueUr.isEmpty,
@@ -70,35 +99,5 @@ object TestCreateJourneyForm {
       errMsg = "Regime is not entered"
     )
   )
-
-  def form(businessEntity: BusinessEntity): Form[JourneyConfig] = {
-    Form(mapping(
-      continueUrl -> text.verifying(continueUrlEmpty),
-      serviceName -> optText,
-      deskProServiceId -> text.verifying(deskProServiceIdEmpty),
-      signOutUrl -> text.verifying(signOutUrlEmpty),
-      accessibilityUrl -> text.verifying(accessibilityUrlEmpty),
-      businessVerificationCheck -> boolean,
-      regime -> text.verifying(regimeEmpty),
-      welshServiceName -> optText
-    )((continueUrl, serviceName, deskProServiceId, signOutUrl, accessibilityUrl, businessVerificationCheck, regime, welshServiceName) =>
-      JourneyConfig.apply(
-        continueUrl,
-        PageConfig(deskProServiceId, signOutUrl, accessibilityUrl, JourneyLabels(welshServiceName, serviceName)),
-        businessEntity,
-        businessVerificationCheck,
-        regime)
-    )(journeyConfig =>
-      Some(journeyConfig.continueUrl,
-        journeyConfig.pageConfig.optLabels.flatMap(_.optEnglishServiceName),
-        journeyConfig.pageConfig.deskProServiceId,
-        journeyConfig.pageConfig.signOutUrl,
-        journeyConfig.pageConfig.accessibilityUrl,
-        journeyConfig.businessVerificationCheck,
-        journeyConfig.regime,
-        journeyConfig.pageConfig.optLabels.flatMap(_.optWelshServiceName)
-      )
-    ))
-  }
 
 }

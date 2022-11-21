@@ -58,7 +58,7 @@ class TestCreateOverseasCompanyJourneyController @Inject()(messagesControllerCom
     implicit request =>
       authorised() {
         Future.successful(
-          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(OverseasCompany).fill(defaultJourneyConfig), routes.TestCreateOverseasCompanyJourneyController.submit()))
+          Ok(view(defaultPageConfig, TestCreateJourneyForm.form(OverseasCompany).fill(defaultJourneyConfig), routes.TestCreateOverseasCompanyJourneyController.submit))
         )
       }
   }
@@ -69,7 +69,7 @@ class TestCreateOverseasCompanyJourneyController @Inject()(messagesControllerCom
         TestCreateJourneyForm.form(OverseasCompany).bindFromRequest().fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateOverseasCompanyJourneyController.submit()))
+              BadRequest(view(defaultPageConfig, formWithErrors, routes.TestCreateOverseasCompanyJourneyController.submit))
             ),
           journeyConfig =>
             testCreateJourneyConnector.createOverseasCompanyJourney(journeyConfig).map {
