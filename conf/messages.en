@@ -57,7 +57,7 @@ trust.error.invalid_format_sa-postcode                       = Enter the postcod
 trust.error.no_entry_sa-postcode                             = Enter the postcode used to register the trust for Self Assessment
 
 ## UA Office Postcode Page
-office-postcode.title                                        = What is the postcode used to register the association?
+office-postcode.title                                        = What is the postcode used to register the association for Corporation Tax?
 office-postcode.hint                                         = For example, AB1 2YZ
 ua.error.invalid_format_office_postcode                      = Enter the postcode in the correct format
 ua.error.no_entry_office_postcode                            = Enter the postcode used to register the association for Corporation Tax
@@ -78,6 +78,7 @@ check-your-answers.no_ua_charity_hmrc_reference_number      = The association do
 check-your-answers.sa_postcode                              = Self Assessment postcode
 check-your-answers.no_sa_postcode                           = The trust does not have a Self Assessment postcode
 check-your-answers.office_postcode                          = Postcode
+check-your-answers.ua_office_postcode                       = Corporation Tax postcode
 
 ## Capture Charity HMRC Reference number
 chrn.title                                                  = What is the charity’s HMRC reference number?

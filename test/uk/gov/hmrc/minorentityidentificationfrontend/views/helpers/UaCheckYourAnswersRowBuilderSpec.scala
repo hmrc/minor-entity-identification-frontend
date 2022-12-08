@@ -76,13 +76,13 @@ class UaCheckYourAnswersRowBuilderSpec extends AbstractCheckYourAnswersRowBuilde
   )
 
   val testOfficePostcodeRow: SummaryListRow = SummaryListRow(
-    key = Key(content = Text("Postcode")),
+    key = Key(content = Text("Corporation Tax postcode")),
     value = Value(HtmlContent(testOfficePostcode)),
     actions = Some(Actions(items = Seq(
       ActionItem(
         href = uaControllers.routes.CaptureOfficePostcodeController.show(testJourneyId).url,
         content = Text("Change"),
-        visuallyHiddenText = Some("Postcode")
+        visuallyHiddenText = Some("Corporation Tax postcode")
       )
     )))
   )

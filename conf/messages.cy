@@ -57,7 +57,7 @@ trust.error.invalid_format_sa-postcode              = Nodwch y cod post yn y ffo
 trust.error.no_entry_sa-postcode                    = Nodwch y cod post a ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad
 
 ## UA Office Postcode Page
-office-postcode.title                               = Beth yw’r cod post a ddefnyddir i gofrestru’r gymdeithas?
+office-postcode.title                               = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r gymdeithas ar gyfer Treth Gorfforaeth
 office-postcode.hint                                = Er enghraifft, AB1 2YZ
 ua.error.invalid_format_office_postcode             = Nodwch y cod post yn y fformat cywir
 ua.error.no_entry_office_postcode                   = Nodwch y cod post a ddefnyddiwyd i gofrestru’r gymdeithas ar gyfer Treth Gorfforaeth
@@ -78,6 +78,7 @@ check-your-answers.no_ua_charity_hmrc_reference_number = Nid oes gan y gymdeitha
 check-your-answers.sa_postcode                         = Cod post Hunanasesiad
 check-your-answers.no_sa_postcode                      = Does dim cod post Hunanasesiad gan yr ymddiriedolaeth
 check-your-answers.office_postcode                     = Cod post
+check-your-answers.ua_office_postcode                  = Cod post Treth Gorfforaeth
 
 ## Capture Charity HMRC Reference number
 chrn.title                                          = Beth yw cyfeirnod CThEM yr elusen?

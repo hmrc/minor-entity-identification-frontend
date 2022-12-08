@@ -49,7 +49,7 @@ class UaCheckYourAnswersRowBuilder() {
     )
 
     def officePostcodeRow(): Aliases.SummaryListRow = CheckYourAnswersRowBuilder.buildSummaryRow(
-      messages(checkYourAnswersMessageKey(keySuffix = "office_postcode")),
+      messages(checkYourAnswersMessageKey(keySuffix = "ua_office_postcode")),
       optOfficePostcode match {
         case Some(postcode) => postcode
         case None => throw new InternalServerException("Office post code is not available")

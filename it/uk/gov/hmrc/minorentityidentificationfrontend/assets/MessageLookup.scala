@@ -119,7 +119,7 @@ object MessageLookup {
 
   object CaptureOfficePostcode {
 
-    val title = "What is the postcode used to register the association?"
+    val title = "What is the postcode used to register the association for Corporation Tax?"
     val hint = "For example, AB1 2YZ"
 
     object Error {
@@ -167,7 +167,7 @@ object MessageLookup {
 
     val postcode = "Self Assessment postcode"
     val noPostCode = "The trust does not have a Self Assessment postcode"
-    val uaPostcode = "Postcode"
+    val uaPostcode = "Corporation Tax postcode"
 
     val charityHRMCReferenceNumber = "HMRC reference number"
     val charityHMRCReferenceNumberNotProvided = "The charity does not have a HMRC reference number"
