@@ -77,7 +77,6 @@ check-your-answers.no_charity_hmrc_reference_number    = Nid oes gan yr elusen g
 check-your-answers.no_ua_charity_hmrc_reference_number = Nid oes gan y gymdeithas gyfeirnod CThEM
 check-your-answers.sa_postcode                         = Cod post Hunanasesiad
 check-your-answers.no_sa_postcode                      = Does dim cod post Hunanasesiad gan yr ymddiriedolaeth
-check-your-answers.office_postcode                     = Cod post
 check-your-answers.ua_office_postcode                  = Cod post Treth Gorfforaeth
 
 ## Capture Charity HMRC Reference number
