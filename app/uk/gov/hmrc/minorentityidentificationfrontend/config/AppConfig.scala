@@ -43,6 +43,8 @@ class AppConfig @Inject()(config: Configuration,
 
   lazy val contactHost: String = servicesConfig.getString("contact-frontend.host")
 
+  lazy val grsDeskProServiceId: String = "grs"
+
   private lazy val backendUrl: String = servicesConfig.baseUrl("minor-entity-identification")
 
   lazy val createJourneyUrl: String = s"$backendUrl/minor-entity-identification/journey"

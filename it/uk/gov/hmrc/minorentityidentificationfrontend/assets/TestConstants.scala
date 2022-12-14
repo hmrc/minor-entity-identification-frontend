@@ -66,7 +66,7 @@ object TestConstants {
   val optWelshServiceName: String = "This is a welsh service name from Journey labels"
   val testDefaultWelshServiceName: String = "Gwasanaeth Dilysu Endid"
   val testCallingServiceNameFromLabels: String = "Service Name from Labels"
-  val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=vrs"
+  val testTechnicalHelpUrl: String = "http://localhost:9250/contact/report-technical-problem?newTab=true&service=grs"
 
   def testJourneyConfig(serviceName: Option[String] = None,
                         businessEntity: BusinessEntity,
