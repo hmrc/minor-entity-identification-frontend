@@ -44,7 +44,7 @@
     </div>
 
     @hmrcReportTechnicalIssue(ReportTechnicalIssue(
-        serviceId = pageConfig.deskProServiceId,
+        serviceId = appConfig.grsDeskProServiceId,
         baseUrl = Some(appConfig.contactHost),
         language = if(messages.lang.code == "cy") Cy else En
     ))

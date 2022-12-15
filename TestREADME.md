@@ -56,7 +56,7 @@ to Business Verification (rather than stub it) all non-relative urls will cause 
 
 3. DeskPro Service ID (Required)
 
-    - Used for the `Get help with this page` link
+    - Used for the `Beta feedback` link
     - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)
@@ -104,7 +104,7 @@ to Business Verification (rather than stub it) all non-relative urls will cause 
 
 3. DeskPro Service ID (Required)
 
-    - Used for the `Get help with this page` link
+    - Used for the `Beta feedback` link
     - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)
@@ -152,7 +152,7 @@ to Business Verification (rather than stub it) all non-relative urls will cause 
 
 3. DeskPro Service ID (Required)
 
-    - Used for the `Get help with this page` link
+    - Used for the `Beta feedback` link
     - This is currently autofilled but can be changed
 
 4. Sign Out Link (Required)

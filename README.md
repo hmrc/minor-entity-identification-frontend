@@ -40,6 +40,8 @@ All other fields must be provided.
 All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out to Business
 Verification (rather than stub it) all non-relative urls will cause the handover to Business Verification to fail.
 
+The Deskpro service identifier is used to set the service name in the beta feedback url.
+
 ```
 {
     "accessibilityUrl": "/accessibility",
@@ -83,6 +85,8 @@ All other fields must be provided.
 All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out to Business
 Verification (rather than stub it) all non-relative urls will cause the handover to Business Verification to fail.
 
+The Deskpro service identifier is used to set the service name in the beta feedback url.
+
 ```
 {
     "accessibilityUrl": "/accessibility",
@@ -125,6 +129,8 @@ All other fields must be provided.
 
 All URLs provided must be relative, apart from locally where localhost is allowed. If you need to call out to Business
 Verification (rather than stub it) all non-relative urls will cause the handover to Business Verification to fail.
+
+The Deskpro service identifier is used to set the service name in the beta feedback url.
 
 ```
 {
