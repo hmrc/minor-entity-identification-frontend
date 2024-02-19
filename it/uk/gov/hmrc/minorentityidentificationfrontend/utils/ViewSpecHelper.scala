@@ -20,7 +20,7 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalatest.matchers.{HavePropertyMatchResult, HavePropertyMatcher}
 
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 object ViewSpecHelper {
 

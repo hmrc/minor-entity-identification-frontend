@@ -26,7 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControl
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 trait OverseasCheckYourAnswersSpecificViewTests {
 
