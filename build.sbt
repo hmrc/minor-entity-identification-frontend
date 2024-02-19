@@ -1,6 +1,7 @@
 import uk.gov.hmrc.DefaultBuildSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import scoverage.ScoverageKeys
+import play.sbt.PlayImport.PlayKeys.playDefaultPort
 
 val appName = "minor-entity-identification-frontend"
 
@@ -48,6 +49,7 @@ lazy val microservice = Project(appName, file("."))
     // ***************
   )
   .settings(scoverageSettings)
+  .settings(playDefaultPort := 9725)
   .settings(publishingSettings)
   .configs(IntegrationTest)
   .settings(DefaultBuildSettings.integrationTestSettings())
