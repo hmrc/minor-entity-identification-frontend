@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,12 @@ import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{
 
 import java.io.IOException
 import javax.inject.{Inject, Singleton}
-import scala.collection.JavaConverters.asScalaBufferConverter
-
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 @Singleton
 class AppConfig @Inject()(config: Configuration,
                           servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {
+
+  lazy val appName: String = servicesConfig.getString("appName")
 
   lazy val allowedHosts: Set[String] = config.underlying.getStringList("microservice.hosts.allowList").asScala.toSet
 
@@ -52,6 +53,7 @@ class AppConfig @Inject()(config: Configuration,
   lazy val vatRegExitSurveyOrigin: String = "vat-registration"
   private lazy val feedbackUrl: String = servicesConfig.getString("feedback.host")
   lazy val vatRegFeedbackUrl: String = s"$feedbackUrl/feedback/$vatRegExitSurveyOrigin"
+  lazy val basGatewayUrl: String = s"${servicesConfig.baseUrl("bas-gateway-frontend")}"
 
   def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier"
 

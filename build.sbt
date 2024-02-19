@@ -1,10 +1,10 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import scoverage.ScoverageKeys
 
 val appName = "minor-entity-identification-frontend"
 
-val silencerVersion = "1.7.3"
+val silencerVersion = "1.7.14"
 
 lazy val scoverageSettings = {
 
@@ -35,7 +35,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     majorVersion                     := 0,
-    scalaVersion                     := "2.12.13",
+    scalaVersion                     := "2.13.12",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     Assets / pipelineStages := Seq(gzip),
     // ***************
@@ -48,9 +48,9 @@ lazy val microservice = Project(appName, file("."))
     // ***************
   )
   .settings(scoverageSettings)
-  .settings(publishingSettings: _*)
+  .settings(publishingSettings)
   .configs(IntegrationTest)
-  .settings(integrationTestSettings(): _*)
+  .settings(DefaultBuildSettings.integrationTestSettings())
   .settings(resolvers += Resolver.jcenterRepo)
 
 Test / javaOptions += "-Dlogger.resource=logback-test.xml"
