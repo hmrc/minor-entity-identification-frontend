@@ -12,3 +12,34 @@
 # Add all the application routes to the prod.routes file
 ->         /                                                   prod.Routes
 ->         /                                                   test.Routes
+GET        /identify-your-overseas-business/test-only/create-overseas-company-journey                                             uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateOverseasCompanyJourneyController.show
+POST       /identify-your-overseas-business/test-only/create-overseas-company-journey                                             uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateOverseasCompanyJourneyController.submit
+
+GET        /identify-your-trust/test-only/create-trusts-journey                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateTrustsJourneyController.show
+POST       /identify-your-trust/test-only/create-trusts-journey                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateTrustsJourneyController.submit
+
+GET        /identify-your-unincorporated-association/test-only/create-unincorporated-association-journey                          uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateUnincorporatedAssociationJourneyController.show
+POST       /identify-your-unincorporated-association/test-only/create-unincorporated-association-journey                          uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestCreateUnincorporatedAssociationJourneyController.submit
+
+GET        /identify-your-overseas-business/test-only/retrieve-journey/:journeyId                                                 uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+GET        /identify-your-overseas-business/test-only/retrieve-journey                                                            uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+
+GET        /identify-your-trust/test-only/retrieve-journey/:journeyId                                                             uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+GET        /identify-your-trust/test-only/retrieve-journey                                                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+
+GET        /identify-your-unincorporated-association/test-only/retrieve-journey/:journeyId                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+GET        /identify-your-unincorporated-association/test-only/retrieve-journey                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.controllers.TestRetrieveJourneyDataController.retrieveDetails(journeyId)
+
+GET        /:journey/test-only/feature-switches                                                                                   uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.frontend.controllers.FeatureSwitchFrontendController.show(journey)
+POST       /:journey/test-only/feature-switches                                                                                   uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.frontend.controllers.FeatureSwitchFrontendController.submit(journey)
+
+GET        /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches(journey)
++ nocsrf
+POST       /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches(journey)
+
+GET        /identify-your-trust/test-only/trusts/:sautr/refresh                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.TrustsKnownFactsVerificationStubController.stubTrustKnownFacts(sautr)
+
+GET         /identify-your-trust/test-only/business-verification/journey/:journeyId/status                                        uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.retrieveVerificationResult(journeyId)
+
++ nocsrf
+POST        /identify-your-trust/test-only/business-verification/journey                                                          uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.BusinessVerificationStubController.createBusinessVerificationJourney
