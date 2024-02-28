@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,10 @@ class CannotConfirmBusinessController @Inject()(mcc: MessagesControllerComponent
 
   def submit(journeyId: String): Action[AnyContent] = Action.async {
     implicit request =>
-      authorised.retrieve(internalId) {
+      authorised().retrieve(internalId) {
         case Some(authInternalId) =>
           if (isEnabled(EnableFullUAJourney)) {
-            cannotConfirmBusinessForm.bindFromRequest.fold(
+            cannotConfirmBusinessForm.bindFromRequest().fold(
               formWithErrors =>
                 journeyService.getJourneyConfig(journeyId, authInternalId).map {
                   journeyConfig =>
