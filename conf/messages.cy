@@ -16,7 +16,7 @@ country.noResult                                    = Dim canlyniadau wedi’u d
 
 ## Capture UTR page
 utr.title                                           = Beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer y cwmni?
-utr.line_1                                          = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth CThEM a llythyrau eraill ynghylch Treth Gorfforaeth neu Hunanasesiad. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
+utr.line_1                                          = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth CThEF a llythyrau eraill ynghylch Treth Gorfforaeth neu Hunanasesiad. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
 utr.no_utr_link                                     = Nid oes UTR gan y cwmni
 utr.error_not_entered                               = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni
 utr.error_invalid_characters                        = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni yn y fformat cywir
@@ -72,35 +72,35 @@ check-your-answers.no_ua_utr                           = Nid oes gan y gymdeitha
 check-your-answers.tax_identifier                      = Dynodydd treth tramor
 check-your-answers.tax_identifier_yes                  = Iawn, {0}
 check-your-answers.tax_identifier_country              = Y wlad a gyhoeddodd y dynodydd treth tramor
-check-your-answers.charity_hmrc_reference_number       = Cyfeirnod CThEM
-check-your-answers.no_charity_hmrc_reference_number    = Nid oes gan yr elusen gyfeirnod CThEM
-check-your-answers.no_ua_charity_hmrc_reference_number = Nid oes gan y gymdeithas gyfeirnod CThEM
+check-your-answers.charity_hmrc_reference_number       = Cyfeirnod CThEF
+check-your-answers.no_charity_hmrc_reference_number    = Nid oes gan yr elusen gyfeirnod CThEF
+check-your-answers.no_ua_charity_hmrc_reference_number = Nid oes gan y gymdeithas gyfeirnod CThEF
 check-your-answers.sa_postcode                         = Cod post Hunanasesiad
 check-your-answers.no_sa_postcode                      = Does dim cod post Hunanasesiad gan yr ymddiriedolaeth
 check-your-answers.ua_office_postcode                  = Cod post Treth Gorfforaeth
 
 ## Capture Charity HMRC Reference number
-chrn.title                                          = Beth yw cyfeirnod CThEM yr elusen?
-chrn.inset                                          = Os yw’r elusen wedi’i chofrestru ar gyfer Rhodd Cymorth, yna bydd ei chyfeirnod CThEM yr un peth â’i rhif Rhodd Cymorth. Nid yw hwn yr un peth â’r rhif elusen sydd ar gael ar y gofrestr elusennau.
-chrn.label                                          = Cyfeirnod CThEM
+chrn.title                                          = Beth yw cyfeirnod CThEF yr elusen?
+chrn.inset                                          = Os yw’r elusen wedi’i chofrestru ar gyfer Rhodd Cymorth, yna bydd ei chyfeirnod CThEF yr un peth â’i rhif Rhodd Cymorth. Nid yw hwn yr un peth â’r rhif elusen sydd ar gael ar y gofrestr elusennau.
+chrn.label                                          = Cyfeirnod CThEF
 chrn.hint                                           = Gallai hyn fod hyd at 7 o gymeriadau, a rhaid iddo ddechrau gyda naill ai un neu ddwy lythyren ar y dechrau ac yna 1-5 rhif. Er enghraifft, A999 neu AB99999
-chrn.no_chrn_link                                   = Nid oes gan yr elusen gyfeirnod CThEM
-chrn.error_not_entered                              = Nodwch gyfeirnod CThEM
-chrn.error_invalid_characters                       = Nodwch gyfeirnod CThEM yn y fformat cywir
-chrn.error_invalid_length                           = Mae’n rhaid i gyfeirnod CThEM fod yn 7 o gymeriadau neu lai
+chrn.no_chrn_link                                   = Nid oes gan yr elusen gyfeirnod CThEF
+chrn.error_not_entered                              = Nodwch gyfeirnod CThEF
+chrn.error_invalid_characters                       = Nodwch gyfeirnod CThEF yn y fformat cywir
+chrn.error_invalid_length                           = Mae’n rhaid i gyfeirnod CThEF fod yn 7 o gymeriadau neu lai
 
-chrn.ua.title                                       = Beth yw cyfeirnod CThEM y gymdeithas?
-chrn.ua.inset                                       = Os yw’r gymdeithas wedi ei chofrestru ar gyfer Rhodd Cymorth, yna bydd ei chyfeirnod CThEM yr un peth â’i rhif Rhodd Cymorth. Nid yw hwn yr un peth â’r rhif elusen sydd ar gael ar y gofrestr elusennau.
+chrn.ua.title                                       = Beth yw cyfeirnod CThEF y gymdeithas?
+chrn.ua.inset                                       = Os yw’r gymdeithas wedi ei chofrestru ar gyfer Rhodd Cymorth, yna bydd ei chyfeirnod CThEF yr un peth â’i rhif Rhodd Cymorth. Nid yw hwn yr un peth â’r rhif elusen sydd ar gael ar y gofrestr elusennau.
 chrn.ua.hint                                        = Gallai hyn fod hyd at 7 o gymeriadau, a rhaid iddo ddechrau gyda naill ai un neu ddwy lythyren ar y dechrau ac yna 1-5 rhif. Er enghraifft, A999 neu AB99999
-chrn.ua.label                                       = Cyfeirnod CThEM
-chrn.ua.no_chrn_link                                = Nid oes gan y gymdeithas gyfeirnod CThEM
-chrn.ua.error.no_entry                              = Nodwch gyfeirnod CThEM
-chrn.ua.error.invalid_format                        = Nodwch gyfeirnod CThEM yn y fformat cywir
-chrn.ua.error.invalid_length                        = Mae’n rhaid i gyfeirnod CThEM fod yn 7 o gymeriadau neu lai
+chrn.ua.label                                       = Cyfeirnod CThEF
+chrn.ua.no_chrn_link                                = Nid oes gan y gymdeithas gyfeirnod CThEF
+chrn.ua.error.no_entry                              = Nodwch gyfeirnod CThEF
+chrn.ua.error.invalid_format                        = Nodwch gyfeirnod CThEF yn y fformat cywir
+chrn.ua.error.invalid_length                        = Mae’n rhaid i gyfeirnod CThEF fod yn 7 o gymeriadau neu lai
 
 ## Cannot confirm business
-cannot-confirm-business.title                       = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEM
-cannot-confirm-business.heading                     = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEM
+cannot-confirm-business.title                       = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
+cannot-confirm-business.heading                     = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
 cannot-confirm-business.line_1                      = Os yw’r manylion hyn yn gywir, gallwch gofrestru o hyd. Os gwnaethoch nodi’r manylion anghywir, ewch yn ôl i wneud newidiadau.
 cannot-confirm-business.line_2                      = A ydych am barhau i gofrestru gyda’r manylion a roesoch?
 cannot-confirm-business.no_selection                = Dewiswch ‘Iawn’ os ydych am barhau i gofrestru gyda’r manylion a roesoch
