@@ -5,10 +5,7 @@ import play.sbt.PlayImport.PlayKeys.playDefaultPort
 
 val appName = "minor-entity-identification-frontend"
 
-val silencerVersion = "1.7.14"
-
 lazy val scoverageSettings = {
-
   val exclusionList: List[String] = List(
     "<empty>",
     ".*Routes.*",
@@ -32,28 +29,25 @@ lazy val scoverageSettings = {
   )
 }
 
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.12"
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
-  .settings(
-    majorVersion                     := 0,
-    scalaVersion                     := "2.13.12",
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
-    Assets / pipelineStages := Seq(gzip),
-    // ***************
-    // Use the silencer plugin to suppress warnings
-    scalacOptions += "-P:silencer:pathFilters=views;routes",
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-    )
-    // ***************
-  )
   .settings(scoverageSettings)
-  .settings(playDefaultPort := 9725)
-  .settings(publishingSettings)
-  .configs(IntegrationTest)
-  .settings(DefaultBuildSettings.integrationTestSettings())
-  .settings(resolvers += Resolver.jcenterRepo)
+  .settings(
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
+    Assets / pipelineStages := Seq(gzip),
+    resolvers += Resolver.jcenterRepo,
+    PlayKeys.playDefaultPort := 9725,
+    // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
+    // suppress warnings in generated routes files
+    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s"
+  )
 
-Test / javaOptions += "-Dlogger.resource=logback-test.xml"
-IntegrationTest / javaOptions += "-Dlogger.resource=logback-test.xml"
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(libraryDependencies ++= AppDependencies.it)
