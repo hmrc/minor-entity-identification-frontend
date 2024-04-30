@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
+package test.uk.gov.hmrc.minorentityidentificationfrontend.api.controllers
 
 import play.api.libs.json.{JsObject, Json, __}
 import play.api.libs.ws.WSResponse

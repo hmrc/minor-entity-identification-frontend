@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.repositories
+package test.uk.gov.hmrc.minorentityidentificationfrontend.repositories
 
 import play.api.test.Helpers.{await, _}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
