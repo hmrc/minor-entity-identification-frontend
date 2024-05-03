@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.connectors
+package connectors
 
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import play.api.test.Helpers.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testCtutr, testPostcode}
+import uk.gov.hmrc.minorentityidentificationfrontend.connectors.ValidateUnincorporatedAssociationDetailsConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{DetailsMismatch, DetailsNotFound, KnownFactsMatchingResult, SuccessfulMatch}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.ValidateUnincorporatedAssociationDetailsConnectorStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper

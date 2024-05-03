@@ -56,7 +56,7 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
           Json.obj(identifierJsonKey -> utr)
         )
       ) ++ optEntityTypeJson
-
+  println(s"\nactul json body\n$jsonBody\n\n")
     http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(
       implicitly[Writes[JsObject]],
       BusinessVerificationHttpReads,

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.minorentityidentificationfrontend.connectors
+package connectors
 
 import play.api.libs.json.Json
 import play.api.test.Helpers.{OK, await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.testBusinessVerificationJourneyId
+import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RetrieveBusinessVerificationStatusConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationFail, BusinessVerificationPass}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.BusinessVerificationStub

@@ -252,7 +252,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
     }
   }
 
-  "POST /identify-your-trust/check-your-answers-business" when {
+  "POST /identify-your-trust/check-your-answers-business" when { //todo HERE
     "the EnableFullTrustJourney is enabled" when {
       "identifier match is SuccessfulMatch (for example all postcodes are the same)" should {
         "contact TrustKnownFacts api and create a BV journey. The redirect url is the BV start journey url.The journey is not audited" in {
@@ -278,7 +278,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubAudit()
 
           val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
-
+          /*
+          todo - [info] - should contact TrustKnownFacts api and create a BV journey. The redirect url is the BV start journey url.The journey is not audited *** FAILED ***
+            [info] The redirectUri property had value "", instead of its expected value "/business-verification-start", on object AhcWSResponse(StandaloneAhcWSResponse(500, Internal Server Error)) (CheckYourAnswersControllerISpec.scala
+           */
           result must have {
             httpStatus(SEE_OTHER)
             redirectUri(expectedValue = testBusinessVerificationRedirectUrl)
@@ -290,10 +293,26 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
       }
 
-      "identifier match is SuccessfulMatch (for example all postcodes are the same)" should {
+      "identifier match is SuccessfulMatch (for example all postcodes are the same)" should { //todo HERE
         "contact TrustKnownFacts api and try to create a BV journey. " +
           "Given BV returns NOT_FOUND a BV status NOT_ENOUGH_INFORMATION_TO_CHALLENGE is persisted. " +
           "The redirect url is the fullContinueUrl. The journey is audited" in {
+
+          /*
+           todo - [info]     - should contact TrustKnownFacts api and try to create a BV journey. Given BV returns NOT_FOUND a BV status NOT_ENOUGH_INFORMATION_TO_CHALLENGE is persisted. The redirect url is the fullContinueUrl. The journey is audited *** FAILED ***
+            [info]       com.github.tomakehurst.wiremock.client.VerificationException: No requests exactly matched. Most similar request was:  expected:<
+            [info] POST
+            [info] /business-verification/journey
+            [info]
+            [info] [equalTo]
+            [info] {"continueUrl":"/identify-your-trust/f91c67f1-95df-4419-b608-764e723089d3/business-verification-result","origin":"vatc","deskproServiceName":"vrs","accessibilityStatementUrl":"/accessibility","pageTitle":"Entity Validation Service","journeyType":"BUSINESS_VERIFICATION","identifiers":[{"saUtr":"1234567890"}],"entityType":"TRUST"}> but was:<
+            [info] POST
+            [info] /identify-your-trust/test-only/business-verification/journey
+            [info]
+            [info]
+            [info] {"continueUrl":"/identify-your-trust/f91c67f1-95df-4419-b608-764e723089d3/business-verification-result","origin":"vatc","deskproServiceName":"vrs","accessibilityStatementUrl":"/accessibility","pageTitle":"Entity Validation Service","journeyType":"BUSINESS_VERIFICATION","identifiers":[{"saUtr":"1234567890"}],"entityType":"TRUST"}>
+           */
+
           enable(EnableFullTrustJourney)
 
           await(insertJourneyConfig(
@@ -327,14 +346,14 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))
-          verifyCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)
+          verifyCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson) //todo HERE
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
           verifyAudit()
         }
       }
 
-      "identifier match is SuccessfulMatch (for example all postcodes are the same)" should {
+      "identifier match is SuccessfulMatch (for example all postcodes are the same)" should {  //todo HERE
         "contact TrustKnownFacts api and try to create a BV journey. " +
           "Given BV returns FORBIDDEN a BV status FAIL is persisted. " +
           "The redirect url is the fullContinueUrl. The journey is audited" in {
@@ -364,7 +383,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubAudit()
 
           val result = post(s"/identify-your-trust/$testJourneyId/check-your-answers-business")()
-
+          /*
+          todo - - should contact TrustKnownFacts api and try to create a BV journey. Given BV returns FORBIDDEN a BV status FAIL is persisted. The redirect url is the fullContinueUrl. The journey is audited *** FAILED ***
+            [info]       The redirectUri property had value "", instead of its expected value "/test?journeyId=f91c67f1-95df-4419-b608-764e723089d3", on object AhcWSResponse(StandaloneAhcWSResponse(500, Internal Server Error)) (CheckYourAnswersControllerISpec.scala:368)
+           */
           result must have {
             httpStatus(SEE_OTHER)
             redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")

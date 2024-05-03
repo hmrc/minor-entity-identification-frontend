@@ -256,8 +256,10 @@ trait StorageStub extends WiremockMethods {
       body = body
     )
 
-  def stubRetrieveEntityDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit =
+  def stubRetrieveEntityDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit = {
+    println(s"\n\n stubRetrieveEntityDetails $journeyId :: $status :: $body")
     when(method = GET, uri =  s"/minor-entity-identification/journey/$journeyId").thenReturn(status = status, body = body)
+  }
 
   def verifyStoreOverseasTaxIdentifier(journeyId: String, overseasTaxIdentifier: String): Unit =
     WiremockHelper.verifyPut(
