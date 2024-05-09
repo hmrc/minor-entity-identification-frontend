@@ -90,7 +90,6 @@ trait ComponentSpecHelper extends AnyWordSpec
   }
 
   override def beforeEach(): Unit = {
-    println(s"\n\n\n Wiremock Before Each \n\n")
     await(journeyConfigRepository.drop)
     resetWiremock()
     super.beforeEach()

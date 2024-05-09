@@ -21,8 +21,4 @@ object AppDependencies {
     "org.scalatestplus"       %% "mockito-3-4"              % "3.2.10.0"            % Test
   )
 
-  val it: Seq[ModuleID] = Seq(
-  "com.github.tomakehurst"  % "wiremock-jre8-standalone"  % "3.0.1" % Test // todo - this can be removed ??
-  )
-
 }

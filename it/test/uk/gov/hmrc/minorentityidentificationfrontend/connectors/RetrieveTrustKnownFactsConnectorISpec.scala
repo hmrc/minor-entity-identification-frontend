@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package connectors
+package test.uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}

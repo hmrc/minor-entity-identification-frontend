@@ -20,7 +20,7 @@ import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
-import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{EnableFullUAJourney, FeatureSwitching}
+import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, EnableFullUAJourney, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig, RegistrationNotCalled}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
@@ -38,6 +38,16 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
   with CheckYourAnswersCommonViewTests
   with UaCheckYourAnswersSpecificViewTests
   with FeatureSwitching {
+
+  override def beforeEach(): Unit = {
+    disable(BusinessVerificationStub)
+    super.beforeEach()
+  }
+
+  override def afterEach(): Unit = {
+    super.afterEach()
+    disable(BusinessVerificationStub)
+  }
 
       "GET /identify-your-unincorporated-association/<testJourneyId>/check-your-answers-business" when {
 
@@ -223,8 +233,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         "identifiers are matched, calls BV. Given BV creates a journey, the redirect url is the BV start journey url. The journey is not audited" in {
           enable(EnableFullUAJourney)
 
-          println(s"\n\n\n HERE :: 01 \n\n")
-
           await(insertJourneyConfig(
             journeyId = testJourneyId,
             internalId = testInternalId,
@@ -241,15 +249,10 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           stubCreateBusinessVerificationJourney(expectedBvUAJson)(CREATED, testBVRedirectURIJson(testBusinessVerificationRedirectUrl))
 
           stubAudit()
-          println("here")
+
           val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
-          /*
-           todo - [info] - when identifiers are matched, calls BV. Given BV creates a journey, the redirect url is the BV start journey url. The journey is not audited *** FAILED ***
-                  [info]  The redirectUri property had value "", instead of its expected value "/business-verification-start", on object AhcWSResponse(StandaloneAhcWSResponse(500, Internal Server Error)) (CheckYourAnswersControllerISpec.scala:245)
-           */
-            Thread.sleep(10000)
+
           result must have {
-            println(s"\n\n result :: $result \n\n")
             httpStatus(SEE_OTHER)
             redirectUri(expectedValue = testBusinessVerificationRedirectUrl)
           }
@@ -287,12 +290,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
 
-            /*
-            todo -
-             [info] - when identifiers are matched, calls BV. Given BV returns FORBIDDEN, the redirect url is the provided continueUrl. The journey is audited *** FAILED ***
-             [info]   The redirectUri property had value "", instead of its expected value "/test?journeyId=f91c67f1-95df-4419-b608-764e723089d3", on object AhcWSResponse(StandaloneAhcWSResponse(500, Internal Server Error)) (CheckYourAnswersControllerISpec.scala:283)
-             */
-
           result must have {
             httpStatus(SEE_OTHER)
             redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
@@ -306,22 +303,6 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         }
 
         "identifiers are matched, calls BV and given BV returns NOT_FOUND, it redirects to the provided continueUrl. The journey is audited" in {
-
-          /*
-          todo - [info] - when identifiers are matched, calls BV and given BV returns NOT_FOUND, it redirects to the provided continueUrl. The journey is audited *** FAILED ***
-            [info]   com.github.tomakehurst.wiremock.client.VerificationException: No requests exactly matched. Most similar request was:  expected:<
-            [info] POST
-            [info] /business-verification/journey
-            [info]
-            [info] [equalTo]
-            [info] {"continueUrl":"/identify-your-unincorporated-association/f91c67f1-95df-4419-b608-764e723089d3/business-verification-result","origin":"vatc","deskproServiceName":"vrs","accessibilityStatementUrl":"/accessibility","pageTitle":"Entity Validation Service","journeyType":"BUSINESS_VERIFICATION","identifiers":[{"ctUtr":"1000000001"}]}> but was:<
-            [info] POST
-            [info] /identify-your-trust/test-only/business-verification/journey
-            [info]
-            [info]
-            [info] {"continueUrl":"/identify-your-unincorporated-association/f91c67f1-95df-4419-b608-764e723089d3/business-verification-result","origin":"vatc","deskproServiceName":"vrs","accessibilityStatementUrl":"/accessibility","pageTitle":"Entity Validation Service","journeyType":"BUSINESS_VERIFICATION","identifiers":[{"ctUtr":"1000000001"}]}>
-           */
-
           enable(EnableFullUAJourney)
 
           await(insertJourneyConfig(
@@ -353,7 +334,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           }
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-          verifyCreateBusinessVerificationJourney(expectedBvUAJson) // todo <---
+          verifyCreateBusinessVerificationJourney(expectedBvUAJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
           verifyAudit()

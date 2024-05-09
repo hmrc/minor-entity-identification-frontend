@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package connectors
+package test.uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.UNAUTHORIZED
 import play.api.libs.json.{JsArray, Json}

@@ -23,7 +23,6 @@ trait BusinessVerificationStub extends WiremockMethods {
 
   def stubCreateBusinessVerificationJourney(expBody: JsObject)(status: Int,
                                                                body: JsObject = Json.obj()): Unit = {
-    println(s"\n\n expectedBody == $expBody \n body==$body \n")
     when(method = POST, uri = "/business-verification/journey", body = expBody)
       .thenReturn(
         status = status,

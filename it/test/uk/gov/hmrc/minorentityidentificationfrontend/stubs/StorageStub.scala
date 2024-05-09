@@ -257,7 +257,6 @@ trait StorageStub extends WiremockMethods {
     )
 
   def stubRetrieveEntityDetails(journeyId: String)(status: Int, body: JsValue = Json.obj()): Unit = {
-    println(s"\n\n stubRetrieveEntityDetails $journeyId :: $status :: $body")
     when(method = GET, uri =  s"/minor-entity-identification/journey/$journeyId").thenReturn(status = status, body = body)
   }
 
