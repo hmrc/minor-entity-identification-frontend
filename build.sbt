@@ -1,7 +1,5 @@
 import uk.gov.hmrc.DefaultBuildSettings
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import scoverage.ScoverageKeys
-import play.sbt.PlayImport.PlayKeys.playDefaultPort
 
 val appName = "minor-entity-identification-frontend"
 
