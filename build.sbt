@@ -34,6 +34,7 @@ ThisBuild / scalaVersion := "2.13.12"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(scoverageSettings)
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
