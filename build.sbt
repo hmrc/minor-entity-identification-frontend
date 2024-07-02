@@ -1,7 +1,5 @@
 import uk.gov.hmrc.DefaultBuildSettings
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import scoverage.ScoverageKeys
-import play.sbt.PlayImport.PlayKeys.playDefaultPort
 
 val appName = "minor-entity-identification-frontend"
 
@@ -34,6 +32,7 @@ ThisBuild / scalaVersion := "2.13.12"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(scoverageSettings)
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
