@@ -46,16 +46,15 @@
             id = "country",
             name = "country",
             label = HmrcPageHeadingLabel(content = Text(messages("tax-identifiers-country.title"))),
-            errorMessage = form("country").error.map(fe ⇒ ErrorMessage(content = HtmlContent(messages("error.no_entry_tax_identifier_country")))),
+            errorMessage = form("country").error.map(fe => ErrorMessage(content = HtmlContent(messages("error.no_entry_tax_identifier_country")))),
             items = Seq(SelectItem(value = Some(""), text = messages("country.select"))) ++ countries.map {
-                case Country(code, name) ⇒ SelectItem(
+                case Country(code, name) => SelectItem(
                     value = Some(code),
                     text = name,
                     selected = code == form("country").value.getOrElse(""),
                     attributes = Map("id" -> s"country-$code")
                 )
-            },
-            formGroupClasses = "form-field-group"
+            }
         ))
 
         <script src="@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.js")" ></script>
