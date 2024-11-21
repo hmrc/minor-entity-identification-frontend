@@ -31,6 +31,7 @@ utr.trust.error_invalid_length                              = Enter the trust’
 utr.ua.title                                                = What is the association’s Unique Taxpayer Reference?
 utr.ua.line_1                                               = This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can
 utr.ua.line_1_ending                                        = find a lost UTR number.
+utr.ua.inset                                                = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter a UTR. Instead, click on ‘The association does not have a UTR’ hyperlink below.
 utr.ua.no_utr_link                                          = The association does not have a UTR
 utr.ua.error_not_entered                                    = Enter the association’s Unique Taxpayer Reference
 utr.ua.error_invalid_characters                             = Enter the association’s Unique Taxpayer Reference in the correct format
@@ -90,7 +91,8 @@ chrn.error_invalid_characters                               = Enter the HMRC ref
 chrn.error_invalid_length                                   = The HMRC reference number must be 7 characters or fewer
 
 chrn.ua.title                                               = What is the association’s HMRC reference Number?
-chrn.ua.inset                                               = If the association has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register.
+chrn.ua.p1                                                  = If the association has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register.
+chrn.ua.inset                                               = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter an HMRC reference number. Instead, click on ‘The association does not have an HMRC reference number’ hyperlink below.
 chrn.ua.hint                                                = This could be up to 7 characters and must begin with either one or two letters, followed by 1-5 numbers. For example, A999 or AB99999
 chrn.ua.label                                               = HMRC reference number
 chrn.ua.no_chrn_link                                        = The association does not have a HMRC reference number

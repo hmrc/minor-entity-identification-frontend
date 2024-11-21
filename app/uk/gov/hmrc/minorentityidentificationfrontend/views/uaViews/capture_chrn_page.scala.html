@@ -26,6 +26,7 @@
 
 @this(layout: govuk_template,
       h1: h1,
+      p: p,
       inset: inset,
       govukInput: GovukInput,
       govukErrorSummary: GovukErrorSummary,
@@ -44,6 +45,8 @@
     @formWithCSRF(action = formAction) {
 
         @h1(messages("chrn.ua.title"))
+
+        @p(Html(messages("chrn.ua.p1")))
 
         @inset(messages("chrn.ua.inset"))
 

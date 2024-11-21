@@ -80,8 +80,12 @@ trait CaptureCHRNumberViewTests {
       insetElements.first.text mustBe messages.inset
     }
 
+    "have the correct paragraph text" in {
+      doc.getParagraphs.get(1).text mustBe messages.paragraph
+    }
+
     "have the correct hint text" in {
-      doc.getParagraphs.get(1).text mustBe messages.hint
+      doc.getParagraphs.get(2).text mustBe messages.hint
     }
 
     "have the correct label" in {
