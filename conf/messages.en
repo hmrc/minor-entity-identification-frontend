@@ -92,7 +92,7 @@ chrn.error_invalid_length                                   = The HMRC reference
 
 chrn.ua.title                                               = What is the association’s HMRC reference Number?
 chrn.ua.p1                                                  = If the association has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register.
-chrn.ua.inset                                               = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter an HMRC reference number. Instead, click on ‘The association does not have an HMRC reference number’ hyperlink below.
+chrn.ua.inset                                               = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter an HMRC reference number. Instead, click on ‘The association does not have a HMRC reference number’ hyperlink below.
 chrn.ua.hint                                                = This could be up to 7 characters and must begin with either one or two letters, followed by 1-5 numbers. For example, A999 or AB99999
 chrn.ua.label                                               = HMRC reference number
 chrn.ua.no_chrn_link                                        = The association does not have a HMRC reference number
