@@ -92,7 +92,7 @@ chrn.error_invalid_length                           = Mae’n rhaid i gyfeirnod 
 
 chrn.ua.title                                       = Beth yw cyfeirnod CThEF y gymdeithas?
 chrn.ua.p1                                          = Os yw’r gymdeithas wedi ei chofrestru ar gyfer Rhodd Cymorth, yna bydd ei chyfeirnod CThEF yr un peth â’i rhif Rhodd Cymorth. Nid yw hwn yr un peth â’r rhif elusen sydd ar gael ar y gofrestr elusennau.
-chrn.ua.inset                                       = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter an HMRC reference number. Instead, click on ‘The association does not have an HMRC reference number’ hyperlink below.
+chrn.ua.inset                                       = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter an HMRC reference number. Instead, click on ‘The association does not have a HMRC reference number’ hyperlink below.
 chrn.ua.hint                                        = Gallai hyn fod hyd at 7 o gymeriadau, a rhaid iddo ddechrau gyda naill ai un neu ddwy lythyren ar y dechrau ac yna 1-5 rhif. Er enghraifft, A999 neu AB99999
 chrn.ua.label                                       = Cyfeirnod CThEF
 chrn.ua.no_chrn_link                                = Nid oes gan y gymdeithas gyfeirnod CThEF
