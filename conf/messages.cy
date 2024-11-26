@@ -29,7 +29,7 @@ utr.trust.error_not_entered                         = Nodwch Gyfeirnod Unigryw y
 utr.trust.error_invalid_characters                  = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer yr ymddiriedolaeth yn y fformat cywir
 utr.trust.error_invalid_length                      = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer yr ymddiriedolaeth yn y fformat cywir
 utr.ua.title                                        = Beth yw Cyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas?
-utr.ua.inset                                        = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter a UTR. Instead, click on ‘The association does not have a UTR’ hyperlink below.
+utr.ua.inset                                        = Os ydych yn cofrestru fel ‘Sefydliad Corfforedig Elusennol’, nid oes angen i chi nodi UTR. Yn hytrach, cliciwch ar yr hypergysylltiad ‘Nid oes gan y gymdeithas UTR’ isod.
 utr.ua.line_1                                       = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill am Dreth Gorfforaeth. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’. Gallwch
 utr.ua.line_1_ending                                = ddod o hyd i UTR sydd ar goll.
 utr.ua.no_utr_link                                  = Nid oes gan y gymdeithas UTR
@@ -92,7 +92,7 @@ chrn.error_invalid_length                           = Mae’n rhaid i gyfeirnod 
 
 chrn.ua.title                                       = Beth yw cyfeirnod CThEF y gymdeithas?
 chrn.ua.p1                                          = Os yw’r gymdeithas wedi ei chofrestru ar gyfer Rhodd Cymorth, yna bydd ei chyfeirnod CThEF yr un peth â’i rhif Rhodd Cymorth. Nid yw hwn yr un peth â’r rhif elusen sydd ar gael ar y gofrestr elusennau.
-chrn.ua.inset                                       = If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter an HMRC reference number. Instead, click on ‘The association does not have a HMRC reference number’ hyperlink below.
+chrn.ua.inset                                       = Os ydych yn cofrestru fel ‘Sefydliad Corfforedig Elusennol’, nid oes angen i chi nodi cyfeirnod CThEF. Yn hytrach, cliciwch ar yr hypergysylltiad ‘Nid oes gan y gymdeithas cyfeirnod CThEF’ isod.
 chrn.ua.hint                                        = Gallai hyn fod hyd at 7 o gymeriadau, a rhaid iddo ddechrau gyda naill ai un neu ddwy lythyren ar y dechrau ac yna 1-5 rhif. Er enghraifft, A999 neu AB99999
 chrn.ua.label                                       = Cyfeirnod CThEF
 chrn.ua.no_chrn_link                                = Nid oes gan y gymdeithas gyfeirnod CThEF
