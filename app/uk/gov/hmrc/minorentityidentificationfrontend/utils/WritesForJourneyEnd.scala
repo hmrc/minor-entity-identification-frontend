@@ -24,8 +24,8 @@ object WritesForJourneyEnd {
 
   def registrationBlock(optRegistrationStatus: Option[RegistrationStatus]): JsObject = {
     val regValue = optRegistrationStatus match {
-      case Some(regStatus) => Json.toJson(regStatus)(RegistrationStatus.format.writes)
-      case None => Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes)
+      case Some(regStatus) => Json.toJson(regStatus)(RegistrationStatus.format.writes(_))
+      case None => Json.toJson(RegistrationNotCalled)(RegistrationStatus.format.writes(_))
     }
     Json.obj("registration" -> regValue)
   }

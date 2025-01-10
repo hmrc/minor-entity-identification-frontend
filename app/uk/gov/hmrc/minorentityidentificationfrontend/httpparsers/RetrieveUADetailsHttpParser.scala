@@ -27,7 +27,7 @@ object RetrieveUADetailsHttpParser {
     override def read(method: String, url: String, response: HttpResponse): Option[UADetails] = {
       response.status match {
         case OK =>
-          response.json.validate[UADetails](reads) match {
+          response.json.validate[UADetails](reads(_)) match {
             case JsSuccess(uaDetails, _) => Some(uaDetails)
             case JsError(errors) =>
               throw new InternalServerException(s"`Failed to read UA Details with the following error/s: $errors")

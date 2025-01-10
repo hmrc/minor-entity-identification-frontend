@@ -17,27 +17,25 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.OK
-import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RegistrationHttpParser.RegistrationHttpReads
 import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RegistrationConnector @Inject()(httpClient: HttpClient,
+class RegistrationConnector @Inject()(httpClient: HttpClientV2,
                                       appConfig: AppConfig
                                      )(implicit ec: ExecutionContext) {
 
-  private def register(jsonBody: JsObject, postUrl: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
-    httpClient.POST[JsObject, RegistrationStatus](postUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      RegistrationHttpReads,
-      hc,
-      ec
-    )
+  import RegistrationHttpParser.RegistrationHttpReads
+
+  private def register(jsonBody: JsObject, postUrl: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] = {
+    httpClient.post(url"$postUrl").withBody(Json.toJson(jsonBody)).execute[RegistrationStatus](RegistrationHttpReads, ec)
+  }
 
   def registerTrust(sautr: String, regime: String)(implicit hc: HeaderCarrier): Future[RegistrationStatus] =
     register(

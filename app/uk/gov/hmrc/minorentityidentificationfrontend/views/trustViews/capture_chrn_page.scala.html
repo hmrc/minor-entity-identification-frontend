@@ -33,7 +33,7 @@
       govukButton: GovukButton
 )
 
-@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit messages: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("chrn.title", form)) {
 

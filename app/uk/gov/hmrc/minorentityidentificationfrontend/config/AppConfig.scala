@@ -26,7 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{
 
 import java.io.IOException
 import javax.inject.{Inject, Singleton}
-import scala.collection.JavaConverters.collectionAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 @Singleton
 class AppConfig @Inject()(config: Configuration,
                           servicesConfig: ServicesConfig, environment: Environment) extends FeatureSwitching {

@@ -63,6 +63,7 @@ class UaCheckYourAnswersRowBuilder() {
       case (None, None, _) => Seq(utrRow, charityHMRCReferenceNumberRow)
       case (Some(_), _, Some(_)) => throw new IllegalStateException("User cannot have CTUTR and charity HMRC reference number at the same time")
       case (None, Some(_), _) => throw new IllegalStateException("User cannot have registered office postcode when they don't have CTUTR")
+      case _ => throw new IllegalStateException("Invalid state: No UTR,Postcode or CRN")
     }
 
   }

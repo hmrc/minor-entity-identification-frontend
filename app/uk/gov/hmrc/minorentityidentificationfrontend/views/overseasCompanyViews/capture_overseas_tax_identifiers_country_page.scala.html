@@ -32,7 +32,7 @@
         select: GovukSelect
 )
 
-@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_], countries: Seq[Country])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_], countries: Seq[Country])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("tax-identifiers-country.title", form)) {
 

@@ -17,16 +17,16 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import javax.inject.Inject
-
 import play.api.libs.json.{JsObject, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.ValidateUnincorporatedAssociationDetailsHttpParser._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingResult
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ValidateUnincorporatedAssociationDetailsConnector @Inject()(httpClient: HttpClient,
+class ValidateUnincorporatedAssociationDetailsConnector @Inject()(httpClient: HttpClientV2,
                                                                   appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def validateUnincorporatedAssociationDetails(ctUtr: String, postcode: String)
@@ -37,7 +37,7 @@ class ValidateUnincorporatedAssociationDetailsConnector @Inject()(httpClient: Ht
       "postcode" -> postcode
     )
 
-    httpClient.POST(appConfig.validateUnincorporatedAssociationDetailsUrl, requestBody)
+    httpClient.post(url"${appConfig.validateUnincorporatedAssociationDetailsUrl}").withBody(Json.toJson(requestBody)).execute
   }
 
 }

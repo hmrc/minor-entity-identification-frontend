@@ -51,7 +51,7 @@ trait ComponentSpecHelper extends AnyWordSpec
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config ++ extraConfig())
-    .build
+    .build()
 
   val mockHost: String = WiremockHelper.wiremockHost
   val mockPort: String = WiremockHelper.wiremockPort.toString
@@ -100,7 +100,7 @@ trait ComponentSpecHelper extends AnyWordSpec
   val enLangCookie: WSCookie = DefaultWSCookie("PLAY_LANG", "en")
 
   def get[T](uri: String, cookie: WSCookie = enLangCookie): WSResponse = {
-    await(buildClient(uri).withHttpHeaders("Authorization" -> "Bearer123").withCookies(cookie, mockSessionCookie).get)
+    await(buildClient(uri).withHttpHeaders("Authorization" -> "Bearer123").withCookies(cookie, mockSessionCookie).get())
   }
 
   def extractDocumentFrom(aWSResponse: WSResponse): Document = Jsoup.parse(aWSResponse.body)

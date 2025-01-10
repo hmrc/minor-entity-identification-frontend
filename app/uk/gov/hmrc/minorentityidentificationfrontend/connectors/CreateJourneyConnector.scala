@@ -17,7 +17,8 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.CREATED
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateJourneyHttpParser.CreateJourneyHttpReads
 
@@ -25,12 +26,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateJourneyConnector @Inject()(httpClient: HttpClient,
+class CreateJourneyConnector @Inject()(httpClient: HttpClientV2,
                                        appConfig: AppConfig
                                       )(implicit ec: ExecutionContext) {
 
-  def createJourney()(implicit hc: HeaderCarrier): Future[String] =
-    httpClient.POSTEmpty[String](appConfig.createJourneyUrl)(CreateJourneyHttpReads, hc, ec)
+  def createJourney()(implicit hc: HeaderCarrier): Future[String] = {
+    httpClient.post(url"${appConfig.createJourneyUrl}").execute[String](CreateJourneyHttpReads, ec)
+  }
 
 }
 

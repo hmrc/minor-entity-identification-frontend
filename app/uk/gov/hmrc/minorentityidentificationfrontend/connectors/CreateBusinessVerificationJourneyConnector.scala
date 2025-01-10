@@ -17,9 +17,10 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.{CREATED, FORBIDDEN, NOT_FOUND}
-import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.Call
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateBusinessVerificationJourneyConnector._
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers._
@@ -30,7 +31,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
+class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClientV2,
                                                            appConfig: AppConfig
                                                           )(implicit ec: ExecutionContext) {
 
@@ -56,13 +57,10 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClient,
           Json.obj(identifierJsonKey -> utr)
         )
       ) ++ optEntityTypeJson
-    http.POST[JsObject, BusinessVerificationJourneyCreationResponse](appConfig.createBusinessVerificationJourneyUrl, jsonBody)(
-      implicitly[Writes[JsObject]],
-      BusinessVerificationHttpReads,
-      hc,
-      ec
-    )
-  }
+  http.post(url"${appConfig.createBusinessVerificationJourneyUrl}")
+    .withBody(Json.toJson(jsonBody)).execute[BusinessVerificationJourneyCreationResponse](BusinessVerificationHttpReads,
+    ec)
+}
 
   private def jsonPartsBy(businessEntity: BusinessEntity, journeyId: String): (String, Call, JsObject) = businessEntity match {
     case BusinessEntity.Trusts =>

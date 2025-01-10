@@ -18,7 +18,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.OK
 import play.api.libs.json.JsonValidationError
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RetrieveBusinessVerificationStatusParser.RetrieveBusinessVerificationStatusHttpReads
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationFail, BusinessVerificationPass, BusinessVerificationStatus}
@@ -27,16 +28,16 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveBusinessVerificationStatusConnector @Inject()(http: HttpClient,
+class RetrieveBusinessVerificationStatusConnector @Inject()(http: HttpClientV2,
                                                             appConfig: AppConfig
                                                            )(implicit ec: ExecutionContext) {
 
-  def retrieveBusinessVerificationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] =
-    http.GET[BusinessVerificationStatus](appConfig.getBusinessVerificationResultUrl(journeyId))(
+  def retrieveBusinessVerificationStatus(journeyId: String)(implicit hc: HeaderCarrier): Future[BusinessVerificationStatus] = {
+    http.get(url"${appConfig.getBusinessVerificationResultUrl(journeyId)}").execute[BusinessVerificationStatus](
       RetrieveBusinessVerificationStatusHttpReads,
-      hc,
       ec
     )
+  }
 
 }
 
