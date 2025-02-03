@@ -19,7 +19,8 @@ package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.KnownFactsHttpParser.KnownFactsHttpReads
 import uk.gov.hmrc.minorentityidentificationfrontend.models.TrustKnownFacts
@@ -28,12 +29,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveTrustKnownFactsConnector @Inject()(httpClient: HttpClient, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class RetrieveTrustKnownFactsConnector @Inject()(httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveTrustKnownFacts(sautr: String)(implicit hc: HeaderCarrier): Future[Option[TrustKnownFacts]] = {
-    httpClient.GET(appConfig.retrieveTrustsKnownFactsUrl(sautr))(
+    httpClient.get(url"${appConfig.retrieveTrustsKnownFactsUrl(sautr)}").execute[Option[TrustKnownFacts]](
       KnownFactsHttpReads,
-      hc,
       ec)
   }
 }

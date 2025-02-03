@@ -17,13 +17,15 @@
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.{Cy, En}
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcHeader, HmrcReportTechnicalIssue}
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcLayout, HmrcTimeoutDialogHelper, HmrcTrackingConsentSnippet}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTimeoutDialogHelper, HmrcTrackingConsentSnippet}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.reporttechnicalissue.ReportTechnicalIssue
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
+@import uk.gov.hmrc.govukfrontend.views.Aliases.BackLink
 @import views.html.helper.CSPNonce
 
-@this(hmrcLayout: HmrcLayout,
+@this(hmrcStandardPage: HmrcStandardPage,
     hmrcHeader: HmrcHeader,
     appConfig: AppConfig,
     hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
@@ -31,7 +33,7 @@
     hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
     hmrcReportTechnicalIssue: HmrcReportTechnicalIssue)
 
-@(pageConfig: PageConfig, title: String, startUrl: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, title: String, startUrl: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @head = {
     <link href='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.css")' media="screen" rel="stylesheet" type="text/css" />
@@ -54,14 +56,23 @@
   <script @{CSPNonce.attr} src='@controllers.routes.Assets.versioned("javascripts/backLink.js")'></script>
 }
 
-@hmrcLayout(
-    pageTitle = Some(title),
-    isWelshTranslationAvailable = true,
-    signOutUrl = Some(pageConfig.signOutUrl),
-    additionalHeadBlock = Some(head),
-    accessibilityStatementUrl = Some(pageConfig.accessibilityUrl),
-    phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUrl(pageConfig.deskProServiceId))),
-    serviceName = Some(if (messages.isDefinedAt("optServiceName")) messages("optServiceName") else messages("service.name.default")),
-    backLinkUrl = Some("#"),
-    additionalScriptsBlock = Some(scripts)
-)(content)
+@hmrcStandardPage(
+    HmrcStandardPageParams(
+        serviceURLs = ServiceURLs(
+        signOutUrl = Some(pageConfig.signOutUrl),
+        accessibilityStatementUrl = Some(pageConfig.accessibilityUrl)
+        ),
+        banners = Banners(
+        phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUrl(pageConfig.deskProServiceId)))
+        ),
+        serviceName = Some(if (messages.isDefinedAt("optServiceName")) messages("optServiceName") else messages("service.name.default")),
+        pageTitle = Some(title),
+        isWelshTranslationAvailable = true,
+        backLink = Some(BackLink(href = "#")),
+        templateOverrides = TemplateOverrides(
+            additionalHeadBlock = Some(head),
+            additionalScriptsBlock = Some(scripts)
+        ))
+    )(content)
+
+

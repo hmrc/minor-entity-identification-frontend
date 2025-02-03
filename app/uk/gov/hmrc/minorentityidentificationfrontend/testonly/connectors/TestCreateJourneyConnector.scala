@@ -18,26 +18,27 @@ package uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors
 
 import play.api.http.Status.CREATED
 import play.api.libs.json.{JsObject, Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.{routes => apiRoutes}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyConfig, JourneyLabels}
 import uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors.TestCreateJourneyConnector.journeyConfigWriter
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
+class TestCreateJourneyConnector @Inject()(httpClient: HttpClientV2,
                                            appConfig: AppConfig
                                           )(implicit ec: ExecutionContext) {
 
   def createOverseasCompanyJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] = {
     val url = appConfig.selfBaseUrl + apiRoutes.JourneyController.createOverseasCompanyJourney().url
 
-    httpClient.POST(url, journeyConfig).map {
+    httpClient.post(url"$url").withBody(Json.toJson(journeyConfig)).execute.map {
       case response@HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
     }
   }
@@ -45,7 +46,7 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
   def createTrustsJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] = {
     val url = appConfig.selfBaseUrl + apiRoutes.JourneyController.createTrustsJourney().url
 
-    httpClient.POST(url, journeyConfig).map {
+    httpClient.post(url"$url").withBody(Json.toJson(journeyConfig)).execute.map {
       case response@HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
     }
   }
@@ -53,7 +54,7 @@ class TestCreateJourneyConnector @Inject()(httpClient: HttpClient,
   def createUnincorporatedAssociationJourney(journeyConfig: JourneyConfig)(implicit hc: HeaderCarrier): Future[String] = {
     val url = appConfig.selfBaseUrl + apiRoutes.JourneyController.createUnincorporatedAssociationJourney().url
 
-    httpClient.POST(url, journeyConfig).map {
+    httpClient.post(url"$url").withBody(Json.toJson(journeyConfig)).execute.map {
       case response@HttpResponse(CREATED, _, _) => (response.json \ "journeyStartUrl").as[String]
     }
   }

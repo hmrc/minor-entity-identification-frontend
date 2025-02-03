@@ -27,7 +27,7 @@ object RetrieveTrustDetailsHttpParser {
     override def read(method: String, url: String, response: HttpResponse): Option[TrustDetails] = {
       response.status match {
         case OK =>
-          response.json.validate[TrustDetails](reads) match {
+          response.json.validate[TrustDetails](reads(_)) match {
             case JsSuccess(trustDetails, _) => Some(trustDetails)
             case JsError(errors) =>
               throw new InternalServerException(s"`Failed to read Trust Details with the following error/s: $errors")

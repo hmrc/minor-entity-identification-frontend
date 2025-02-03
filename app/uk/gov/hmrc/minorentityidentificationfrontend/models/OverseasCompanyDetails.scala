@@ -47,7 +47,7 @@ object OverseasCompanyDetails {
       Json.obj(
         "identifiersMatch" -> false,
         "businessVerification" -> Json.toJson(Json.toJson(writeForJourneyContinuation(BusinessVerificationNotEnoughInformationToChallenge))),
-        "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
+        "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes(_))
       ) ++ utrBlock ++ overseasTaxIdentifierBlock ++ overseasTaxIdentifierCountryBlock
     }
 
@@ -127,7 +127,7 @@ object OverseasCompanyDetails {
 
     Json.obj(
       "identifiersMatch" -> false,
-      "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes)
+      "registration" -> Json.toJson(RegistrationNotCalled)(regFormat.writes(_))
     ) ++ utrBlock ++ overseasBlock ++ businessVerificationBlock
   }
 
