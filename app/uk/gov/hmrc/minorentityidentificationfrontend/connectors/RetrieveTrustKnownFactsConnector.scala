@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RetrieveTrustKnownFactsConnector @Inject()(httpClient: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
 
   def retrieveTrustKnownFacts(sautr: String)(implicit hc: HeaderCarrier): Future[Option[TrustKnownFacts]] = {
-    httpClient.get(url"${appConfig.retrieveTrustsKnownFactsUrl(sautr)}").execute(
+    httpClient.get(url"${appConfig.retrieveTrustsKnownFactsUrl(sautr)}").execute[Option[TrustKnownFacts]](
       KnownFactsHttpReads,
       ec)
   }

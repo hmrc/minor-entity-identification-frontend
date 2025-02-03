@@ -52,7 +52,7 @@ class WelshLanguageISpec extends ComponentSpecHelper {
 
   private def getMessageKeys(source: Source): Iterator[String] =
     source
-      .getLines
+      .getLines()
       .map(_.trim)
       .filter(!_.startsWith("#"))
       .filter(_.nonEmpty)
