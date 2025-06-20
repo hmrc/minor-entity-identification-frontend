@@ -67,12 +67,17 @@ trait CaptureOverseasTaxIdentifierTests {
       doc.getH1Elements.text mustBe messages.title
     }
 
-    "have the correct hint text" in {
-      val hints: Elements = doc.getHints
+    "have the correct text" in {
+      val paras: Elements = doc.getParagraphs
 
-      hints.size mustBe 1
+      paras.size mustBe 3
 
-      hints.first.text mustBe messages.hint
+      paras.get(1).text mustBe messages.p1
+      paras.get(2).text mustBe messages.p2
+    }
+
+    "have the correct legend" in {
+      doc.getLegendElement.text mustBe messages.legend
     }
 
     "have the correct label for the conditional input field" in {
@@ -88,8 +93,8 @@ trait CaptureOverseasTaxIdentifierTests {
 
     }
 
-    "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+    "have a continue button" in {
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {

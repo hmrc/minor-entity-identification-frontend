@@ -38,8 +38,10 @@ utr.ua.error_invalid_characters                     = Nodwch Gyfeirnod Unigryw y
 utr.ua.error_invalid_length                         = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas yn y fformat cywir
 
 ## Overseas Tax Identifier Page
-tax-identifiers.title                               = Oes gan y busnes ddynodydd treth tramor?
-tax-identifiers.hint                                = Gallai hyn ein helpu i wybod pa fusnes sydd dan sylw. Gallai hyn fod yn rhif cofrestru TAW, Rhif Adnabod y Cyflogai (EIN) neu unrhyw ddynodydd arall y gallem ei ddefnyddio i gadarnhau manylion y busnes.
+tax-identifiers.title                               = Eich dynodydd treth tramor
+tax-identifiers.p1                                  = Gallwch ddarparu unrhyw ddynodydd y gellir ei ddefnyddio i ddilysu’r busnes, er enghraifft rhif cofrestru TAW neu Rif Adnabod y Cyflogai (EIN).
+tax-identifiers.p2                                  = Gall ein helpu i adnabod eich busnes, nid oes rhaid i chi ddarparu dynodydd treth tramor os nad oes gennych un.
+tax-identifiers.label                               = A oes gan y busnes ddynodydd treth tramor?
 tax-identifiers.field_1                             = Dynodydd treth tramor
 error.no_tax_identifier_selection                   = Dewiswch ‘Iawn’ os oes gan y busnes ddynodydd treth tramor
 error.no_tax_identifier                             = Nodwch y dynodydd treth tramor
