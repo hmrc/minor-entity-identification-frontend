@@ -56,10 +56,12 @@ object MessageLookup {
   }
 
   object CaptureTrustUtr {
-    val title = "What is the trust’s Unique Taxpayer Reference?"
-    val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can"
-    val line_1_ending = "find a lost UTR number."
+    val title = "Your trust’s Self Assessment Unique Taxpayer Reference (UTR)"
+    val line_1 = "You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’."
+    val line_1_more_help = "Get more help to find your UTR (opens in new tab)"
     val no_utr_link = "The trust does not have a Self Assessment UTR"
+    val label = "What is your Self Assessment UTR?"
+    val hint = "Your UTR can be 10 to 13 digits long."
 
     object Error {
       val error_not_entered = "Enter the trust’s Unique Taxpayer Reference"
