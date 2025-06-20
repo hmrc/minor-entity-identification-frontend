@@ -38,8 +38,10 @@ utr.ua.error_invalid_characters                             = Enter the associat
 utr.ua.error_invalid_length                                 = Enter the association’s Unique Taxpayer Reference in the correct format
 
 ## Overseas Tax Identifier Page
-tax-identifiers.title                                        = Does the business have an overseas tax identifier?
-tax-identifiers.hint                                         = This may help us identify the business. It could be a VAT registration number, Employee Identification Number (EIN) or any other identifier we could use to verify the business details.
+tax-identifiers.title                                        = Your overseas tax identifier
+tax-identifiers.p1                                           = You can provide any identifier that can be used to verify the business, like a VAT registration number or a Employee Identification Number (EIN).
+tax-identifiers.p2                                           = It can help us to identify the business, you do not need to provide a overseas tax identifier if you don’t have one.
+tax-identifiers.label                                        = Does the business have an overseas tax identifier?
 tax-identifiers.field_1                                      = Overseas tax identifier
 error.no_tax_identifier_selection                            = Select yes if the business has an overseas tax identifier
 error.no_tax_identifier                                      = Enter the overseas tax identifier

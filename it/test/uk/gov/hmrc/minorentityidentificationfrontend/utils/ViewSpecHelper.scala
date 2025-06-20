@@ -89,6 +89,7 @@ object ViewSpecHelper {
     lazy val getBackLinks: Elements = element.getElementsByClass("govuk-back-link")
 
     lazy val getHints: Elements = element.getElementsByClass("govuk-hint")
+
   }
 
   def text(text: String): HavePropertyMatcher[Elements, String] =

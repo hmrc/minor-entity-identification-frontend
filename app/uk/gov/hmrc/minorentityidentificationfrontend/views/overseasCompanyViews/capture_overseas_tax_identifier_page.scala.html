@@ -44,26 +44,34 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
     }
 
+    @h1(messages("tax-identifiers.title"), classes = "govuk-!-margin-bottom-3")
+
+    @p(Html(messages("tax-identifiers.p1")))
+
+    @p(Html(messages("tax-identifiers.p2")), classes = "govuk-inset-text")
+
     @formWithCSRF(action = formAction) {
         @govukRadios(Radios(
-            fieldset = Some(Fieldset(legend = Some(HmrcPageHeadingLegend(
-                                                                         content = Text(messages("tax-identifiers.title")),
-                                                                     )))),
-            hint = Some(Hint(content = Text(messages("tax-identifiers.hint")))),
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                content = Text(messages("tax-identifiers.label")),
+                isPageHeading = false,
+                classes = "govuk-fieldset__legend--m")
+            ))),
             name = "tax-identifier-radio",
             items = Seq(
               RadioItem(
                 content = Text(messages("app.common.yes")),
                 value = Some(YesNo.Yes),
                 conditionalHtml = Some(govukInput(
-                                       Input(
-                                               id = "tax-identifier",
-                                               name = "tax-identifier",
-                                               label =  Label(
-                                                               content = HtmlContent(messages("tax-identifiers.field_1")),
-                                                               classes = "govuk-label"
-                                                              ),
-                                                classes = "govuk-input--width-20"
+                   Input(
+                       id = "tax-identifier",
+                       name = "tax-identifier",
+                       label =  Label(
+                           content = HtmlContent(messages("tax-identifiers.field_1")),
+                           classes = "govuk-label"
+                          ),
+                        classes = "govuk-input--width-10"
                     ).withFormField(form("tax-identifier"))
                   )
                 ),
@@ -80,9 +88,9 @@
         )
 
         @govukButton(Button(
-            attributes = Map("id" -> "save-and-continue"),
+            attributes = Map("id" -> "continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(messages("base.save_and_continue"))
+            content = Text(messages("base.continue"))
         ))
     }
 
