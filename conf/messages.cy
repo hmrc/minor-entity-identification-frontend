@@ -5,7 +5,7 @@ service.govuk                                       = GOV.UK
 base.save_and_continue                              = Cadw ac yn eich blaen
 base.change                                         = Newid
 base.confirm_and_continue                           = Cadarnhau ac yn eich blaen
-base.continue                                       = Yn eich blaen
+base.continue                                       = Parhau
 error.title-prefix                                  = ‘Gwall: ’
 
 app.common.yes                                      = Iawn
@@ -14,10 +14,13 @@ app.common.no                                       = Na
 country.select                                      = Dewiswch wlad
 country.noResult                                    = Dim canlyniadau wedi’u darganfod
 
-## Capture UTR page
-utr.title                                           = Beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer y cwmni?
-utr.line_1                                          = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth CThEF a llythyrau eraill ynghylch Treth Gorfforaeth neu Hunanasesiad. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
-utr.no_utr_link                                     = Nid oes UTR gan y cwmni
+## Capture CT UTR page
+utr.title                                           = Cyfeirnod Unigryw y Trethdalwr (UTR) eich cwmni ar gyfer Treth Gorfforaeth
+utr.p1                                              = Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill ynghylch Treth Gorfforaeth. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
+utr.p2                                              = Gofynnwch am gopi o’ch UTR ar gyfer Treth Gorfforaeth (yn agor tab newydd)
+utr.no_utr_link                                     = Nid oes gen i gyfeirnod UTR y cwmni
+utr.label                                           = Beth yw’ch UTR ar gyfer Treth Gorfforaeth?
+utr.hint                                            = Mae eich UTR yn rhif 10 digid o hyd.
 utr.error_not_entered                               = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni
 utr.error_invalid_characters                        = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni yn y fformat cywir
 utr.error_invalid_length                            = Nodwch Gyfeirnod Unigryw y Trethdalwr yn y DU ar gyfer y cwmni yn y fformat cywir
