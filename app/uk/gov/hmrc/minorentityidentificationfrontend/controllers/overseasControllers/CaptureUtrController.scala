@@ -26,7 +26,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControl
 import uk.gov.hmrc.minorentityidentificationfrontend.forms.overseasForm.OverseasCaptureUtrForm
 import uk.gov.hmrc.minorentityidentificationfrontend.services.{JourneyService, StorageService}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.MessagesHelper
-import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_utr_page
+import uk.gov.hmrc.minorentityidentificationfrontend.views.html.overseasCompanyViews.capture_ctutr_page
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -37,7 +37,7 @@ class CaptureUtrController @Inject()(val authConnector: AuthConnector,
                                      journeyService: JourneyService,
                                      storageService: StorageService,
                                      mcc: MessagesControllerComponents,
-                                     view: capture_utr_page,
+                                     view: capture_ctutr_page,
                                      messagesHelper: MessagesHelper
                                     )(implicit val config: AppConfig,
                                       executionContext: ExecutionContext) extends FrontendController(mcc) with AuthorisedFunctions {

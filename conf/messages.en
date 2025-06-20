@@ -15,8 +15,10 @@ country.select                                              = Select a country
 country.noResult                                            = No results found
 
 ## Capture UTR page
-utr.title                                                   = What is the company’s UK Unique Taxpayer Reference?
-utr.line_1                                                  = This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘.
+ctutr.title                                                 = Your company's Corporation Tax Unique Taxpayer Reference (UTR)
+ctutr.p1                                                    = It will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+ctutr.p2                                                    = Ask for a copy of your Corporation Tax UTR
+
 utr.no_utr_link                                             = The company does not have a UTR
 utr.error_not_entered                                       = Enter the company’s UK Unique Taxpayer Reference
 utr.error_invalid_characters                                = Enter the company’s UK Unique Taxpayer Reference in the correct format
