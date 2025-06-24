@@ -81,6 +81,8 @@ check-your-answers.no_ua_charity_hmrc_reference_number = Nid oes gan y gymdeitha
 check-your-answers.sa_postcode                         = Cod post Hunanasesiad
 check-your-answers.no_sa_postcode                      = Does dim cod post Hunanasesiad gan yr ymddiriedolaeth
 check-your-answers.ua_office_postcode                  = Cod post Treth Gorfforaeth
+check-your-answers.overseas.h2.uk                      = Manylion yn y DU
+check-your-answers.overseas.h2.overseas                = Manylion tramor
 
 ## Capture Charity HMRC Reference number
 chrn.title                                          = Beth yw cyfeirnod CThEF yr elusen?
