@@ -33,6 +33,7 @@ trait UaCheckYourAnswersSpecificViewTests {
 
   def testUaWithCtutrAndOfficePostcodeSummaryListView(response: => WSResponse, journeyId: String): Unit = {
     lazy val summaryListRows: List[Element] = extractSummaryListRows(response)
+    lazy val doc = Jsoup.parse(response.body)
 
     "have a summary list which" should {
 
@@ -57,6 +58,12 @@ trait UaCheckYourAnswersSpecificViewTests {
         postcodeRow.getSummaryListChangeLink mustBe uaControllers.routes.CaptureOfficePostcodeController.show(journeyId).url
         postcodeRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.uaPostcode}"
       }
+    }
+
+    "must not display extra h2 headers for overseas journey" in {
+      val h2s = doc.select("h2.govuk-heading-m")
+      h2s must not contain messages.overseasH2UkDetails
+      h2s must not contain messages.overseasH2OverseasDetails
     }
 
   }
