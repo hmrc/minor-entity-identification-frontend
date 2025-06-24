@@ -20,10 +20,12 @@
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.h1
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.h2
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 
 @this(layout: govuk_template,
         h1: h1,
+        h2: h2,
         govUkHeader: GovukHeader,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
@@ -31,14 +33,32 @@
 
 @(pageConfig: PageConfig, formAction: Call, summaryRows: Seq[SummaryListRow])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
+
 @layout(pageConfig, title = title("check-your-answers.title")) {
 
     @h1(messages("check-your-answers.heading"))
 
-    @govukSummaryList(SummaryList(
-        classes = "govuk-!-margin-bottom-9",
-        rows = summaryRows
-    ))
+
+    @if(summaryRows.exists(_.key.content.toString.contains("overseas"))) {
+        @h2(messages("check-your-answers.overseas.h2.uk"))
+        @govukSummaryList(SummaryList(
+            classes = "govuk-!-margin-bottom-9",
+            rows = summaryRows.headOption.toSeq
+        ))
+
+        @if(summaryRows.drop(1).nonEmpty) {
+            @h2(messages("check-your-answers.overseas.h2.overseas"))
+            @govukSummaryList(SummaryList(
+                classes = "govuk-!-margin-bottom-9",
+                rows = summaryRows.drop(1)
+            ))
+        }
+    } else {
+        @govukSummaryList(SummaryList(
+            classes = "govuk-!-margin-bottom-9",
+            rows = summaryRows
+        ))
+    }
 
     @formWithCSRF(action = formAction) {
         @govukButton(Button(
