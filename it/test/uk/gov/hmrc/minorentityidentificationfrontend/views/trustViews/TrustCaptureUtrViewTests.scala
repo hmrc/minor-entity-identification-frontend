@@ -66,15 +66,31 @@ trait TrustCaptureUtrViewTests {
     }
 
     "have the correct first line" in {
-      doc.getParagraphs.get(1).text mustBe messages.line_1 + " " + messages.line_1_ending
+      doc.getParagraphs.get(1).text mustBe messages.p1
+    }
+
+    "have the correct get more help link text" in {
+      doc.getParagraphs.get(2).text mustBe messages.more_help
+    }
+
+    "have the correct get more help link href" in {
+      doc.getElementsByClass("govuk-link").get(3).attr("href") mustBe messages.findUtrLink
     }
 
     "have the correct skip link" in {
       doc.getElementById("no-utr").text() mustBe messages.no_utr_link
     }
 
-    "have a continue and confirm button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+    "have the correct label" in {
+      doc.getLabelElement.text() mustBe messages.label
+    }
+
+    "have the correct hint" in {
+      doc.getElementById("utr-hint").text() mustBe messages.hint
+    }
+
+    "have a continue button" in {
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
