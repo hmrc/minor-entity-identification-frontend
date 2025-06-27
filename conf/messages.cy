@@ -105,6 +105,6 @@ chrn.ua.error.invalid_length                        = Mae’n rhaid i gyfeirnod 
 ## Cannot confirm business
 cannot-confirm-business.title                       = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
 cannot-confirm-business.heading                     = Nid yw’r manylion a roesoch yn cyd-fynd â’r cofnodion sydd gan CThEF
-cannot-confirm-business.line_1                      = Os yw’r manylion hyn yn gywir, gallwch gofrestru o hyd. Os gwnaethoch nodi’r manylion anghywir, ewch yn ôl i wneud newidiadau.
+cannot-confirm-business.line_1                      = Os yw’ch manylion yn gywir, gallwch gofrestru a pharhau â’ch taith. Os nad ydynt yn gywir, ewch yn ôl a gwnewch newidiadau.
 cannot-confirm-business.line_2                      = A ydych am barhau i gofrestru gyda’r manylion a roesoch?
 cannot-confirm-business.no_selection                = Dewiswch ‘Iawn’ os ydych am barhau i gofrestru gyda’r manylion a roesoch
