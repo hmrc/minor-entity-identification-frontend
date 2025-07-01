@@ -34,6 +34,7 @@ trait TrustCheckYourAnswersSpecificViewTests {
 
   def testTrustWithUtrAndPostcodeSummaryListView(response: => WSResponse, journeyId: String): Unit = {
     lazy val summaryListRows: List[Element] = extractSummaryListRows(response)
+    lazy val doc = Jsoup.parse(response.body)
 
     "have a summary list which" should {
 
@@ -58,6 +59,12 @@ trait TrustCheckYourAnswersSpecificViewTests {
         postcodeRow.getSummaryListChangeLink mustBe trustControllers.routes.CaptureSaPostcodeController.show(journeyId).url
         postcodeRow.getSummaryListChangeText mustBe s"${Base.change} ${messages.postcode}"
       }
+    }
+
+    "must not display extra h2 headers for overseas journey" in {
+      val h2s = doc.select("h2.govuk-heading-m")
+      h2s must not contain messages.overseasH2UkDetails
+      h2s must not contain messages.overseasH2OverseasDetails
     }
 
   }

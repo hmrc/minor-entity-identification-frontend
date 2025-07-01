@@ -83,6 +83,9 @@ check-your-answers.no_ua_charity_hmrc_reference_number      = The association do
 check-your-answers.sa_postcode                              = Self Assessment postcode
 check-your-answers.no_sa_postcode                           = The trust does not have a Self Assessment postcode
 check-your-answers.ua_office_postcode                       = Corporation Tax postcode
+check-your-answers.overseas.h2.uk                           = UK details
+check-your-answers.overseas.h2.overseas                     = Overseas details
+
 
 ## Capture Charity HMRC Reference number
 chrn.title                                                  = What is the charity’s HMRC reference number?

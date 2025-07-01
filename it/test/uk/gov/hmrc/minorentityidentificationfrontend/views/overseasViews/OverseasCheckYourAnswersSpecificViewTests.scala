@@ -38,8 +38,15 @@ trait OverseasCheckYourAnswersSpecificViewTests {
     val changeOverseasTaxIdentifiersCountryPageLink: String = overseasControllers.routes.CaptureOverseasTaxIdentifiersCountryController.show(journeyId).url
 
     lazy val summaryListRows: List[Element] = extractSummaryListRows(result)
+    lazy val doc = Jsoup.parse(result.body)
 
     "have a summary list which" should {
+
+      "display h2 headers" in {
+        val h2s = doc.select("h2.govuk-heading-m")
+        h2s.get(0).text() mustBe messages.overseasH2UkDetails
+        h2s.get(1).text() mustBe messages.overseasH2OverseasDetails
+      }
 
       "have 3 rows" in {
         summaryListRows.size mustBe 3

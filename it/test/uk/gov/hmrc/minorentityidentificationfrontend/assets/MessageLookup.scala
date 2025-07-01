@@ -182,6 +182,9 @@ object MessageLookup {
     val overseasTaxIdentifier = "Overseas tax identifier"
     val overseasTaxIdentifierCountry = "Country of overseas tax identifier"
     val overseasTaxIdentifierNotProvided = "I do not want to provide an identifier"
+    val overseasH2UkDetails = "UK details"
+    val overseasH2OverseasDetails = "Overseas details"
+
   }
 
   object CannotConfirmBusiness {
