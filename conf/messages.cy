@@ -17,7 +17,7 @@ country.noResult                                    = Dim canlyniadau wedi’u d
 ## Capture CT UTR page
 utr.title                                           = Cyfeirnod Unigryw y Trethdalwr (UTR) eich cwmni ar gyfer Treth Gorfforaeth
 utr.p1                                              = Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill ynghylch Treth Gorfforaeth. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
-utr.p2                                              = Gofynnwch am gopi o’ch UTR ar gyfer Treth Gorfforaeth (yn agor tab newydd)
+utr.p2                                              = Gofynnwch am gopi o’ch UTR ar gyfer Treth Gorfforaeth
 utr.no_utr_link                                     = Nid oes gen i gyfeirnod UTR y cwmni
 utr.label                                           = Beth yw’ch UTR ar gyfer Treth Gorfforaeth?
 utr.hint                                            = Mae eich UTR yn rhif 10 digid o hyd.
