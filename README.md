@@ -10,6 +10,23 @@ This is a Scala/Play frontend to allow Minor Entities to provide their informati
 3. Run the frontend locally using
    `sbt 'run 9725 -Dapplication.router=testOnlyDoNotUseInAppConf.Routes'`
 
+### How to run a journey 
+
+#### Authority Wizard
+
+1. Navigate to Auth Login Stub http://localhost:9949/auth-login-stub/gg-sign-in
+2. Populate the 'Redirect URL' field with the appropriate test journey creation URL. An example for creating an overseas 
+   company journey would be:
+   http://localhost:9725/identify-your-overseas-business/test-only/create-overseas-company-journey
+3. Click on 'Submit'  
+
+#### Journey Config
+
+1. Enter the following values within the 'Enter Minor Entity Identification Journey Config' page:
+   - Continue URL:  `/test`
+   - Service Name:  `Test Service Name`
+2. Click on 'Submit'
+
 ## Testing
 
 ---

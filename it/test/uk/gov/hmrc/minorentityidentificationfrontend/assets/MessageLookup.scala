@@ -44,9 +44,12 @@ object MessageLookup {
   }
 
   object CaptureUtr {
-    val title = "What is the company’s UK Unique Taxpayer Reference?"
-    val line_1 = "This is 10 numbers, for example 1234567890. It will be on HMRC tax returns and other letters about Corporation Tax or Self Assessment. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘."
-    val no_utr_link = "The company does not have a UTR"
+    val title = "Your company’s Corporation Tax Unique Taxpayer Reference (UTR)"
+    val paragraph1 = "It will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’ or ‘official use’."
+    val para2LinkText = "Ask for a copy of your Corporation Tax UTR (opens in new tab)"
+    val no_utr_link = "I do not have the company’s UTR number"
+    val label = "What is your Corporation Tax UTR?"
+    val hint = "Your UTR is 10 digits long."
 
     object Error {
       val error_not_entered = "Enter the company’s UK Unique Taxpayer Reference"

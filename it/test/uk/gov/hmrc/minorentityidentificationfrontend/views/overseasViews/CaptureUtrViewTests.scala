@@ -23,6 +23,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base, BetaBanner, Header, CaptureUtr => messages}
 import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
+import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
 
@@ -65,16 +66,43 @@ trait CaptureUtrViewTests {
       doc.getH1Elements.text mustBe messages.title
     }
 
-    "have the correct first line" in {
-      doc.getParagraphs.get(1).text mustBe messages.line_1
+    "have the correct first paragraph" in {
+      doc.getParagraphs.get(1).text mustBe messages.paragraph1
     }
 
-    "have the correct skip link" in {
-      doc.getElementById("no-utr").text() mustBe messages.no_utr_link
+    "have the correct CT corporation copy link" in {
+      val paragraphElement = doc.getParagraphs.get(2)
+      paragraphElement.text mustBe messages.para2LinkText
+
+      paragraphElement.getElementsByClass("govuk-link").attr("href") mustBe
+        "https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr"
     }
 
-    "have a continue and confirm button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+    "have the correct skip link inset" in {
+      val insetElement = doc.getElementsByClass("govuk-inset-text").get(0)
+      insetElement.text() mustBe messages.no_utr_link
+
+      insetElement.getElementById("no-utr").attr("href") mustBe
+        overseasControllers.routes.CaptureUtrController.noUtr(testJourneyId).url
+    }
+
+    "have the correct label" in {
+      doc.getLabelElement.eq(0).text mustBe messages.label
+    }
+
+    "have the correct hint" in {
+      doc.getHintText mustBe messages.hint
+    }
+
+    "have an input text field" in {
+      val textInputs: Elements = doc.getTextFieldInput("utr")
+      textInputs.size() mustBe 1
+
+      textInputs.first.attr("type") mustBe "text"
+    }
+
+    "have a continue button" in {
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
@@ -94,6 +122,7 @@ trait CaptureUtrViewTests {
       doc.getErrorSummaryTitle.text mustBe Base.Error.title
       doc.getErrorSummaryBody.text mustBe messages.Error.error_not_entered
     }
+
     "correctly display the field error" in {
       doc.getFieldErrorMessage.text mustBe Base.Error.error + messages.Error.error_not_entered
     }
