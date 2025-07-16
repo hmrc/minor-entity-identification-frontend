@@ -62,16 +62,24 @@ trait CaptureSaPostcodeViewTests {
       backLinks.first.text mustBe Base.back
     }
 
+    "have the correct paragrpah text" in {
+      doc.getParagraphs.get(1).text mustBe messages.p1
+    }
+
+    "have the correct label text" in {
+      doc.getLabelElement.text mustBe messages.label
+    }
+
     "have the correct hint text" in {
-      doc.getParagraphs.get(1).text mustBe messages.hint
+      doc.getHintText mustBe messages.hint
     }
 
     "have a correct link to skip self assessment postcode" in {
-      doc.getElementById("no-sa-postcode").text() mustBe messages.no_postcodeLink
+      doc.getElementById("no-sautr-postcode").text() mustBe messages.no_postcodeLink
     }
 
     "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {

@@ -22,42 +22,55 @@
 @import uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers.routes
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.{errorSummary, inputText, h1, p, link}
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 
 @this(
     layout: govuk_template,
+    h1: h1,
+    p: p,
+    link: link,
+    errorSummary: errorSummary,
+    inputText: inputText,
     govukButton: GovukButton,
-    formWithCSRF: FormWithCSRF,
-    govukInput: GovukInput,
-    govukErrorSummary: GovukErrorSummary
+    formWithCSRF: FormWithCSRF
 )
 
 @(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[String])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("sa-postcode.title", form)) {
 
-    @if(form.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
-    }
+    @errorSummary(form.errors)
 
-    @formWithCSRF(action = formAction) {
-        @govukInput(
-            Input(
-                label = HmrcPageHeadingLabel(content = Text(messages("sa-postcode.title"))),
-                hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-body">${messages("sa-postcode.hint")}</p>"""))),
-                classes = "govuk-input--width-10"
-            ).withFormField(form("saPostcode"))
+    @h1(messages("sa-postcode.title"))
+
+    @p(Html(messages("sa-postcode.p1")))
+
+    @p(
+        link(
+             link = routes.CaptureSaPostcodeController.noSaPostcode(journeyId).url,
+            messageKey = messages("sa-postcode.no.postcodeLink"),
+            id = Some("no-sautr-postcode")
+            ),
+        classes = "govuk-inset-text"
         )
 
-        <p class="govuk-body">
-            <a class="govuk-link" id="no-sa-postcode" href="@routes.CaptureSaPostcodeController.noSaPostcode(journeyId)">@messages("sa-postcode.no.postcodeLink")</a>
-        </p>
-
+    @formWithCSRF(action = formAction) {
+        @inputText(
+            form = form,
+            id = "saPostcode",
+            name = "saPostcode",
+            isPageHeading = false,
+            hasFieldTitle = true,
+            label = messages("sa-postcode.label"),
+            hint = Some(Html(messages("sa-postcode.hint"))),
+            classes = "govuk-input--width-10"
+        )
 
         @govukButton(Button(
-            attributes = Map("id" -> "save-and-continue"),
+            attributes = Map("id" -> "continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(messages("base.save_and_continue"))
+            content = Text(messages("base.continue"))
         ))
     }
 }
