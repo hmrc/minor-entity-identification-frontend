@@ -91,10 +91,13 @@ check-your-answers.overseas.h2.overseas                     = Overseas details
 
 
 ## Capture Charity HMRC Reference number
-chrn.title                                                  = What is the charity’s HMRC reference number?
-chrn.inset                                                  = If the charity has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register.
-chrn.label                                                  = HMRC reference number
-chrn.hint                                                   = This could be up to 7 characters and must begin with either one or two letters, followed by 1-5 numbers. For example, A999 or AB99999
+chrn.title                                                  = Charity’s HMRC reference number
+chrn.p1                                                     = You can find your charity’s HMRC reference number on the
+chrn.link.text                                              = charity register
+chrn.p2                                                     = If your charity has registered for Gift Aid then the HMRC reference number will be the same as their Gift Aid number, it is not available on the charity register.
+chrn.inset                                                  = The charity does not have a HMRC reference number
+chrn.label                                                  = What is your charity’s HMRC reference number?
+chrn.hint                                                   = This could be up to 7 characters and must begin with either one or two letters, followed by 1-5 numbers, like A999 or AB99999
 chrn.no_chrn_link                                           = The charity does not have a HMRC reference number
 chrn.error_not_entered                                      = Enter the HMRC reference number
 chrn.error_invalid_characters                               = Enter the HMRC reference number in the correct format

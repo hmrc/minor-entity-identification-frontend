@@ -25,6 +25,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testD
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.CaptureCHRN
+
 
 trait CaptureCHRNumberViewTests {
   this: ComponentSpecHelper =>
@@ -81,7 +83,26 @@ trait CaptureCHRNumberViewTests {
     }
 
     "have the correct hint text" in {
-      doc.getParagraphs.get(1).text mustBe messages.hint
+      doc.getElementById("chrn-hint").text mustBe CaptureCHRN.hint
+    }
+
+    "have the correct first line with the link" in {
+      doc.getParagraphs.get(1).text must include (CaptureCHRN.paragraph1)
+
+      val link = doc.getParagraphs.get(1).select("a")
+
+      link.size mustBe 1
+
+      link.attr("href") mustBe "https://www.gov.uk/find-charity-information"
+      link.text() must include ("(opens in new tab)")
+      link.attr("target") mustBe "_blank"
+      link.attr("rel") must include ("noopener")
+      link.attr("rel") must include ("noreferrer")
+
+    }
+
+    "have the correct second line" in {
+      doc.getParagraphs.get(2).text mustBe messages.paragraph2
     }
 
     "have the correct label" in {
@@ -108,8 +129,8 @@ trait CaptureCHRNumberViewTests {
       }
     }
 
-    "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+    "have a continue button" in {
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
