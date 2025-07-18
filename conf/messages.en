@@ -58,8 +58,10 @@ tax-identifiers-country.title                                = Which country iss
 error.no_entry_tax_identifier_country                        = Enter the name of the country that issued the overseas tax identifier
 
 ## Trust SA Postcode Page
-sa-postcode.title                                            = What is the postcode used to register the trust for Self Assessment?
+sa-postcode.title                                            = The postcode used to register the trust for Self Assessment
+sa-postcode.p1                                               = The postcode you enter must match our records. For example, this postcode was used to register the trust for Self Assessment.
 sa-postcode.hint                                             = For example, AB1 2YZ
+sa-postcode.label                                            = Enter the Self Assessment postcode
 sa-postcode.no.postcodeLink                                  = The trust does not have a Self Assessment postcode
 trust.error.invalid_format_sa-postcode                       = Enter the postcode in the correct format
 trust.error.no_entry_sa-postcode                             = Enter the postcode used to register the trust for Self Assessment

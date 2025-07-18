@@ -25,8 +25,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.MessageLookup.{Base,
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.jdk.CollectionConverters._
 
 trait OverseasCheckYourAnswersSpecificViewTests {
 

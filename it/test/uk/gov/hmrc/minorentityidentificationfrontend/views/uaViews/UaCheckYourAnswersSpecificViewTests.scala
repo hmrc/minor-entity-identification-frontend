@@ -24,8 +24,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.{testC
 import uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ViewSpecHelper.ElementExtensions
-
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.jdk.CollectionConverters._
 
 trait UaCheckYourAnswersSpecificViewTests {
 
@@ -61,7 +60,7 @@ trait UaCheckYourAnswersSpecificViewTests {
     }
 
     "must not display extra h2 headers for overseas journey" in {
-      val h2s = doc.select("h2.govuk-heading-m")
+      val h2s = doc.select("h2.govuk-heading-m").eachText().asScala
       h2s must not contain messages.overseasH2UkDetails
       h2s must not contain messages.overseasH2OverseasDetails
     }
