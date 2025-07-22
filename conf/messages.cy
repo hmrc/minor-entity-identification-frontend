@@ -58,9 +58,11 @@ tax-identifiers-country.title                       = Ym mha wlad y cyhoeddwyd y
 error.no_entry_tax_identifier_country               = Nodwch enw’r wlad a gyhoeddodd y dynodydd treth tramor
 
 ## Trust SA Postcode Page
-sa-postcode.title                                   = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad?
+sa-postcode.title                                   = Y cod post â ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad
+sa-postcode.p1                                      = Mae’n rhaid i’r cod post rydych yn ei nodi gyd-fynd â’n cofnodion. Er enghraifft, defnyddiwyd y cod post hwn i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad.
 sa-postcode.hint                                    = Er enghraifft, AB1 2YZ
-sa-postcode.no.postcodeLink                         = Does dim cod post Hunanasesiad gan yr ymddiriedolaeth
+sa-postcode.label                                   = Nodwch y cod post ar gyfer Hunanasesiad
+sa-postcode.no.postcodeLink                         = Nid oes gan yr ymddiriedolaeth god post ar gyfer Hunanasesiad
 trust.error.invalid_format_sa-postcode              = Nodwch y cod post yn y fformat cywir
 trust.error.no_entry_sa-postcode                    = Nodwch y cod post a ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad
 
