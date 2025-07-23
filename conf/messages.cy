@@ -36,7 +36,6 @@ utr.trust.error_invalid_length                      = Nodwch Gyfeirnod Unigryw y
 utr.ua.title                                        = Beth yw Cyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas?
 utr.ua.inset                                        = Os ydych yn cofrestru fel ‘Sefydliad Corfforedig Elusennol’, nid oes angen i chi nodi UTR. Yn hytrach, cliciwch ar yr hypergysylltiad ‘Nid oes gan y gymdeithas UTR’ isod.
 utr.ua.line_1                                       = Rhif 10 digid yw hwn, er enghraifft 1234567890. Bydd i’w weld ar Ffurflenni Treth a llythyrau eraill am Dreth Gorfforaeth. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’. Gallwch
-utr.ua.line_1_ending                                = ddod o hyd i UTR sydd ar goll.
 utr.ua.no_utr_link                                  = Nid oes gan y gymdeithas UTR
 utr.ua.error_not_entered                            = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas
 utr.ua.error_invalid_characters                     = Nodwch Gyfeirnod Unigryw y Trethdalwr ar gyfer y gymdeithas yn y fformat cywir
