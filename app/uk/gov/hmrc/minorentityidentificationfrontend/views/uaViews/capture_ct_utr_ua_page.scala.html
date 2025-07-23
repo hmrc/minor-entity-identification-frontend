@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers._
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLabel
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
@@ -23,10 +24,16 @@
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 
 @this(layout: govuk_template,
-        govukInput: GovukInput,
+        h1: h1,
+        p : p,
+        link : link,
+        inputText : inputText,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
         govukErrorSummary: GovukErrorSummary,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton)
@@ -40,29 +47,47 @@
     }
 
     @formWithCSRF(action = formAction) {
-        @govukInput(
-            Input(
-                label = HmrcPageHeadingLabel(content = Text(messages("utr.ua.title"))),
-                hint = Some(
-                    Hint(
-                        content = HtmlContent(
-                            s"""<p class="govuk-body">${messages("utr.ua.line_1")} <a class="govuk-link" href="https://www.gov.uk/find-lost-utr-number">${messages("utr.ua.line_1_ending")}</a></p><p class="govuk-inset-text">${messages("utr.ua.inset")}</p>"""
-                        )
-                    )
-                ),
-                classes = "govuk-input--width-20",
-                inputmode = Some("numeric"),
-            ).withFormField(form("utr"))
+
+        @h1(messages("utr.ua.title"))
+
+        @p(Html(messages("utr.ua.line_1")))
+
+        @p((hmrcNewTabLinkHelper(NewTabLinkHelper(
+                    text = messages("utr.ua.ask_for_copy_of_utr"),
+                    href = Some("https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr")
+                ))
+        ))
+
+
+        @p(
+            Html(messages("utr.ua.inset") +
+            link(
+                routes.CaptureCtutrController.noUtr(journeyId).url ,
+                messages("utr.ua.no_utr_link"),
+                Some("no-utr")
+            ) + Html(".")),
+
+            classes = "govuk-inset-text"
         )
 
-        <p class="govuk-body">
-            <a class="govuk-link" id="no-utr" href="@routes.CaptureCtutrController.noUtr(journeyId)">@messages("utr.ua.no_utr_link")</a>
-        </p>
+
+
+        @inputText(
+            form = form,
+            id = "utr",
+            name = "utr",
+            isPageHeading = false,
+            hasFieldTitle = true,
+            label = messages("utr.ua.label"),
+            hint = Some(Html(messages("utr.ua.hint"))),
+            classes = "govuk-input--width-10"
+        )
+
 
         @govukButton(Button(
-            attributes = Map("id" -> "save-and-continue"),
+            attributes = Map("id" -> "continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(messages("base.save_and_continue"))
+            content = Text(messages("base.continue"))
         ))
     }
 }
