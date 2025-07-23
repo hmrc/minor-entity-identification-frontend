@@ -67,7 +67,9 @@ trust.error.invalid_format_sa-postcode              = Nodwch y cod post yn y ffo
 trust.error.no_entry_sa-postcode                    = Nodwch y cod post a ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Hunanasesiad
 
 ## UA Office Postcode Page
-office-postcode.title                               = Beth yw’r cod post a ddefnyddiwyd i gofrestru’r gymdeithas ar gyfer Treth Gorfforaeth
+office-postcode.title                               = Y cod post â ddefnyddiwyd i gofrestru’r ymddiriedolaeth ar gyfer Treth Gorfforaeth
+office-postcode.body                                = Mae’n rhaid i’r cod post rydych yn ei nodi gyd-fynd â’n cofnodion. Er enghraifft, defnyddiwyd y cod post hwn i gofrestru’r gymdeithas ar gyfer Treth Gorfforaeth.
+office-postcode.label                               = Nodwch y cod post ar gyfer Treth Gorfforaeth
 office-postcode.hint                                = Er enghraifft, AB1 2YZ
 ua.error.invalid_format_office_postcode             = Nodwch y cod post yn y fformat cywir
 ua.error.no_entry_office_postcode                   = Nodwch y cod post a ddefnyddiwyd i gofrestru’r gymdeithas ar gyfer Treth Gorfforaeth

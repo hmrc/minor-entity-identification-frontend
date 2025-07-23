@@ -67,7 +67,9 @@ trust.error.invalid_format_sa-postcode                       = Enter the postcod
 trust.error.no_entry_sa-postcode                             = Enter the postcode used to register the trust for Self Assessment
 
 ## UA Office Postcode Page
-office-postcode.title                                        = What is the postcode used to register the association for Corporation Tax?
+office-postcode.title                                        = The postcode used to register the association for Corporation Tax
+office-postcode.body                                         = The postcode you enter must match our records. For example, this postcode was used to register the association for Corporation Tax.
+office-postcode.label                                        = Enter the Corporation Tax postcode
 office-postcode.hint                                         = For example, AB1 2YZ
 ua.error.invalid_format_office_postcode                      = Enter the postcode in the correct format
 ua.error.no_entry_office_postcode                            = Enter the postcode used to register the association for Corporation Tax
