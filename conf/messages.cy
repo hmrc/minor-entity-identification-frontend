@@ -92,10 +92,13 @@ check-your-answers.overseas.h2.uk                      = Manylion yn y DU
 check-your-answers.overseas.h2.overseas                = Manylion tramor
 
 ## Capture Charity HMRC Reference number
-chrn.title                                          = Beth yw cyfeirnod CThEF yr elusen?
+chrn.title                                          = Cyfeirnod CThEF yr elusen
+chrn.p1                                             = Bydd cyfeirnod CThEF eich elusen i’w weld ar y
+chrn.link.text                                      = gofrestr elusennau
+chrn.p2                                             = Os yw’ch elusen wedi’i chofrestru ar gyfer Rhodd Cymorth, yna bydd cyfeirnod CThEF yr un peth â’i rhif Rhodd Cymorth.
 chrn.inset                                          = Os yw’r elusen wedi’i chofrestru ar gyfer Rhodd Cymorth, yna bydd ei chyfeirnod CThEF yr un peth â’i rhif Rhodd Cymorth. Nid yw hwn yr un peth â’r rhif elusen sydd ar gael ar y gofrestr elusennau.
-chrn.label                                          = Cyfeirnod CThEF
-chrn.hint                                           = Gallai hyn fod hyd at 7 o gymeriadau, a rhaid iddo ddechrau gyda naill ai un neu ddwy lythyren ar y dechrau ac yna 1-5 rhif. Er enghraifft, A999 neu AB99999
+chrn.label                                          = Beth yw cyfeirnod CThEF eich elusen?
+chrn.hint                                           = Gallai hyn fod hyd at 7 o gymeriadau, a rhaid iddo ddechrau gyda naill ai un neu ddwy lythyren ac yna 1-5 rhif, megis A999 neu AB99999
 chrn.no_chrn_link                                   = Nid oes gan yr elusen gyfeirnod CThEF
 chrn.error_not_entered                              = Nodwch gyfeirnod CThEF
 chrn.error_invalid_characters                       = Nodwch gyfeirnod CThEF yn y fformat cywir
