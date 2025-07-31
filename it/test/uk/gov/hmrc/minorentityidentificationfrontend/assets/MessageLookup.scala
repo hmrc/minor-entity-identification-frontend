@@ -129,7 +129,9 @@ object MessageLookup {
 
   object CaptureOfficePostcode {
 
-    val title = "What is the postcode used to register the association for Corporation Tax?"
+    val title = "The postcode used to register the association for Corporation Tax"
+    val body = "The postcode you enter must match our records. For example, this postcode was used to register the association for Corporation Tax."
+    val inputLabel = "Enter the Corporation Tax postcode"
     val hint = "For example, AB1 2YZ"
 
     object Error {

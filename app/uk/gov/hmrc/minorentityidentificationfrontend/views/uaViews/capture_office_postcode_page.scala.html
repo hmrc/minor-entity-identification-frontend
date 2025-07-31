@@ -16,14 +16,16 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLabel
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.models.PageConfig
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.helpers.TitleHelper.title
+@import uk.gov.hmrc.minorentityidentificationfrontend.views.html.helpers.{h1, p}
 @import uk.gov.hmrc.minorentityidentificationfrontend.views.html.templates.govuk_template
 
 @this(
+    h1: h1,
+    p: p,
     layout: govuk_template,
     govukButton: GovukButton,
     formWithCSRF: FormWithCSRF,
@@ -39,19 +41,25 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
     }
 
+    @h1(messages("office-postcode.title"))
+
+    @p(Text(messages("office-postcode.body")).asHtml, id = Some("officePostcode-body"))
+
     @formWithCSRF(action = formAction) {
         @govukInput(
             Input(
-                label = HmrcPageHeadingLabel(content = Text(messages("office-postcode.title"))),
-                hint = Some(Hint(content = HtmlContent(s"""<p class="govuk-body">${messages("office-postcode.hint")}</p>"""))),
+                label = Label(
+                    classes = "govuk-label--m",
+                    content = Text(messages("office-postcode.label"))),
+                hint = Some(Hint(content = Text(messages("office-postcode.hint")))),
                 classes = "govuk-input--width-10"
             ).withFormField(form("officePostcode"))
         )
 
         @govukButton(Button(
-            attributes = Map("id" -> "save-and-continue"),
+            attributes = Map("id" -> "continue"),
             classes = "govuk-!-margin-right-1",
-            content = Text(messages("base.save_and_continue"))
+            content = Text(messages("base.continue"))
         ))
     }
 }

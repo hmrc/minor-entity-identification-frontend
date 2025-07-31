@@ -80,12 +80,16 @@ trait CaptureOfficePostcodeViewTests {
       }
     }
 
-    "have the correct hint text" in {
-      doc.getParagraphs.get(1).text mustBe messages.hint
+    "have the correct body text" in {
+      doc.getElementById("officePostcode-body").text mustBe messages.body
     }
 
-    "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+    "have the correct hint text" in {
+      doc.getHintText mustBe messages.hint
+    }
+
+    "have a continue button" in {
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
