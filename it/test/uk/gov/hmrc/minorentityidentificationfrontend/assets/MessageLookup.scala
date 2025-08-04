@@ -158,12 +158,13 @@ object MessageLookup {
   }
 
   object CaptureUaChrn {
-    val title = "What is the association’s HMRC reference Number?"
-    val inset = "If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter an HMRC reference number. Instead, click on ‘The association does not have a HMRC reference number’ hyperlink below."
-    val paragraph = "If the association has registered for Gift Aid then their HMRC reference number will be the same as their Gift Aid number. This is not the same as the charity number available on the charity register."
+    val title = "Association’s HMRC reference Number"
+    val paragraph1 = "You can find your association’s HMRC reference number on the charity register (opens in new tab)."
+    val paragraph2 = "If your association has registered for Gift Aid then the HMRC reference number will be the same as their Gift Aid number, it is not available on the charity register."
+    val inset = "If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter a UTR. Instead, click here the association does not have a UTR."
     val hint = "This could be up to 7 characters and must begin with either one or two letters, followed by 1-5 numbers. For example, A999 or AB99999"
-    val link = "The association does not have a HMRC reference number"
-    val label = "HMRC reference number"
+    val link = "the association does not have a UTR"
+    val label = "What is your association’s HMRC reference number?"
 
     object Error {
       val error_not_entered = "Enter the HMRC reference number"
