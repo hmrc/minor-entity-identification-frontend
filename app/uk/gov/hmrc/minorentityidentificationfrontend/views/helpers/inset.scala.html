@@ -14,8 +14,10 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.{Html, HtmlFormat}
+
 @this()
 
-@(msg: String)
+@(msg: String = "", htmlContent: Html = HtmlFormat.empty)
 
-<div class="govuk-inset-text">@msg</div>
+<div class="govuk-inset-text">@if(htmlContent != HtmlFormat.empty){ @htmlContent } else { @msg }</div>

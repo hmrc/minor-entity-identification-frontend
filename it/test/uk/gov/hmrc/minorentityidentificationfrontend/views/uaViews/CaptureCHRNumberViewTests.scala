@@ -81,11 +81,12 @@ trait CaptureCHRNumberViewTests {
     }
 
     "have the correct paragraph text" in {
-      doc.getParagraphs.get(1).text mustBe messages.paragraph
+      doc.getParagraphs.get(1).text mustBe messages.paragraph1
+      doc.getParagraphs.get(2).text mustBe messages.paragraph2
     }
 
     "have the correct hint text" in {
-      doc.getParagraphs.get(2).text mustBe messages.hint
+      doc.getParagraphs.get(3).text mustBe messages.hint
     }
 
     "have the correct label" in {
@@ -113,7 +114,7 @@ trait CaptureCHRNumberViewTests {
     }
 
     "have a save and continue button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
