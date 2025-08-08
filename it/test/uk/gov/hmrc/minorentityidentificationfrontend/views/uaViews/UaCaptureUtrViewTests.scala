@@ -66,15 +66,42 @@ trait UaCaptureUtrViewTests {
     }
 
     "have the correct first line" in {
-      doc.getParagraphs.get(1).text mustBe messages.line_1 + " " + messages.line_1_ending
+      doc.getParagraphs.get(1).text mustBe messages.line_1
+    }
+
+    "have the correct second line with external link" in {
+      val paragraph = doc.getParagraphs.get(2)
+
+      val link = paragraph.select("a").first()
+
+      link.text mustBe messages.ask_for_copy_of_utr
+
+      link must not be null
+      link.attr("href") mustBe "https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr"
+      link.attr("target") mustBe "_blank"
+      link.attr("rel") must include ("noopener")
+      link.attr("rel") must include ("noreferrer")
+
+    }
+
+    "have the correct third line with the no utr link" in {
+      doc.getParagraphs.get(3).text mustBe messages.inset  + " " + messages.no_utr_link + "."
     }
 
     "have the correct skip link" in {
       doc.getElementById("no-utr").text() mustBe messages.no_utr_link
     }
 
+    "display the correct label" in {
+      doc.select("label[for=utr]").text().trim mustBe messages.label
+    }
+
+    "display the correct hint" in {
+      doc.getElementById("utr-hint").text().trim mustBe messages.hint
+    }
+
     "have a continue and confirm button" in {
-      doc.getSubmitButton.first.text mustBe Base.saveAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
