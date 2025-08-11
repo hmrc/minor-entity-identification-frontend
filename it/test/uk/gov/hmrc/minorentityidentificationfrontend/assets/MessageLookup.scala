@@ -75,10 +75,13 @@ object MessageLookup {
   }
 
   object CaptureUaUtr {
-    val title = "What is the association’s Unique Taxpayer Reference?"
-    val line_1 = "This is 10 numbers, for example 1234567890. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference‘, ‘UTR‘ or ‘official use‘. You can"
-    val line_1_ending = "find a lost UTR number."
-    val no_utr_link = "The association does not have a UTR"
+    val title = "Your company’s Corporation Tax Unique Taxpayer Reference (UTR)"
+    val line_1 = "It will be on tax returns and other letters about Corporation Tax. It might be called ‘reference’, ‘UTR’ or ‘official use’."
+    val ask_for_copy_of_utr  = "Ask for a copy of your Corporation Tax UTR (opens in new tab)"
+    val inset = "If you are registering as a ‘Charitable Incorporated Organisation’, you do not need to enter a UTR. Instead, click here"
+    val no_utr_link = "the association does not have a UTR"
+    val label = "What is your Corporation Tax UTR?"
+    val hint  = "Your UTR is 10 digits long."
 
     object Error {
       val error_not_entered = "Enter the association’s Unique Taxpayer Reference"
