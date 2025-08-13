@@ -100,7 +100,7 @@ trait UaCaptureUtrViewTests {
       doc.getElementById("utr-hint").text().trim mustBe messages.hint
     }
 
-    "have a continue and confirm button" in {
+    "have a continue button" in {
       doc.getSubmitButton.first.text mustBe Base.continue
     }
 

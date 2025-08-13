@@ -66,8 +66,8 @@ trait CheckYourAnswersCommonViewTests {
       doc.getH1Elements.text mustBe messages.title
     }
 
-    "have a continue and confirm button" in {
-      doc.getSubmitButton.first.text mustBe Base.confirmAndContinue
+    "have a continue button" in {
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
