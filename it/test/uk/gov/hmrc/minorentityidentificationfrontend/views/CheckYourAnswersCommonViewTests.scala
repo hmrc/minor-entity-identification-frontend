@@ -67,7 +67,7 @@ trait CheckYourAnswersCommonViewTests {
     }
 
     "have a continue and confirm button" in {
-      doc.getSubmitButton.first.text mustBe Base.confirmAndContinue
+      doc.getSubmitButton.first.text mustBe Base.continue
     }
 
     "have a link to contact frontend" in {
