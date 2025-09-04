@@ -40,8 +40,12 @@ lazy val microservice = Project(appName, file("."))
     PlayKeys.playDefaultPort := 9725,
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
-    scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s"
+    scalacOptions ++= Seq(
+      "-Wconf:cat=unused-imports&src=html/.*:s",
+      "-Wunused",
+      "-Wdead-code",
+      "-Wconf:src=routes/.*:s"
+    )
   )
 
 lazy val it = project
