@@ -17,6 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, StringContextOps}
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
@@ -27,6 +28,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.{OverseasCompanyDeta
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.ClassTag
 
 class StorageConnector @Inject()(http: HttpClientV2,
                                  appConfig: AppConfig
@@ -35,7 +37,7 @@ class StorageConnector @Inject()(http: HttpClientV2,
   def retrieveDataField[DataType](journeyId: String,
                                   dataKey: String
                                  )(implicit dataTypeReads: Reads[DataType],
-                                   manifest: Manifest[DataType],
+                                   classTag: ClassTag[DataType],
                                    hc: HeaderCarrier): Future[Option[DataType]] = {
     http.get(url"${appConfig.minorEntityIdentificationUrl(journeyId)}/$dataKey").execute[Option[DataType]]
   }

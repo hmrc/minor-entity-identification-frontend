@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.repositories.mocks
 
-import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
 import org.scalatest.Suite
+import org.mockito.Mockito.verify
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository
 
-trait MockJourneyConfigRepository extends IdiomaticMockito with ResetMocksAfterEachTest {
+trait MockJourneyConfigRepository extends MockitoSugar {
   self: Suite =>
 
   val mockJourneyConfigRepository: JourneyConfigRepository = mock[JourneyConfigRepository]
@@ -29,17 +30,17 @@ trait MockJourneyConfigRepository extends IdiomaticMockito with ResetMocksAfterE
   def verifyInsertJourneyConfig(journeyId: String,
                                 internalId: String,
                                 journeyConfig: JourneyConfig): Unit =
-    mockJourneyConfigRepository.insertJourneyConfig(
+    verify(mockJourneyConfigRepository).insertJourneyConfig(
       journeyId,
       internalId,
       journeyConfig
-    ) was called
+    )
 
   def verifyGetJourneyConfig(journeyId: String, internalId: String): Unit =
-    mockJourneyConfigRepository.getJourneyConfig(
+    verify(mockJourneyConfigRepository).getJourneyConfig(
       journeyId,
       internalId
-    ) was called
+    )
 
 }
 

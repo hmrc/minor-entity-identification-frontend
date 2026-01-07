@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.frontend.con
 
 import play.api.http.Status._
 import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2

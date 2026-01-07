@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
+import org.mockito.Mockito.{reset, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
@@ -28,7 +30,13 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerification
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConnector {
+class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConnector with BeforeAndAfterEach {
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+
+    reset(mockStorageConnector)
+  }
 
   object TestStorageService extends StorageService(mockStorageConnector)
 
@@ -37,32 +45,32 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
   "retrieveOverseasAuditDetails" should {
     "return the correct json" when {
       "a sautr is entered" in {
-        mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
-          Future.successful(
-            Some(OverseasCompanyDetails(Some(Sautr(testSautr)), Some(testOverseasTaxIdentifier), Some(testOverseasTaxIdentifierCountry))))
+        when(mockStorageConnector.retrieveOverseasDetails(testJourneyId))
+          .thenReturn(Future.successful(
+            Some(OverseasCompanyDetails(Some(Sautr(testSautr)), Some(testOverseasTaxIdentifier), Some(testOverseasTaxIdentifierCountry)))))
         val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasSautrAuditDataJson ++ testOverseasTaxIdentifiersJson
       }
       "a ctutr is entered but no overseas tax identifier" in {
-        mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
-          Future.successful(Some(OverseasCompanyDetails(Some(Ctutr(testCtutr)), None, None)))
+        when(mockStorageConnector.retrieveOverseasDetails(testJourneyId))
+          .thenReturn(Future.successful(Some(OverseasCompanyDetails(Some(Ctutr(testCtutr)), None, None))))
 
         val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasCtutrDataJson
       }
       "only overseas tax identifier is entered" in {
-        mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
-          Future.successful(
-            Some(OverseasCompanyDetails(None, Some(testOverseasTaxIdentifier), Some(testOverseasTaxIdentifierCountry))))
+        when(mockStorageConnector.retrieveOverseasDetails(testJourneyId))
+          .thenReturn(Future.successful(
+            Some(OverseasCompanyDetails(None, Some(testOverseasTaxIdentifier), Some(testOverseasTaxIdentifierCountry)))))
 
         val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasTaxIdentifiersDataJson ++ testOverseasTaxIdentifiersJson
       }
       "no data is entered" in {
-        mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns Future.successful(None)
+        when(mockStorageConnector.retrieveOverseasDetails(testJourneyId)).thenReturn(Future.successful(None))
 
         val result = await(TestStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
 
@@ -74,7 +82,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
   "retrieveTrustsAuditDetails" should {
     "return the correct json" when {
       "user is on the legacy journey" in {
-        mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(None)
+        when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(None))
 
         val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -89,7 +97,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
           Some(BusinessVerificationNotEnoughInformationToCallBV),
           Some(RegistrationNotCalled)
         )
-        mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+        when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
         val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -104,7 +112,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
           Some(BusinessVerificationNotEnoughInformationToCallBV),
           Some(RegistrationNotCalled)
         )
-        mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+        when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
         val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -120,7 +128,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationPass),
             Some(Registered(testSafeId))
           )
-          mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+          when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
           val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -135,7 +143,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationFail),
             Some(RegistrationNotCalled)
           )
-          mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+          when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
           val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -150,7 +158,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationNotEnoughInformationToChallenge),
             Some(RegistrationNotCalled)
           )
-          mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+          when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
           val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -165,7 +173,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationPass),
             Some(RegistrationFailed(testRegistrationFailure))
           )
-          mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+          when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
           val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -180,7 +188,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             None,
             Some(Registered(testSafeId))
           )
-          mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+          when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
           val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig(false)))
 
@@ -196,7 +204,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
           Some(BusinessVerificationPass),
           Some(Registered(testSafeId))
         )
-        mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(Some(testTrustDetails))
+        when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(Some(testTrustDetails)))
 
         val result = await(TestStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()))
 
@@ -208,7 +216,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
   "retrieveUAAuditDetails" should {
     "return the correct json" when {
       "user is on the legacy journey" in {
-        mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(None)
+        when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(None))
 
         val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -223,7 +231,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
           Some(BusinessVerificationNotEnoughInformationToCallBV),
           Some(RegistrationNotCalled)
         )
-        mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+        when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
         val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -238,7 +246,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
           Some(BusinessVerificationNotEnoughInformationToCallBV),
           Some(RegistrationNotCalled)
         )
-        mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+        when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
         val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -254,7 +262,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationPass),
             Some(Registered(testSafeId))
           )
-          mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+          when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
           val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -269,7 +277,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationFail),
             Some(RegistrationNotCalled)
           )
-          mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+          when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
           val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -284,7 +292,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationNotEnoughInformationToChallenge),
             Some(RegistrationNotCalled)
           )
-          mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+          when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
           val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -299,7 +307,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             Some(BusinessVerificationPass),
             Some(RegistrationFailed(registrationFailures = Array(Failure("code1", "reason1"))))
           )
-          mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+          when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
           val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -314,7 +322,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
             None,
             Some(Registered(testSafeId))
           )
-          mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+          when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
           val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig(false)))
 
@@ -330,7 +338,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
           Some(BusinessVerificationPass),
           Some(Registered(testSafeId))
         )
-        mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(Some(testUADetails))
+        when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(Some(testUADetails)))
 
         val result = await(TestStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
 
@@ -342,20 +350,20 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
   "retrieveOverseasCompanyDetails" should {
     "return the correct json" when {
       "business verification check is set to true" in {
-        mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
-          Future.successful(
+        when(mockStorageConnector.retrieveOverseasDetails(testJourneyId))
+          .thenReturn(Future.successful(
             Some(OverseasCompanyDetails(Some(Sautr(testSautr)), Some(testOverseasTaxIdentifier), Some(testOverseasTaxIdentifierCountry)))
-          )
+          ))
 
         val result = await(TestStorageService.retrieveOverseasCompanyDetails(testJourneyId, testOverseasJourneyConfig()))
 
         result mustBe testOverseasSautrDataJson(Some(BusinessVerificationUnchallengedKey)) ++ testOverseasJson
       }
       "business verification check is set to false" in {
-        mockStorageConnector.retrieveOverseasDetails(testJourneyId) returns
-          Future.successful(
+        when(mockStorageConnector.retrieveOverseasDetails(testJourneyId))
+          .thenReturn(Future.successful(
             Some(OverseasCompanyDetails(Some(Sautr(testSautr)), Some(testOverseasTaxIdentifier), Some(testOverseasTaxIdentifierCountry)))
-          )
+          ))
 
         val result = await(TestStorageService.retrieveOverseasCompanyDetails(
           testJourneyId, testOverseasJourneyConfig(businessVerificationCheck = false)))
@@ -369,7 +377,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
     "return the correct json" when {
 
       "user is on the legacy journey" in {
-        mockStorageConnector.retrieveTrustsDetails(testJourneyId) returns Future.successful(None)
+        when(mockStorageConnector.retrieveTrustsDetails(testJourneyId)).thenReturn(Future.successful(None))
 
         val theActualException: InternalServerException  = intercept[InternalServerException] {
           await(TestStorageService.retrieveTrustsDetails(testJourneyId, testTrustJourneyConfig()))
@@ -385,7 +393,7 @@ class StorageServiceSpec extends AnyWordSpec with Matchers with MockStorageConne
     "return the correct json" when {
 
       "user is on the legacy journey" in {
-        mockStorageConnector.retrieveUADetails(testJourneyId) returns Future.successful(None)
+        when(mockStorageConnector.retrieveUADetails(testJourneyId)).thenReturn(Future.successful(None))
 
         val theActualException: InternalServerException = intercept[InternalServerException] {
           await(TestStorageService.retrieveUADetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))

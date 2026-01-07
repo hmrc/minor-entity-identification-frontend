@@ -21,10 +21,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.StorageConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.{SuccessfullyRemoved, SuccessfullyStored}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity.{OverseasCompany, Trusts, UnincorporatedAssociation}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessVerificationStatus.{format => bvFormat}
-import uk.gov.hmrc.minorentityidentificationfrontend.models.RegistrationStatus.{format => regFormat}
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
-import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService._
+import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageServiceHelper._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -137,7 +135,7 @@ class StorageService @Inject()(connector: StorageConnector) {
     connector.retrieveDataField[BusinessVerificationStatus](journeyId, VerificationStatusKey)
 }
 
-object StorageService {
+object StorageServiceHelper {
   val UtrKey = "utr"
   val OverseasTaxIdentifierKey: String = "overseasTaxIdentifier"
   val OverseasCountryKey: String = "country"

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.uaControllers
 
+import com.github.tomakehurst.wiremock.http.RequestMethod
 import play.api.libs.json.{JsString, Json}
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
@@ -25,7 +26,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingRe
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig, RegistrationNotCalled}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.CustomRequestVerifier.verifyAuditRequests
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit, verifyPost}
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersCommonViewTests
 import uk.gov.hmrc.minorentityidentificationfrontend.views.uaViews.UaCheckYourAnswersSpecificViewTests
 
@@ -298,8 +300,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
           verifyCreateBusinessVerificationJourney(expectedBvUAJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "UnincorporatedAssociationRegistration")
+          verifyPost("/write/audit/merged")
         }
 
         "identifiers are matched, calls BV and given BV returns NOT_FOUND, it redirects to the provided continueUrl. The journey is audited" in {
@@ -336,8 +338,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
           verifyCreateBusinessVerificationJourney(expectedBvUAJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "UnincorporatedAssociationRegistration")
+          verifyPost("/write/audit/merged")
         }
 
         "identifiers are not matched, does not call BV and it redirects to the cannot confirm business error page. The journey is audited" in {
@@ -373,46 +375,48 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsMismatchKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "UnincorporatedAssociationRegistration")
+          verifyPost("/write/audit/merged")
         }
 
-    "identifiers are matched but BV check is false, does not call BV (BV status None). Registration is called. The journey is audited" in {
+        "identifiers are matched but BV check is false, does not call BV (BV status None). Registration is called. The journey is audited" in {
 
-      enable(EnableFullUAJourney)
+          enable(EnableFullUAJourney)
 
-      await(insertJourneyConfig(
-        journeyId = testJourneyId,
-        internalId = testInternalId,
-        testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = false)
-      ))
+          await(insertJourneyConfig(
+            journeyId = testJourneyId,
+            internalId = testInternalId,
+            testUnincorporatedAssociationJourneyConfig(businessVerificationCheck = false)
+          ))
 
-      stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
-      stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
-      stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
+          stubAuth(OK, successfulAuthResponse(Some(testInternalId)))
+          stubRetrieveUtr(testJourneyId)(OK, testCtutrJson)
+          stubRetrievePostcode(testJourneyId)(OK, testOfficePostcode)
 
-      stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> true))
-      stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
+          stubValidateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode)(OK, Json.obj("matched" -> true))
+          stubStoreIdentifiersMatch(testJourneyId, SuccessfulMatchKey)(OK)
 
-      stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
-      stubRegisterUA(testCtutr, testRegime)(OK, testBackEndRegisteredJson(testSafeId))
-      stubStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson(testSafeId))(OK)
+          stubRetrieveBusinessVerificationStatus(testJourneyId)(NOT_FOUND)
+          stubRegisterUA(testCtutr, testRegime)(OK, testBackEndRegisteredJson(testSafeId))
+          stubStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson(testSafeId))(OK)
 
-      stubRetrieveEntityDetails(testJourneyId)(OK, testThisIsADummyJson)
+          stubRetrieveEntityDetails(testJourneyId)(OK, testThisIsADummyJson)
 
-      stubAudit()
+          stubAudit()
 
-      val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
+          val result = post(s"/identify-your-unincorporated-association/$testJourneyId/check-your-answers-business")()
 
-      result must have {
-        httpStatus(SEE_OTHER)
-        redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
-      }
+          result must have {
+            httpStatus(SEE_OTHER)
+            redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
+          }
 
-      verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
-      verifyStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson(testSafeId))
-      verifyRegisterUA(testRegisterUAJson(testCtutr, testRegime))
-      verifyAudit()
-    }
+          verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
+          verifyStoreRegistrationStatus(testJourneyId, testSuccessfulRegistrationJson(testSafeId))
+          verifyRegisterUA(testRegisterUAJson(testCtutr, testRegime))
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "UnincorporatedAssociationRegistration")
+          verifyPost("/write/audit/merged")
+        }
 
         "the unincorporated association's validate details cannot be found, " +
           "does not call BV and it redirects to the cannot confirm business error page. " +
@@ -451,7 +455,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsNotFoundKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "UnincorporatedAssociationRegistration")
+          verifyPost("/write/audit/merged")
         }
 
         "redirect to the full continue url" when {
@@ -488,7 +493,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
             verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
             verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
             verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-            verifyAudit()
+            verifyAuditRequests(RequestMethod.POST, "/write/audit", "UnincorporatedAssociationRegistration")
+            verifyPost("/write/audit/merged")
           }
         }
 

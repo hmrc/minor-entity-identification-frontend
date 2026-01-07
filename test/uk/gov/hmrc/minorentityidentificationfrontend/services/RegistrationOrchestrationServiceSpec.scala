@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
@@ -29,7 +31,21 @@ import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks.{MockAuditSe
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RegistrationOrchestrationServiceSpec extends AnyWordSpec with Matchers with MockRegistrationConnector with MockStorageService with MockAuditService {
+class RegistrationOrchestrationServiceSpec
+  extends AnyWordSpec
+    with Matchers
+    with MockRegistrationConnector
+    with MockStorageService
+    with MockAuditService
+    with BeforeAndAfterEach {
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+
+    reset(mockRegistrationConnector)
+    reset(mockAuditService)
+    reset(mockStorageService)
+  }
 
   object TestRegistrationOrchestrationService extends RegistrationOrchestrationService(mockStorageService, mockRegistrationConnector, mockAuditService)
 
@@ -38,45 +54,45 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec with Matchers wit
   "register trust" should {
     "return Registered" when {
       "the user has successfully passed BV check" in {
-        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
-        mockRegistrationConnector.registerTrust(testSautr, testRegime) returns Future.successful(Registered(testSafeId))
-        mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.retrieveBusinessVerificationStatus(testJourneyId)).thenReturn(Future.successful(Some(BusinessVerificationPass)))
+        when(mockRegistrationConnector.registerTrust(testSautr, testRegime)).thenReturn(Future.successful(Registered(testSafeId)))
+        when(mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId))).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig())).thenReturn(Future.successful(()))
 
         val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), testTrustJourneyConfig()))
 
         result mustBe Registered(testSafeId)
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
+        verify(mockAuditService).auditJourney(testJourneyId, testTrustJourneyConfig())
       }
       "the Business Verification Check is disabled" in {
-        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(None)
-        mockRegistrationConnector.registerTrust(testSautr, testRegime) returns Future.successful(Registered(testSafeId))
-        mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.retrieveBusinessVerificationStatus(testJourneyId)).thenReturn(Future.successful(None))
+        when(mockRegistrationConnector.registerTrust(testSautr, testRegime)).thenReturn(Future.successful(Registered(testSafeId)))
+        when(mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId))).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig(false)) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig(false))).thenReturn(Future.successful(()))
 
         val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), testTrustJourneyConfig(false)))
 
         result mustBe Registered(testSafeId)
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig(false)) was called
+        verify(mockAuditService).auditJourney(testJourneyId, testTrustJourneyConfig(false))
       }
     }
     "return RegistrationNotCalled" when {
       "the user did not pass BV checks" in {
-        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationFail))
-        mockRegistrationConnector.registerTrust(testSautr, testRegime) returns Future.successful(RegistrationNotCalled)
-        mockStorageService.storeRegistrationStatus(testJourneyId,RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.retrieveBusinessVerificationStatus(testJourneyId)).thenReturn(Future.successful(Some(BusinessVerificationFail)))
+        when(mockRegistrationConnector.registerTrust(testSautr, testRegime)).thenReturn(Future.successful(RegistrationNotCalled))
+        when(mockStorageService.storeRegistrationStatus(testJourneyId,RegistrationNotCalled)).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig())).thenReturn(Future.successful(()))
 
         val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), testTrustJourneyConfig()))
 
         result mustBe RegistrationNotCalled
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
+        verify(mockAuditService).auditJourney(testJourneyId, testTrustJourneyConfig())
       }
     }
   }
@@ -84,45 +100,45 @@ class RegistrationOrchestrationServiceSpec extends AnyWordSpec with Matchers wit
   "register Unincorporated association" should {
     "return Registered" when {
       "the user has successfully passed BV check" in {
-        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationPass))
-        mockRegistrationConnector.registerUA(testCtutr, testRegime) returns Future.successful(Registered(testSafeId))
-        mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.retrieveBusinessVerificationStatus(testJourneyId)).thenReturn(Future.successful(Some(BusinessVerificationPass)))
+        when(mockRegistrationConnector.registerUA(testCtutr, testRegime)).thenReturn(Future.successful(Registered(testSafeId)))
+        when(mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId))).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig())).thenReturn(Future.successful(()))
 
         val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testCtutr), testUAJourneyConfig()))
 
         result mustBe Registered(testSafeId)
 
-        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) was called
+        verify(mockAuditService).auditJourney(testJourneyId, testUAJourneyConfig())
       }
       "the Business Verification Check is disabled" in {
-        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(None)
-        mockRegistrationConnector.registerUA(testCtutr, testRegime) returns Future.successful(Registered(testSafeId))
-        mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId)) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.retrieveBusinessVerificationStatus(testJourneyId)).thenReturn(Future.successful(None))
+        when(mockRegistrationConnector.registerUA(testCtutr, testRegime)).thenReturn(Future.successful(Registered(testSafeId)))
+        when(mockStorageService.storeRegistrationStatus(testJourneyId, Registered(testSafeId))).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(journeyId = testJourneyId, journeyConfig = testUAJourneyConfig(false)) returns Future.successful(())
+        when(mockAuditService.auditJourney(journeyId = testJourneyId, journeyConfig = testUAJourneyConfig(false))).thenReturn(Future.successful(()))
 
         val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testCtutr), testUAJourneyConfig(false)))
 
         result mustBe Registered(testSafeId)
 
-        mockAuditService.auditJourney(journeyId = testJourneyId, journeyConfig = testUAJourneyConfig(false)) was called
+        verify(mockAuditService).auditJourney(journeyId = testJourneyId, journeyConfig = testUAJourneyConfig(false))
       }
     }
     "return RegistrationNotCalled" when {
       "the user did not pass BV checks" in {
-        mockStorageService.retrieveBusinessVerificationStatus(testJourneyId) returns Future.successful(Some(BusinessVerificationFail))
-        mockRegistrationConnector.registerUA(testCtutr, testRegime) returns Future.successful(RegistrationNotCalled)
-        mockStorageService.storeRegistrationStatus(testJourneyId,RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.retrieveBusinessVerificationStatus(testJourneyId)).thenReturn(Future.successful(Some(BusinessVerificationFail)))
+        when(mockRegistrationConnector.registerUA(testCtutr, testRegime)).thenReturn(Future.successful(RegistrationNotCalled))
+        when(mockStorageService.storeRegistrationStatus(testJourneyId,RegistrationNotCalled)).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig())).thenReturn(Future.successful(()))
 
         val result = await(TestRegistrationOrchestrationService.register(testJourneyId, Some(testCtutr), testUAJourneyConfig()))
 
         result mustBe RegistrationNotCalled
 
-        mockAuditService.auditJourney(testJourneyId, testUAJourneyConfig()) was called
+        verify(mockAuditService).auditJourney(testJourneyId, testUAJourneyConfig())
       }
     }
   }

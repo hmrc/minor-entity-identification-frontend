@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.connectors
 
 import play.api.http.Status.{CREATED, FORBIDDEN, NOT_FOUND}
 import play.api.libs.json.{JsObject, Json}
+import play.api.libs.ws.writeableOf_JsValue
 import play.api.mvc.Call
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, InternalServerException, StringContextOps}
@@ -57,9 +58,9 @@ class CreateBusinessVerificationJourneyConnector @Inject()(http: HttpClientV2,
           Json.obj(identifierJsonKey -> utr)
         )
       ) ++ optEntityTypeJson
-  http.post(url"${appConfig.createBusinessVerificationJourneyUrl}")
-    .withBody(Json.toJson(jsonBody)).execute[BusinessVerificationJourneyCreationResponse](BusinessVerificationHttpReads,
-    ec)
+    http.post(url"${appConfig.createBusinessVerificationJourneyUrl}")
+      .withBody(Json.toJson(jsonBody)).execute[BusinessVerificationJourneyCreationResponse](BusinessVerificationHttpReads,
+      ec)
 }
 
   private def jsonPartsBy(businessEntity: BusinessEntity, journeyId: String): (String, Call, JsObject) = businessEntity match {

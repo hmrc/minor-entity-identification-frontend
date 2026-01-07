@@ -51,7 +51,6 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
               journeyConfig =>
                 implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                 Ok(view(
-                  journeyId = journeyId,
                   pageConfig = journeyConfig.pageConfig,
                   formAction = routes.CaptureOfficePostcodeController.submit(journeyId),
                   form = UaCaptureOfficePostcodeForm.form
@@ -74,7 +73,6 @@ class CaptureOfficePostcodeController @Inject()(mcc: MessagesControllerComponent
                   journeyConfig =>
                     implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                     BadRequest(view(
-                      journeyId = journeyId,
                       pageConfig = journeyConfig.pageConfig,
                       formAction = routes.CaptureOfficePostcodeController.submit(journeyId),
                       form = formWithErrors

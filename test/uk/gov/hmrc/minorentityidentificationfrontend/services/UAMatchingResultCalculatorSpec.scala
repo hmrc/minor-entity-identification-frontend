@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -34,7 +36,15 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
   with Matchers
   with ScalaFutures
   with MockValidateUnincorporatedAssociationDetailsConnector
-  with MockStorageService {
+  with MockStorageService
+  with BeforeAndAfterEach {
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+
+    reset(mockValidateUnincorporatedAssociationDetailsConnector)
+    reset(mockStorageService)
+  }
 
   object TestUAMatchingResultCalculator extends
     UAMatchingResultCalculator(mockValidateUnincorporatedAssociationDetailsConnector, mockStorageService)
@@ -47,9 +57,9 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
 
       "the user's utr and postcode are matched by the connector" in {
 
-        mockValidateUnincorporatedAssociationDetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode).
-          returns(Future.successful(SuccessfulMatch))
-        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch).returns(Future.successful(SuccessfullyStored))
+        when(mockValidateUnincorporatedAssociationDetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode))
+          .thenReturn(Future.successful(SuccessfulMatch))
+        when(mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch)).thenReturn(Future.successful(SuccessfullyStored))
 
         val result = await(TestUAMatchingResultCalculator.matchKnownFacts(
           testJourneyId, Some(testCtutr), Some(testOfficePostcode))
@@ -57,7 +67,7 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
 
         result mustBe SuccessfulMatch
 
-        mockStorageService.storeIdentifiersMatch(testJourneyId, SuccessfulMatch) was called
+        verify(mockStorageService).storeIdentifiersMatch(testJourneyId, SuccessfulMatch)
       }
     }
 
@@ -65,9 +75,9 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
 
       "the user's utr and postcode are not matched by the connector" in {
 
-        mockValidateUnincorporatedAssociationDetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode).
-          returns(Future.successful(DetailsMismatch))
-        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch).returns(Future.successful(SuccessfullyStored))
+        when(mockValidateUnincorporatedAssociationDetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode))
+          .thenReturn(Future.successful(DetailsMismatch))
+        when(mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch)).thenReturn(Future.successful(SuccessfullyStored))
 
         val result = await(TestUAMatchingResultCalculator.matchKnownFacts(
           testJourneyId, Some(testCtutr), Some(testOfficePostcode))
@@ -75,7 +85,7 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
 
         result mustBe DetailsMismatch
 
-        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsMismatch) was called
+        verify(mockStorageService).storeIdentifiersMatch(testJourneyId, DetailsMismatch)
       }
 
     }
@@ -84,9 +94,9 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
 
       "the user's details cannot be found by the connector" in {
 
-        mockValidateUnincorporatedAssociationDetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode).
-          returns(Future.successful(DetailsNotFound))
-        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound).returns(Future.successful(SuccessfullyStored))
+        when(mockValidateUnincorporatedAssociationDetailsConnector.validateUnincorporatedAssociationDetails(testCtutr, testOfficePostcode))
+          .thenReturn(Future.successful(DetailsNotFound))
+        when(mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound)).thenReturn(Future.successful(SuccessfullyStored))
 
         val result = await(TestUAMatchingResultCalculator.matchKnownFacts(
           testJourneyId, Some(testCtutr), Some(testOfficePostcode))
@@ -94,7 +104,7 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
 
         result mustBe DetailsNotFound
 
-        mockStorageService.storeIdentifiersMatch(testJourneyId, DetailsNotFound) was called
+        verify(mockStorageService).storeIdentifiersMatch(testJourneyId, DetailsNotFound)
       }
 
     }
@@ -117,13 +127,13 @@ class UAMatchingResultCalculatorSpec extends AnyWordSpec
 
       "the unincorporated association does not have a CT Utr" in {
 
-        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable).returns(Future.successful(SuccessfullyStored))
+        when(mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable)).thenReturn(Future.successful(SuccessfullyStored))
 
         val result = await(TestUAMatchingResultCalculator.matchKnownFacts(testJourneyId, optCtUtr = None, optPostcode = None))
 
         result mustBe UnMatchable
 
-        mockStorageService.storeIdentifiersMatch(testJourneyId, UnMatchable) was called
+        verify(mockStorageService).storeIdentifiersMatch(testJourneyId, UnMatchable)
       }
     }
 

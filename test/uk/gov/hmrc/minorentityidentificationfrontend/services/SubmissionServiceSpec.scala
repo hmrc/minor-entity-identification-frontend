@@ -16,14 +16,16 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
+import org.mockito.Mockito.{never, reset, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants._
+import uk.gov.hmrc.minorentityidentificationfrontend.helpers.TestConstants.*
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser.SuccessfullyStored
-import uk.gov.hmrc.minorentityidentificationfrontend.models._
-import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks._
+import uk.gov.hmrc.minorentityidentificationfrontend.models.*
+import uk.gov.hmrc.minorentityidentificationfrontend.services.mocks.*
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,7 +36,18 @@ class SubmissionServiceSpec extends AnyWordSpec
   with MockBusinessVerificationService
   with MockAuditService
   with MockRegistrationOrchestrationService
-  with MockMatchingResultCalculator {
+  with MockMatchingResultCalculator
+  with BeforeAndAfterEach {
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+
+    reset(mockStorageService)
+    reset(mockBusinessVerificationService)
+    reset(mockAuditService)
+    reset(mockRegistrationOrchestrationService)
+    reset(mockMatchingResultCalculator)
+  }
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -48,17 +61,17 @@ class SubmissionServiceSpec extends AnyWordSpec
   "given businessVerificationCheck is true, submit" should {
     "create a BusinessVerificationJourney and return the businessVerificationUrl" when {
       "TrustKnownFacts is SuccessfulMatch and BV creates a businessVerificationUrl" in {
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(Some(Sautr(testSautr))))
+        when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-        mockMatchingResultCalculator.matchKnownFacts(
+        when(mockMatchingResultCalculator.matchKnownFacts(
           journeyId = testJourneyId,
           optUtr = Some(testSautr),
-          optPostcode = Some(testSaPostcode)) returns Future.successful(SuccessfulMatch)
+          optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(SuccessfulMatch))
 
-        mockBusinessVerificationService.createBusinessVerificationJourney(testJourneyId,
+        when(mockBusinessVerificationService.createBusinessVerificationJourney(testJourneyId,
           testSautr,
-          testTrustJourneyConfig()) returns Future.successful(Some(testBusinessVerificationRedirectUrl))
+          testTrustJourneyConfig())).thenReturn(Future.successful(Some(testBusinessVerificationRedirectUrl)))
 
         val result = await(
           TestSubmissionService.submit(journeyId = testJourneyId,
@@ -69,27 +82,27 @@ class SubmissionServiceSpec extends AnyWordSpec
 
         result mustBe testBusinessVerificationRedirectUrl
 
-        mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) wasNever called
+        verify(mockStorageService, never()).storeRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
       }
     }
     "create a BusinessVerificationJourney and return the full journey continue url" when {
       "TrustKnownFacts is SuccessfulMatch but BV somehow fails." in {
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(Some(Sautr(testSautr))))
+        when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-        mockMatchingResultCalculator.matchKnownFacts(
+        when(mockMatchingResultCalculator.matchKnownFacts(
           journeyId = testJourneyId,
           optUtr = Some(testSautr),
-          optPostcode = Some(testSaPostcode)) returns Future.successful(SuccessfulMatch)
+          optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(SuccessfulMatch))
 
-        mockBusinessVerificationService.createBusinessVerificationJourney(testJourneyId,
+        when(mockBusinessVerificationService.createBusinessVerificationJourney(testJourneyId,
           testSautr,
-          testTrustJourneyConfig()) returns Future.successful(None)
+          testTrustJourneyConfig())).thenReturn(Future.successful(None))
 
-        mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled)).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig())).thenReturn(Future.successful(()))
 
         val result = await(
           TestSubmissionService.submit(journeyId = testJourneyId,
@@ -100,24 +113,25 @@ class SubmissionServiceSpec extends AnyWordSpec
 
         result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
-        mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) was called
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
+        verify(mockStorageService).storeRegistrationStatus(testJourneyId, RegistrationNotCalled)
+        verify(mockAuditService).auditJourney(testJourneyId, testTrustJourneyConfig())
 
       }
       "TrustKnownFacts is UnMatchable" in {
 
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(Some(Sautr(testSautr))))
+        when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-        mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
+        when(mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
           optUtr = Some(testSautr),
-          optPostcode = Some(testSaPostcode)) returns Future.successful(UnMatchable)
+          optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(UnMatchable))
 
-        mockStorageService.storeBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.storeBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV))
+        .thenReturn(Future.successful(SuccessfullyStored))
 
-        mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled)).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig())).thenReturn(Future.successful(()))
 
         val result = await(
           TestSubmissionService.submit(journeyId = testJourneyId,
@@ -128,9 +142,9 @@ class SubmissionServiceSpec extends AnyWordSpec
 
         result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
-        mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
-        mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) was called
-        mockBusinessVerificationService wasNever called
+        verify(mockAuditService).auditJourney(testJourneyId, testTrustJourneyConfig())
+        verify(mockStorageService).storeRegistrationStatus(testJourneyId, RegistrationNotCalled)
+        verifyNoInteractions(mockBusinessVerificationService)
       }
     }
     "not create a BusinessVerificationJourney and return Cannot Confirm ErrorPage url" when {
@@ -138,18 +152,19 @@ class SubmissionServiceSpec extends AnyWordSpec
 
         List(DetailsNotFound, DetailsMismatch).foreach(knownFactsMatchFailure => {
 
-          mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-          mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+          when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(Some(Sautr(testSautr))))
+          when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-          mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
+          when(mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
             optUtr = Some(testSautr),
-            optPostcode = Some(testSaPostcode)) returns Future.successful(knownFactsMatchFailure)
+            optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(knownFactsMatchFailure))
 
-          mockStorageService.storeBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV) returns Future.successful(SuccessfullyStored)
+          when(mockStorageService.storeBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV))
+          .thenReturn(Future.successful(SuccessfullyStored))
 
-          mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+          when(mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled)).thenReturn(Future.successful(SuccessfullyStored))
 
-          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) returns Future.successful(())
+          when(mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig())).thenReturn(Future.successful(()))
 
           val result = await(
             TestSubmissionService.submit(journeyId = testJourneyId,
@@ -160,9 +175,16 @@ class SubmissionServiceSpec extends AnyWordSpec
 
           result mustBe testCannotConfirmErrorPageUrl
 
-          mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) was called
-          mockAuditService.auditJourney(testJourneyId, testTrustJourneyConfig()) was called
-          mockBusinessVerificationService wasNever called
+          verify(mockStorageService).retrieveUtr(testJourneyId)
+          verify(mockStorageService).retrievePostcode(testJourneyId)
+          verify(mockStorageService).storeBusinessVerificationStatus(testJourneyId, BusinessVerificationNotEnoughInformationToCallBV)
+          verify(mockStorageService).storeRegistrationStatus(testJourneyId, RegistrationNotCalled)
+
+          verifyNoMoreInteractions(mockStorageService)
+
+          verify(mockAuditService).auditJourney(testJourneyId, testTrustJourneyConfig())
+
+          verifyNoInteractions(mockBusinessVerificationService)
 
           reset(mockStorageService, mockBusinessVerificationService, mockAuditService)
         })
@@ -171,12 +193,12 @@ class SubmissionServiceSpec extends AnyWordSpec
     }
     "throw an exception" when {
       "SuccessfulMatch but SaUtr is not defined" in {
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(None)
-        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(None))
+        when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-        mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
+        when(mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
           optUtr = None,
-          optPostcode = Some(testSaPostcode)) returns Future.successful(SuccessfulMatch)
+          optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(SuccessfulMatch))
 
         val theActualException: IllegalStateException = intercept[IllegalStateException] {
           await(
@@ -196,14 +218,15 @@ class SubmissionServiceSpec extends AnyWordSpec
     val trustJourneyConfigWithoutBVCheck = testTrustJourneyConfig().copy(businessVerificationCheck = false)
     "not create a BusinessVerificationJourney, not store BusinessVerificationStatus and return the full journey continue url" when {
       "TrustKnownFacts is SuccessfulMatch" in {
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(Some(Sautr(testSautr))))
+        when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-        mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
+        when(mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
           optUtr = Some(testSautr),
-          optPostcode = Some(testSaPostcode)) returns Future.successful(SuccessfulMatch)
+          optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(SuccessfulMatch))
 
-        mockRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), trustJourneyConfigWithoutBVCheck) returns Future.successful(Registered(testSafeId))
+        when(mockRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), trustJourneyConfigWithoutBVCheck))
+          .thenReturn(Future.successful(Registered(testSafeId)))
 
         val result = await(
           TestSubmissionService.submit(journeyId = testJourneyId,
@@ -215,27 +238,28 @@ class SubmissionServiceSpec extends AnyWordSpec
 
         result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
-        mockStorageService.retrieveUtr(testJourneyId) was called
-        mockStorageService.retrievePostcode(testJourneyId) was called
+        verify(mockStorageService).retrieveUtr(testJourneyId)
+        verify(mockStorageService).retrievePostcode(testJourneyId)
 
-        mockRegistrationOrchestrationService.register(testJourneyId, Some(testSautr), trustJourneyConfigWithoutBVCheck) was called
+        verifyNoMoreInteractions(mockStorageService)
 
-        mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) wasNever called
+        verify(mockRegistrationOrchestrationService).register(testJourneyId, Some(testSautr), trustJourneyConfigWithoutBVCheck)
 
-        mockBusinessVerificationService wasNever called
-        mockStorageService wasNever calledAgain
+        verify(mockAuditService, never()).auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck)
+
+        verifyNoInteractions(mockBusinessVerificationService)
       }
       "TrustKnownFacts is UnMatchable" in {
-        mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-        mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+        when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(Some(Sautr(testSautr))))
+        when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-        mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
+        when(mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
           optUtr = Some(testSautr),
-          optPostcode = Some(testSaPostcode)) returns Future.successful(UnMatchable)
+          optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(UnMatchable))
 
-        mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+        when(mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled)).thenReturn(Future.successful(SuccessfullyStored))
 
-        mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) returns Future.successful(())
+        when(mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck)).thenReturn(Future.successful(()))
 
         val result = await(
           TestSubmissionService.submit(journeyId = testJourneyId,
@@ -247,30 +271,31 @@ class SubmissionServiceSpec extends AnyWordSpec
 
         result mustBe testTrustJourneyConfig().fullContinueUrl(testJourneyId)
 
-        mockStorageService.retrieveUtr(testJourneyId) was called
-        mockStorageService.retrievePostcode(testJourneyId) was called
-        mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) was called
+        verify(mockStorageService).retrieveUtr(testJourneyId)
+        verify(mockStorageService).retrievePostcode(testJourneyId)
+        verify(mockStorageService).storeRegistrationStatus(testJourneyId, RegistrationNotCalled)
 
-        mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) was called
+        verifyNoMoreInteractions(mockStorageService)
 
-        mockStorageService wasNever calledAgain
-        mockBusinessVerificationService wasNever called
+        verify(mockAuditService).auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck)
+        
+        verifyNoInteractions(mockBusinessVerificationService)
       }
     }
     "not create a BusinessVerificationJourney, not store BusinessVerificationStatus and return Cannot Confirm ErrorPage url" when {
       "TrustKnownFacts is one of DetailsNotFound, DetailsMismatch" in {
         List(DetailsNotFound, DetailsMismatch).foreach(knownFactsMatchFailure => {
 
-          mockStorageService.retrieveUtr(testJourneyId) returns Future.successful(Some(Sautr(testSautr)))
-          mockStorageService.retrievePostcode(testJourneyId) returns Future.successful(Some(testSaPostcode))
+          when(mockStorageService.retrieveUtr(testJourneyId)).thenReturn(Future.successful(Some(Sautr(testSautr))))
+          when(mockStorageService.retrievePostcode(testJourneyId)).thenReturn(Future.successful(Some(testSaPostcode)))
 
-          mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
+          when(mockMatchingResultCalculator.matchKnownFacts(journeyId = testJourneyId,
             optUtr = Some(testSautr),
-            optPostcode = Some(testSaPostcode)) returns Future.successful(knownFactsMatchFailure)
+            optPostcode = Some(testSaPostcode))).thenReturn(Future.successful(knownFactsMatchFailure))
 
-          mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) returns Future.successful(SuccessfullyStored)
+          when(mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled)).thenReturn(Future.successful(SuccessfullyStored))
 
-          mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) returns Future.successful(())
+          when(mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck)).thenReturn(Future.successful(()))
 
           val result = await(
             TestSubmissionService.submit(journeyId = testJourneyId,
@@ -281,14 +306,16 @@ class SubmissionServiceSpec extends AnyWordSpec
 
           result mustBe testCannotConfirmErrorPageUrl
 
-          mockStorageService.retrieveUtr(testJourneyId) was called
-          mockStorageService.retrievePostcode(testJourneyId) was called
-          mockStorageService.storeRegistrationStatus(testJourneyId, RegistrationNotCalled) was called
+          verify(mockStorageService).retrieveUtr(testJourneyId)
+          verify(mockStorageService).retrievePostcode(testJourneyId)
+          verify(mockStorageService).storeRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          
+          verifyNoMoreInteractions(mockStorageService)
 
-          mockStorageService wasNever calledAgain
-          mockBusinessVerificationService wasNever called
 
-          mockAuditService.auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck) was called
+          verifyNoInteractions(mockBusinessVerificationService)
+
+          verify(mockAuditService).auditJourney(testJourneyId, trustJourneyConfigWithoutBVCheck)
 
           reset(mockStorageService, mockMatchingResultCalculator, mockBusinessVerificationService, mockAuditService, mockStorageService)
         })

@@ -23,7 +23,7 @@ import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.StorageConnector
 import uk.gov.hmrc.minorentityidentificationfrontend.httpparsers.StorageHttpParser._
 import uk.gov.hmrc.minorentityidentificationfrontend.models._
-import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageService.utrStorageFormat
+import uk.gov.hmrc.minorentityidentificationfrontend.services.StorageServiceHelper.utrStorageFormat
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.StorageStub
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.ComponentSpecHelper
 
@@ -38,7 +38,7 @@ class StorageConnectorISpec extends ComponentSpecHelper with StorageStub {
   s"storeDataField($testJourneyId, $utrKey)" should {
     "return SuccessfullyStored" in {
       stubStoreUtr(testJourneyId, Sautr(testSautr))(status = OK)
-      val result = await(storageConnector.storeDataField[Utr](testJourneyId, utrKey, Sautr(testSautr)))
+      val result = await(storageConnector.storeDataField[Utr](testJourneyId, utrKey, Sautr(testSautr))(utrStorageFormat))
 
       result mustBe SuccessfullyStored
     }

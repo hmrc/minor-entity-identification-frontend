@@ -16,15 +16,17 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers
 
+import com.github.tomakehurst.wiremock.http.RequestMethod
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.JsObject
-import play.api.test.Helpers._
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.*
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.{BusinessVerificationStub, FeatureSwitching}
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{BusinessVerificationPass, JourneyConfig, Registered}
-import uk.gov.hmrc.minorentityidentificationfrontend.stubs._
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
+import uk.gov.hmrc.minorentityidentificationfrontend.stubs.*
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyPost}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.{AuditEnabledSpecHelper, WiremockHelper}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.CustomRequestVerifier.verifyAuditRequests
 
 trait AbstractBusinessVerificationControllerISpec
   extends AuditEnabledSpecHelper
@@ -46,7 +48,7 @@ trait AbstractBusinessVerificationControllerISpec
 
   val testJourneyDataJson: JsObject
 
-  def commonTest(): Unit = {
+  def commonTest(auditType: String): Unit = {
     s"the $BusinessVerificationStub feature switch is enabled" should {
       "redirect to the continue url" when {
         "the user has an sautr" in {
@@ -75,7 +77,10 @@ trait AbstractBusinessVerificationControllerISpec
 
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
-          verifyAudit()
+          
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", auditType)
+
+          verifyPost("/write/audit/merged")
         }
       }
       "throw an exception when the query string is missing" in {
@@ -122,7 +127,10 @@ trait AbstractBusinessVerificationControllerISpec
 
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
-          verifyAudit()
+
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", auditType)
+
+          verifyPost("/write/audit/merged")
         }
       }
 

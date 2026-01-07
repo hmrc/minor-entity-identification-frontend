@@ -51,8 +51,8 @@ object RegistrationStatus {
           registrationFailuresKey -> failures)
         case RegistrationNotCalled =>
           Json.obj(registrationStatusKey -> RegistrationNotCalledKey)
-        case _ =>
-          throw new InternalServerException("Invalid registration status")
+        case null =>
+          throw new InternalServerException("Undefined registration status")
       }
 
     override def reads(json: JsValue): JsResult[RegistrationStatus] =

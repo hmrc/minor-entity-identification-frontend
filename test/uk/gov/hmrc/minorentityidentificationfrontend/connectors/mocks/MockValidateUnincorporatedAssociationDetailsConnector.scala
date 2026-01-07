@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks
 
-import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
 import org.scalatest.Suite
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.ValidateUnincorporatedAssociationDetailsConnector
 
 trait MockValidateUnincorporatedAssociationDetailsConnector
-       extends IdiomaticMockito with ResetMocksAfterEachTest {
+       extends MockitoSugar {
 
   self: Suite =>
 

@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
-import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
 import org.scalatest.Suite
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.minorentityidentificationfrontend.services.RegistrationOrchestrationService
 
-trait MockRegistrationOrchestrationService extends IdiomaticMockito with ResetMocksAfterEachTest {
+trait MockRegistrationOrchestrationService extends MockitoSugar {
   self: Suite =>
 
   val mockRegistrationOrchestrationService: RegistrationOrchestrationService = mock[RegistrationOrchestrationService]

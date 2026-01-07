@@ -18,15 +18,15 @@ package uk.gov.hmrc.minorentityidentificationfrontend.services.mocks
 
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
-import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
 import org.scalatest.Suite
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.services.BusinessVerificationService
 
 import scala.concurrent.Future
 
-trait MockBusinessVerificationService extends IdiomaticMockito with ResetMocksAfterEachTest {
+trait MockBusinessVerificationService extends MockitoSugar {
   self: Suite =>
 
   val mockBusinessVerificationService: BusinessVerificationService = mock[BusinessVerificationService]

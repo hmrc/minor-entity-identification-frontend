@@ -16,18 +16,14 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks
 
-import org.mockito.scalatest.IdiomaticMockito
-import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.scalatest.Suite
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-trait MockAuditConnector extends IdiomaticMockito with BeforeAndAfterEach {
+trait MockAuditConnector extends MockitoSugar {
   self: Suite =>
 
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
 
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockAuditConnector)
-  }
 }
 

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, InjectedController}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, InjectedController}
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.services.FeatureSwitchService
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.config.FeatureSwitching
 import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.models.FeatureSwitchSetting
@@ -26,13 +26,16 @@ import uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.core.models.F
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class FeatureSwitchApiController @Inject()(featureSwitchService: FeatureSwitchService) extends InjectedController with FeatureSwitching {
+class FeatureSwitchApiController @Inject()(featureSwitchService: FeatureSwitchService, controllerComponents: ControllerComponents)
+  extends InjectedController with FeatureSwitching {
 
-  def getFeatureSwitches(journey: String): Action[AnyContent] = Action {
+  setControllerComponents(controllerComponents)
+
+  val getFeatureSwitches: Action[AnyContent] = Action {
     Ok(Json.toJson(featureSwitchService.getFeatureSwitches()))
   }
 
-  def updateFeatureSwitches(journey: String): Action[Seq[FeatureSwitchSetting]] = Action(parse.json[Seq[FeatureSwitchSetting]]) {
+  val updateFeatureSwitches: Action[Seq[FeatureSwitchSetting]] = Action(parse.json[Seq[FeatureSwitchSetting]]) {
     req =>
       val updatedFeatureSwitches = featureSwitchService.updateFeatureSwitches(req.body)
       Ok(Json.toJson(updatedFeatureSwitches))

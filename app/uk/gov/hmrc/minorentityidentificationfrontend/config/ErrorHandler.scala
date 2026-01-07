@@ -35,7 +35,7 @@ class ErrorHandler @Inject()(val messagesApi: MessagesApi,
                              view: error_template,
                              val config: Configuration,
                              val env: Environment
-                            )(implicit val appConfig: AppConfig, implicit val ec: ExecutionContext) extends FrontendErrorHandler with Logging  {
+                            )(implicit val appConfig: AppConfig, val ec: ExecutionContext) extends FrontendErrorHandler with Logging  {
 
   override def standardErrorTemplate(pageTitle: String,
                                      heading: String,

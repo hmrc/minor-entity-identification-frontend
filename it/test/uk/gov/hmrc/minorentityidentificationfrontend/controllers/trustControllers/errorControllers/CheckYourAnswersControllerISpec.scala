@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.trustControllers
 
+import com.github.tomakehurst.wiremock.http.RequestMethod
 import play.api.libs.json.JsString
 import play.api.libs.ws.WSResponse
 import play.api.test.Helpers._
@@ -25,7 +26,8 @@ import uk.gov.hmrc.minorentityidentificationfrontend.models.KnownFactsMatchingRe
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig, RegistrationNotCalled}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, BusinessVerificationStub, RetrieveTrustKnownFactsStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit, verifyPost}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.CustomRequestVerifier.verifyAuditRequests
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersCommonViewTests
 import uk.gov.hmrc.minorentityidentificationfrontend.views.trustViews.TrustCheckYourAnswersSpecificViewTests
 
@@ -329,8 +331,9 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))
           verifyCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
+          verifyPost("/write/audit/merged")
 
-          verifyAudit()
         }
       }
 
@@ -373,7 +376,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyCreateBusinessVerificationJourney(expectedBVTrustsJson)
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
+          verifyPost("/write/audit/merged")
         }
       }
       "identifier match is DetailsMismatch (for example all postcodes are different)" should {
@@ -414,7 +418,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsMismatchKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
+          verifyPost("/write/audit/merged")
         }
       }
 
@@ -453,7 +458,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString("DetailsNotFound"))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
+          verifyPost("/write/audit/merged")
         }
       }
       "identifier match is UnMatchable (No SaUtr)" should {
@@ -488,7 +494,8 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
-          verifyAudit()
+          verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
+          verifyPost("/write/audit/merged")
         }
       }
     }
