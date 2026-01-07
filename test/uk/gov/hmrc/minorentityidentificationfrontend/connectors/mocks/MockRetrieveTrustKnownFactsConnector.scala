@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks
 
-import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
 import org.scalatest.Suite
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.RetrieveTrustKnownFactsConnector
 
-trait MockRetrieveTrustKnownFactsConnector extends IdiomaticMockito with ResetMocksAfterEachTest {
+trait MockRetrieveTrustKnownFactsConnector extends MockitoSugar {
   self: Suite =>
 
   val mockRetrieveTrustKnownFactsConnector: RetrieveTrustKnownFactsConnector = mock[RetrieveTrustKnownFactsConnector]

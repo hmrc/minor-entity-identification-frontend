@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -37,7 +39,16 @@ class AuditServiceSpec
     with GuiceOneAppPerSuite
     with MockJourneyService
     with MockStorageService
-    with MockAuditConnector {
+    with MockAuditConnector
+    with BeforeAndAfterEach {
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+
+    reset(mockAuditConnector)
+    reset(mockJourneyService)
+    reset(mockStorageService)
+  }
 
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -48,40 +59,43 @@ class AuditServiceSpec
   "auditJourney" should {
     "send an event" when {
       "the entity is an OverseasCompany with an SA UTR" in {
-        mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
-        mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()) returns Future.successful(testOverseasSautrAuditDataJson)
+        when(mockJourneyService.getJourneyConfig(testJourneyId, testInternalId)).thenReturn(Future.successful(testJourneyConfig(OverseasCompany)))
+        when(mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
+          .thenReturn(Future.successful(testOverseasSautrAuditDataJson))
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
         result.mustBe(())
 
-        mockAuditConnector.sendExplicitAudit("OverseasCompanyRegistration", testOverseasSAUtrAuditEventJson) was called
+        verify(mockAuditConnector).sendExplicitAudit("OverseasCompanyRegistration", testOverseasSAUtrAuditEventJson)
       }
       "the entity is an OverseasCompany with an overseas tax identifier" in {
-        mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(OverseasCompany))
-        mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()) returns Future.successful(testOverseasTaxIdentifierDataJson)
+        when(mockJourneyService.getJourneyConfig(testJourneyId, testInternalId)).thenReturn(Future.successful(testJourneyConfig(OverseasCompany)))
+        when(mockStorageService.retrieveOverseasAuditDetails(testJourneyId, testOverseasJourneyConfig()))
+          .thenReturn(Future.successful(testOverseasTaxIdentifierDataJson))
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
         result.mustBe(())
 
-        mockAuditConnector.sendExplicitAudit("OverseasCompanyRegistration", testOverseasTaxIdentifierAuditEventJson) was called
+        verify(mockAuditConnector).sendExplicitAudit("OverseasCompanyRegistration", testOverseasTaxIdentifierAuditEventJson)
       }
 
       "the entity is a Unincorporated Association" in {
-        mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testUnincorporatedAssociationJourneyConfig())
-        mockStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()) returns Future.successful(testNoIdentifiersDataJson)
+        when(mockJourneyService.getJourneyConfig(testJourneyId, testInternalId)).thenReturn(Future.successful(testUnincorporatedAssociationJourneyConfig()))
+        when(mockStorageService.retrieveUAAuditDetails(testJourneyId, testUnincorporatedAssociationJourneyConfig()))
+          .thenReturn(Future.successful(testNoIdentifiersDataJson))
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
         result.mustBe(())
 
-        mockAuditConnector.sendExplicitAudit("UnincorporatedAssociationRegistration", testUnincorporatedAssociationAuditEventJson) was called
+        verify(mockAuditConnector).sendExplicitAudit("UnincorporatedAssociationRegistration", testUnincorporatedAssociationAuditEventJson)
       }
 
       "the entity is a Trust" in {
-        mockJourneyService.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(testJourneyConfig(Trusts))
-        mockStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig()) returns Future.successful(testTrustsDataJson)
+        when(mockJourneyService.getJourneyConfig(testJourneyId, testInternalId)).thenReturn(Future.successful(testJourneyConfig(Trusts)))
+        when(mockStorageService.retrieveTrustsAuditDetails(testJourneyId, testTrustJourneyConfig())).thenReturn(Future.successful(testTrustsDataJson))
 
         val result: Unit = await(TestAuditService.auditJourney(testJourneyId, testInternalId))
 
@@ -95,7 +109,7 @@ class AuditServiceSpec
           regStatus = "success"
         )
 
-        mockAuditConnector.sendExplicitAudit("TrustsRegistration", expectedAuditData) was called
+        verify(mockAuditConnector).sendExplicitAudit("TrustsRegistration", expectedAuditData)
       }
     }
   }

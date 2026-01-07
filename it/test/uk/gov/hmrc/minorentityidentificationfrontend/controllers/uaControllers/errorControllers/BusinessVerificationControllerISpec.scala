@@ -34,6 +34,6 @@ class BusinessVerificationControllerISpec extends AbstractBusinessVerificationCo
   override val testJourneyDataJson: JsObject = testUAJourneyDataJson
 
   s"GET /identify-your-unincorporated-association/<JourneyId>/business-verification-result" when {
-    commonTest()
+    commonTest("UnincorporatedAssociationRegistration")
   }
 }

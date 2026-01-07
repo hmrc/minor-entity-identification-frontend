@@ -33,9 +33,9 @@ GET        /identify-your-unincorporated-association/test-only/retrieve-journey 
 GET        /:journey/test-only/feature-switches                                                                                   uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.frontend.controllers.FeatureSwitchFrontendController.show(journey)
 POST       /:journey/test-only/feature-switches                                                                                   uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.frontend.controllers.FeatureSwitchFrontendController.submit(journey)
 
-GET        /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches(journey)
+GET        /minor-entity-identification/test-only/api/feature-switches                                                            uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.getFeatureSwitches
 + nocsrf
-POST       /:journey/test-only/api/feature-switches                                                                               uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches(journey)
+POST       /minor-entity-identification/test-only/api/feature-switches                                                            uk.gov.hmrc.minorentityidentificationfrontend.featureswitch.api.controllers.FeatureSwitchApiController.updateFeatureSwitches
 
 GET        /identify-your-trust/test-only/trusts/:sautr/refresh                                                                   uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers.TrustsKnownFactsVerificationStubController.stubTrustKnownFacts(sautr)
 

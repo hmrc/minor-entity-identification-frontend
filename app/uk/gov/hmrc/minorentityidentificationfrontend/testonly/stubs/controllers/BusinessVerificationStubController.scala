@@ -17,17 +17,19 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.testonly.stubs.controllers
 
 import play.api.libs.json.{JsSuccess, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, InjectedController}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, InjectedController}
 
 import java.util.UUID
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BusinessVerificationStubController extends InjectedController {
+class BusinessVerificationStubController @Inject()(controllerComponents: ControllerComponents)extends InjectedController {
 
   private val origin = "vat"
   private val businessVerificationJourneyId = UUID.randomUUID.toString
+
+  setControllerComponents(controllerComponents)
 
   def createBusinessVerificationJourney: Action[JsValue] = Action.async(parse.json) {
     implicit request =>

@@ -27,12 +27,11 @@
 @this(layout: govuk_template,
         govukButton: GovukButton,
         formWithCSRF: FormWithCSRF,
-        govukInput: GovukInput,
         govukErrorSummary: GovukErrorSummary,
         select: GovukSelect
 )
 
-@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_], countries: Seq[Country])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, formAction: Call, form: Form[_], countries: Seq[Country])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("tax-identifiers-country.title", form)) {
 
@@ -46,7 +45,7 @@
             id = "country",
             name = "country",
             label = HmrcPageHeadingLabel(content = Text(messages("tax-identifiers-country.title"))),
-            errorMessage = form("country").error.map(fe => ErrorMessage(content = HtmlContent(messages("error.no_entry_tax_identifier_country")))),
+            errorMessage = form("country").error.map(_ => ErrorMessage(content = HtmlContent(messages("error.no_entry_tax_identifier_country")))),
             items = Seq(SelectItem(value = Some(""), text = messages("country.select"))) ++ countries.map {
                 case Country(code, name) => SelectItem(
                     value = Some(code),

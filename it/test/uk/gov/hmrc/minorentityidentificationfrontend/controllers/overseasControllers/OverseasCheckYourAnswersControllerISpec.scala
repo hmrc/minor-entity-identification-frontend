@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.controllers.overseasControllers
 
+import com.github.tomakehurst.wiremock.http.RequestMethod
 import play.api.libs.ws.WSResponse
-import play.api.test.Helpers._
-import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.minorentityidentificationfrontend.assets.TestConstants.*
 import uk.gov.hmrc.minorentityidentificationfrontend.models.{JourneyLabels, PageConfig}
 import uk.gov.hmrc.minorentityidentificationfrontend.stubs.{AuthStub, StorageStub}
 import uk.gov.hmrc.minorentityidentificationfrontend.utils.AuditEnabledSpecHelper
-import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyAudit}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.WiremockHelper.{stubAudit, verifyPost}
+import uk.gov.hmrc.minorentityidentificationfrontend.utils.CustomRequestVerifier.verifyAuditRequests
 import uk.gov.hmrc.minorentityidentificationfrontend.views.CheckYourAnswersCommonViewTests
 import uk.gov.hmrc.minorentityidentificationfrontend.views.overseasViews.OverseasCheckYourAnswersSpecificViewTests
 
@@ -177,6 +179,7 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
   "POST /check-your-answers-business" should {
     "redirect to the provided continueUrl" in {
+
       await(insertJourneyConfig(
         journeyId = testJourneyId,
         internalId = testInternalId,
@@ -192,8 +195,10 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         httpStatus(SEE_OTHER)
         redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
       }
-      verifyAudit()
-      verifyRetrieveEntityDetails(testJourneyId)
+
+      verifyAuditRequests(RequestMethod.POST, "/write/audit", "OverseasCompanyRegistration")
+
+      verifyPost("/write/audit/merged")
     }
 
     "raise an internal server exception" when {

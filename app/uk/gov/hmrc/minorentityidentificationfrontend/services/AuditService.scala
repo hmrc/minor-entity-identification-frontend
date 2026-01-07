@@ -50,8 +50,8 @@ class AuditService @Inject()(appConfig: AppConfig,
       case OverseasCompany => auditOverseasCompanyJourney(journeyId, callingService, journeyConfig)
       case Trusts => auditTrustsJourney(journeyId, callingService, journeyConfig)
       case UnincorporatedAssociation => auditUnincorporatedAssociationJourney(journeyId, callingService, journeyConfig)
-      case _ =>
-        throw new InternalServerException(s"Unexpected business entity type encountered auditing minor entity journey for Journey ID $journeyId")
+      case null =>
+        throw new InternalServerException(s"Undefined business entity type encountered auditing minor entity journey for Journey ID $journeyId")
     }
   }
 

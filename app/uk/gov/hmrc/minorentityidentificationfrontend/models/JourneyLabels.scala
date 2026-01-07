@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.models
 
-import play.api.libs.functional.syntax.{unlift, _}
+import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, OFormat, OWrites, Reads}
 
 case class JourneyLabels(optWelshServiceName: Option[String], optEnglishServiceName: Option[String]){
@@ -38,7 +38,7 @@ object JourneyLabels {
   implicit val writes: OWrites[JourneyLabels] = (
     (JsPath \ welshLabelsKey \  optServiceNameKey).writeNullable[String] and
       (JsPath \ englishLabelsKey \  optServiceNameKey).writeNullable[String]
-    )(unlift(JourneyLabels.unapply))
+    )(journeyLabels => Tuple.fromProductTyped(journeyLabels))
 
   val format: OFormat[JourneyLabels] = OFormat(reads, writes)
 }

@@ -18,6 +18,7 @@ package uk.gov.hmrc.minorentityidentificationfrontend.testonly.connectors
 
 import play.api.http.Status.CREATED
 import play.api.libs.json.{JsObject, Json, Writes}
+import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController._
 import uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.{routes => apiRoutes}

@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.minorentityidentificationfrontend.services
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{reset, when}
 import org.mongodb.scala.result.InsertOneResult
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
@@ -33,7 +36,15 @@ class JourneyServiceSpec
   extends AnyWordSpec
     with Matchers
     with MockCreateJourneyConnector
-    with MockJourneyConfigRepository {
+    with MockJourneyConfigRepository
+    with BeforeAndAfterEach {
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+
+    reset(mockCreateJourneyConnector)
+    reset(mockJourneyConfigRepository)
+  }
 
   object TestJourneyService extends JourneyService(mockCreateJourneyConnector, mockJourneyConfigRepository)
 
@@ -41,12 +52,12 @@ class JourneyServiceSpec
 
   "createJourney" should {
     "return a journeyID and store the provided journey config" in {
-      mockCreateJourneyConnector.createJourney()(any[HeaderCarrier]) returns Future.successful(testJourneyId)
-      mockJourneyConfigRepository.insertJourneyConfig(
-        eqTo(testJourneyId),
-        eqTo(testInternalId),
-        eqTo(testJourneyConfig(OverseasCompany))
-      ) returns Future.successful(mock[InsertOneResult])
+      when(mockCreateJourneyConnector.createJourney()(any[HeaderCarrier])).thenReturn(Future.successful(testJourneyId))
+      when(mockJourneyConfigRepository.insertJourneyConfig(
+        testJourneyId,
+        testInternalId,
+        testJourneyConfig(OverseasCompany)
+      )).thenReturn(Future.successful(mock[InsertOneResult]))
 
       val result = await(TestJourneyService.createJourney(testJourneyConfig(OverseasCompany), testInternalId))
 
@@ -57,8 +68,8 @@ class JourneyServiceSpec
 
     "throw an exception" when {
       "create journey API returns an invalid response" in {
-        mockCreateJourneyConnector.createJourney()(any[HeaderCarrier]) returns
-          Future.failed(new InternalServerException("Invalid response returned from create journey API"))
+        when(mockCreateJourneyConnector.createJourney()(any[HeaderCarrier]))
+          .thenReturn(Future.failed(new InternalServerException("Invalid response returned from create journey API")))
 
         intercept[InternalServerException](
           await(TestJourneyService.createJourney(testJourneyConfig(OverseasCompany), testInternalId))
@@ -71,7 +82,8 @@ class JourneyServiceSpec
   "getJourneyConfig" should {
     "return the journey config for a specific journey id" when {
       "the journey id exists in the database" in {
-        mockJourneyConfigRepository.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(Some(testJourneyConfig(OverseasCompany)))
+        when(mockJourneyConfigRepository.getJourneyConfig(testJourneyId, testInternalId))
+        .thenReturn(Future.successful(Some(testJourneyConfig(OverseasCompany))))
 
         val result = await(TestJourneyService.getJourneyConfig(testJourneyId, testInternalId))
 
@@ -82,7 +94,8 @@ class JourneyServiceSpec
 
     "throw an Internal Server Exception" when {
       "the journey config does not exist in the database" in {
-        mockJourneyConfigRepository.getJourneyConfig(testJourneyId, testInternalId) returns Future.successful(None)
+        when(mockJourneyConfigRepository.getJourneyConfig(testJourneyId, testInternalId))
+        .thenReturn(Future.successful(None))
 
         intercept[InternalServerException](
           await(TestJourneyService.getJourneyConfig(testJourneyId, testInternalId))

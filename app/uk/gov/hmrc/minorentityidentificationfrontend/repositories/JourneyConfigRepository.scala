@@ -23,7 +23,7 @@ import play.api.libs.json._
 import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
 import uk.gov.hmrc.minorentityidentificationfrontend.models.BusinessEntity._
 import uk.gov.hmrc.minorentityidentificationfrontend.models.JourneyConfig
-import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepository._
+import uk.gov.hmrc.minorentityidentificationfrontend.repositories.JourneyConfigRepositoryHelper._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
@@ -62,7 +62,7 @@ class JourneyConfigRepository @Inject()(mongoComponent: MongoComponent,
 
 }
 
-object JourneyConfigRepository {
+object JourneyConfigRepositoryHelper {
   val JourneyIdKey = "_id"
   val AuthInternalIdKey = "authInternalId"
   val CreationTimestampKey = "creationTimestamp"
@@ -75,9 +75,9 @@ object JourneyConfigRepository {
       .expireAfter(timeToLiveDuration, TimeUnit.SECONDS)
   )
 
-  val OverseasCompanyKey = "OverseasCompany"
-  val TrustsKey = "Trusts"
-  val UnincorporatedAssociationKey = "UnincorporatedAssociation"
+  private val OverseasCompanyKey = "OverseasCompany"
+  private val TrustsKey = "Trusts"
+  private val UnincorporatedAssociationKey = "UnincorporatedAssociation"
 
   implicit val businessEntityMongoFormat: Format[BusinessEntity] = new Format[BusinessEntity] {
     override def reads(json: JsValue): JsResult[BusinessEntity] = json.validate[String].collect(JsonValidationError("Invalid entity type")) {

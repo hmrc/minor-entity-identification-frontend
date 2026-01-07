@@ -59,11 +59,19 @@ class RetrieveTrustKnownFactsConnectorISpec extends ComponentSpecHelper with Ret
         result mustBe None
       }
     }
-    "throw an Internal Server Exception" in {
-      disable(TrustVerificationStub)
-      stubRetrieveTrustKnownFacts(testSautr)(BAD_REQUEST)
+    "throw an Internal Server Exception" when {
+      "an unexpected status is returned" in {
+        disable(TrustVerificationStub)
+        stubRetrieveTrustKnownFacts(testSautr)(BAD_REQUEST)
 
-      intercept[InternalServerException](await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr)))
+        intercept[InternalServerException](await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr)))
+      }
+      "an invalid response body is returned" in {
+        disable(TrustVerificationStub)
+        stubRetrieveTrustKnownFacts(testSautr)(OK)
+
+        intercept[InternalServerException](await(retrieveTrustKnownFactsConnector.retrieveTrustKnownFacts(testSautr)))
+      }
     }
   }
 }

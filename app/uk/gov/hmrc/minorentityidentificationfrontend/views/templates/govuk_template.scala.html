@@ -16,8 +16,8 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.{Cy, En}
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcHeader, HmrcReportTechnicalIssue}
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTimeoutDialogHelper, HmrcTrackingConsentSnippet}
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcReportTechnicalIssue
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcTimeoutDialogHelper}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.reporttechnicalissue.ReportTechnicalIssue
 @import uk.gov.hmrc.minorentityidentificationfrontend.config.AppConfig
@@ -26,14 +26,11 @@
 @import views.html.helper.CSPNonce
 
 @this(hmrcStandardPage: HmrcStandardPage,
-    hmrcHeader: HmrcHeader,
-    appConfig: AppConfig,
-    hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
     standardBetaBanner: StandardBetaBanner,
     hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
     hmrcReportTechnicalIssue: HmrcReportTechnicalIssue)
 
-@(pageConfig: PageConfig, title: String, startUrl: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, title: String)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @head = {
     <link href='@controllers.routes.Assets.versioned("accessible-autocomplete-2.0.2.min.css")' media="screen" rel="stylesheet" type="text/css" />

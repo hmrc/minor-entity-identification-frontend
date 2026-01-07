@@ -17,17 +17,18 @@
 package uk.gov.hmrc.minorentityidentificationfrontend.connectors.mocks
 
 import org.mockito.ArgumentMatchers
-import org.mockito.scalatest.{IdiomaticMockito, ResetMocksAfterEachTest}
+import org.mockito.Mockito.verify
 import org.scalatest.Suite
+import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.minorentityidentificationfrontend.connectors.CreateJourneyConnector
 
-trait MockCreateJourneyConnector extends IdiomaticMockito with ResetMocksAfterEachTest {
+trait MockCreateJourneyConnector extends MockitoSugar {
   self: Suite =>
 
   val mockCreateJourneyConnector: CreateJourneyConnector = mock[CreateJourneyConnector]
 
   def verifyCreateJourney(): Unit =
-    mockCreateJourneyConnector.createJourney()(ArgumentMatchers.any[HeaderCarrier]) was called
+    verify(mockCreateJourneyConnector).createJourney()(ArgumentMatchers.any[HeaderCarrier])
 
 }

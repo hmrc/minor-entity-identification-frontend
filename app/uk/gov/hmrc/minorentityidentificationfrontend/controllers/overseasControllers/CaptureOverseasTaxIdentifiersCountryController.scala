@@ -49,7 +49,6 @@ class CaptureOverseasTaxIdentifiersCountryController @Inject()(mcc: MessagesCont
             journeyConfig =>
               implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
               Ok(view(
-                journeyId = journeyId,
                 pageConfig = journeyConfig.pageConfig,
                 formAction = overseasControllerRoutes.CaptureOverseasTaxIdentifiersCountryController.submit(journeyId),
                 form = OverseasCaptureTaxIdentifiersCountryForm.form,
@@ -72,7 +71,6 @@ class CaptureOverseasTaxIdentifiersCountryController @Inject()(mcc: MessagesCont
                 journeyConfig =>
                   implicit val messages: Messages = messagesHelper.getRemoteMessagesApi(journeyConfig).preferred(request)
                   BadRequest(view(
-                    journeyId = journeyId,
                     pageConfig = journeyConfig.pageConfig,
                     formAction = overseasControllerRoutes.CaptureOverseasTaxIdentifiersCountryController.submit(journeyId),
                     form = formWithErrors,

@@ -271,7 +271,4 @@ trait StorageStub extends WiremockMethods {
 
   def verifyRemoveOverseasTaxIdentifiersCountry(journeyId: String): Unit =
     WiremockHelper.verifyDelete(uri = s"/minor-entity-identification/journey/$journeyId/country")
-
-  def verifyRetrieveEntityDetails(journeyId: String, times: Int = 1): Unit =
-    WiremockHelper.verifyGet(times,s"/minor-entity-identification/journey/$journeyId")
 }

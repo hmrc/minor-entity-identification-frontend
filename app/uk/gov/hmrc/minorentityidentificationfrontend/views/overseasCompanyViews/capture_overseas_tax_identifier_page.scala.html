@@ -32,11 +32,10 @@
         govukInput: GovukInput,
         govukErrorSummary: GovukErrorSummary,
         p: p,
-        link: link,
         govukRadios: GovukRadios
 )
 
-@(journeyId: String, pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+@(pageConfig: PageConfig, formAction: Call, form: Form[_])(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @layout(pageConfig, title = title("tax-identifiers.title", form)) {
 
