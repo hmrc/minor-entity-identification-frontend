@@ -10,6 +10,3 @@ POST        /trusts-journey                                 uk.gov.hmrc.minorent
 POST        /unincorporated-association-journey             uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.createUnincorporatedAssociationJourney()
 
 GET        /journey/:journeyId                              uk.gov.hmrc.minorentityidentificationfrontend.api.controllers.JourneyController.retrieveJourneyData(journeyId: String)
-
-+ nocsrf
-POST       /report-to                                       uk.gov.hmrc.minorentityidentificationfrontend.controllers.CSPReportController.report
