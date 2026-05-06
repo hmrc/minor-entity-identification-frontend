@@ -288,6 +288,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
 
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
           verifyCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)
+          Thread.sleep(1000L)
           verifyAudit()
         }
       }
@@ -331,6 +332,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CHALLENGE"))
           verifyCreateBusinessVerificationJourney(expBody = expectedBVTrustsJson)
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          Thread.sleep(1000L)
           verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
           verifyPost("/write/audit/merged")
 
@@ -376,6 +378,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyCreateBusinessVerificationJourney(expectedBVTrustsJson)
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "FAIL"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          Thread.sleep(1000L)
           verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
           verifyPost("/write/audit/merged")
         }
@@ -418,6 +421,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(DetailsMismatchKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          Thread.sleep(1000L)
           verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
           verifyPost("/write/audit/merged")
         }
@@ -458,6 +462,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString("DetailsNotFound"))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          Thread.sleep(1000L)
           verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
           verifyPost("/write/audit/merged")
         }
@@ -494,6 +499,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(UnMatchableKey))
           verifyStoreBusinessVerificationStatus(testJourneyId, expBody = testVerificationStatusJson(verificationStatusValue = "NOT_ENOUGH_INFORMATION_TO_CALL_BV"))
           verifyStoreRegistrationStatus(testJourneyId, RegistrationNotCalled)
+          Thread.sleep(1000L)
           verifyAuditRequests(RequestMethod.POST, "/write/audit", "TrustsRegistration")
           verifyPost("/write/audit/merged")
         }

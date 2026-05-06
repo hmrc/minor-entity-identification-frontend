@@ -196,6 +196,7 @@ class OverseasCheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
         redirectUri(expectedValue = s"$testContinueUrl?journeyId=$testJourneyId")
       }
 
+      Thread.sleep(1000L)
       verifyAuditRequests(RequestMethod.POST, "/write/audit", "OverseasCompanyRegistration")
 
       verifyPost("/write/audit/merged")
