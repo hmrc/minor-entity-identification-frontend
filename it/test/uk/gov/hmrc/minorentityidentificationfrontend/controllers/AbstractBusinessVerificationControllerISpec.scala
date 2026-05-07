@@ -78,7 +78,6 @@ trait AbstractBusinessVerificationControllerISpec
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
 
-          Thread.sleep(1000L)
           verifyAuditRequests(RequestMethod.POST, "/write/audit", auditType)
 
           verifyPost("/write/audit/merged")
@@ -129,7 +128,6 @@ trait AbstractBusinessVerificationControllerISpec
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
 
-          Thread.sleep(1000L)
           verifyAuditRequests(RequestMethod.POST, "/write/audit", auditType)
 
           verifyPost("/write/audit/merged")
