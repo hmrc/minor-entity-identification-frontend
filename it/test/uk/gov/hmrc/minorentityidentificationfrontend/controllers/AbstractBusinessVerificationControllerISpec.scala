@@ -77,7 +77,7 @@ trait AbstractBusinessVerificationControllerISpec
 
           verifyStoreBusinessVerificationStatus(testJourneyId, BusinessVerificationPass)
           verifyStoreRegistrationStatus(testJourneyId, Registered(testSafeId))
-          
+
           verifyAuditRequests(RequestMethod.POST, "/write/audit", auditType)
 
           verifyPost("/write/audit/merged")

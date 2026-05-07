@@ -262,6 +262,7 @@ class CheckYourAnswersControllerISpec extends AuditEnabledSpecHelper
           verifyStoreIdentifiersMatch(testJourneyId, expBody = JsString(SuccessfulMatchKey))
           verifyCreateBusinessVerificationJourney(expectedBvUAJson)
 
+          Thread.sleep(1000L)
           verifyAudit()
         }
 
