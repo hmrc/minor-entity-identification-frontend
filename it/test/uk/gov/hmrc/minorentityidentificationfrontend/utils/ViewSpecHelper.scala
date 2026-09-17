@@ -56,7 +56,7 @@ object ViewSpecHelper {
 
     lazy val getSummaryListRows: Elements = element.getElementsByClass("govuk-summary-list__row")
 
-    lazy val getServiceName: Elements = element.getElementsByClass("govuk-header__service-name")
+    lazy val getServiceName: Elements = element.getElementsByClass("govuk-service-navigation__service-name")
 
     def getSpan(id: String): Elements = element.select(s"""span[id=$id]""")
 
@@ -77,6 +77,8 @@ object ViewSpecHelper {
     def getSummaryListChangeText: String = element.select("dd.govuk-summary-list__actions > a").text
 
     def getBanner: Elements = element.getElementsByClass("govuk-phase-banner__text")
+
+    lazy val getBetaBannerLink: String = element.select(".govuk-phase-banner__text a").attr("href")
 
     lazy val getSignOutLink: String = element.select(".hmrc-sign-out-nav__link").attr("href")
 

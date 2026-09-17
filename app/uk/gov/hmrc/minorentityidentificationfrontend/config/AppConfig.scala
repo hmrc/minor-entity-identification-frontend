@@ -52,10 +52,10 @@ class AppConfig @Inject()(config: Configuration,
 
   lazy val vatRegExitSurveyOrigin: String = "vat-registration"
   private lazy val feedbackUrl: String = servicesConfig.getString("feedback.host")
-  lazy val vatRegFeedbackUrl: String = s"$feedbackUrl/feedback/$vatRegExitSurveyOrigin"
+  lazy val vatRegFeedbackUrl: String = s"$feedbackUrl/feedback/$vatRegExitSurveyOrigin?useServiceNavigation"
   lazy val basGatewayUrl: String = s"${servicesConfig.baseUrl("bas-gateway-frontend")}"
 
-  def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier"
+  def betaFeedbackUrl(serviceIdentifier: String): String = s"$contactHost/contact/beta-feedback?service=$serviceIdentifier&useServiceNavigation"
 
   private lazy val businessVerificationUrl = servicesConfig.getString("microservice.services.business-verification.url")
 
@@ -74,7 +74,7 @@ class AppConfig @Inject()(config: Configuration,
   }
 
   lazy val accessibilityStatementPath: String = servicesConfig.getString("accessibility-statement.host")
-  lazy val vatRegAccessibilityStatementUrl: String = s"$accessibilityStatementPath/accessibility-statement/vat-registration"
+  lazy val vatRegAccessibilityStatementUrl: String = s"$accessibilityStatementPath/accessibility-statement/vat-registration?useServiceNavigation"
 
   def minorEntityIdentificationUrl(journeyId: String): String = s"$backendUrl/minor-entity-identification/journey/$journeyId"
 
