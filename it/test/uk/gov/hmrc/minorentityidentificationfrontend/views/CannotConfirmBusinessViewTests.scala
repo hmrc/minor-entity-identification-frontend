@@ -43,7 +43,7 @@ trait CannotConfirmBusinessViewTests {
 
     "have the correct beta banner" in {
       doc.getBanner.text mustBe BetaBanner.title
-      doc.getElementsByClass("govuk-link").get(1).attr("href") mustBe config.betaFeedbackUrl("vrs")
+      doc.getBetaBannerLink mustBe config.betaFeedbackUrl("vrs")
     }
 
     "have the correct title" in {
